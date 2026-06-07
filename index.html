@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Pomocníci – Mira</title>
+<meta name="theme-color" content="#7c6cf2" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-1: #fef3f7;
+    --bg-2: #eef2ff;
+    --bg-3: #ecfeff;
+    --card: #ffffff;
+    --ink: #2b2b3f;
+    --muted: #6c6e89;
+    --line: #e7e9f4;
+
+    --primary: #7c6cf2;       /* lavender */
+    --accent:  #ff7aa8;       /* pink     */
+    --green:   #4cc38a;
+    --orange:  #ffb86b;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Quicksand', system-ui, -apple-system, sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(ellipse at 10% 0%, var(--bg-1) 0%, transparent 55%),
+      radial-gradient(ellipse at 95% 10%, var(--bg-3) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 100%, var(--bg-2) 0%, transparent 60%),
+      #fafbff;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 18px 60px;
+  }
+
+  .wrap { max-width: 980px; width: 100%; }
+
+  header.hero { text-align: center; margin-bottom: 32px; }
+  header.hero h1 {
+    margin: 0;
+    font-weight: 700;
+    font-size: clamp(34px, 5vw, 50px);
+    letter-spacing: -0.5px;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  header.hero p {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 17px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  @media (max-width: 820px) { .grid { grid-template-columns: 1fr; } }
+
+  .tile {
+    display: block;
+    background: var(--card);
+    border-radius: 22px;
+    box-shadow: 0 6px 24px rgba(60, 50, 120, 0.08);
+    border: 1px solid var(--line);
+    padding: 26px 22px 22px;
+    text-decoration: none;
+    color: inherit;
+    text-align: center;
+    transition: transform .15s, box-shadow .15s, border-color .15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .tile::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 60%, var(--accent-bg) 100%);
+    opacity: 0;
+    transition: opacity .15s;
+    pointer-events: none;
+  }
+  .tile:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(60, 50, 120, 0.18);
+    border-color: var(--primary);
+  }
+  .tile:hover::before { opacity: 1; }
+
+  .tile .emoji {
+    font-size: 56px;
+    line-height: 1;
+    margin-bottom: 12px;
+    display: inline-block;
+    animation: bob 2.6s ease-in-out infinite;
+  }
+  .tile.t-100 .emoji { animation-delay: .4s; }
+  .tile.t-verb .emoji { animation-delay: .8s; }
+  @keyframes bob {
+    0%, 100% { transform: translateY(0) rotate(-3deg); }
+    50%      { transform: translateY(-5px) rotate(3deg); }
+  }
+
+  .tile h2 {
+    margin: 0 0 4px;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .tile .sub {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 14px;
+    min-height: 38px;
+  }
+  .tile .badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: #fff;
+  }
+  .tile.t-20  .badge { background: linear-gradient(135deg, #5b8def, #7c6cf2); }
+  .tile.t-100 .badge { background: linear-gradient(135deg, #4cc38a, #5bb6e0); }
+  .tile.t-verb .badge { background: linear-gradient(135deg, var(--primary), var(--accent)); }
+
+  .tile .range {
+    display: inline-block;
+    background: #fafbff;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    border-radius: 8px;
+    padding: 2px 8px;
+    font-size: 12px;
+    margin-top: 10px;
+    font-weight: 600;
+  }
+
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 32px;
+  }
+  footer .heart { color: var(--accent); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <h1>🌈 Pomocníci</h1>
+      <p>Vyber si, čo chceš dnes precvičovať.</p>
+    </header>
+
+    <div class="grid">
+
+      <a class="tile t-20" href="math_helper.html">
+        <span class="emoji">🔢</span>
+        <h2>Sčítanie a odčítanie</h2>
+        <div class="sub">Bodky, číselná os, desaťpole, korálky a číselné dvojice.</div>
+        <span class="badge">Matematika</span>
+        <div class="range">do 20</div>
+      </a>
+
+      <a class="tile t-100" href="math_helper_100.html">
+        <span class="emoji">💯</span>
+        <h2>Sčítanie a odčítanie</h2>
+        <div class="sub">Premostenie cez 10, desiatky a jednotky, stočtverček, číselná os.</div>
+        <span class="badge">Matematika</span>
+        <div class="range">do 100</div>
+      </a>
+
+      <a class="tile t-verb" href="verb_helper.html">
+        <span class="emoji">🇬🇧</span>
+        <h2>Slovesník</h2>
+        <div class="sub">Anglické slovesá — preklad, časovanie a precvičovanie.</div>
+        <span class="badge">Angličtina</span>
+        <div class="range">slovesá</div>
+      </a>
+
+    </div>
+
+    <footer>
+      Spravil ocko s láskou <span class="heart">❤️</span>
+    </footer>
+  </div>
+</body>
+</html>

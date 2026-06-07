@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pomocník s matematikou 🎉</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Comic Sans MS', 'Chalkboard SE', cursive;
+    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+
+  h1 {
+    font-size: 2.2rem;
+    color: #fff;
+    text-shadow: 2px 2px 0 #e06c00;
+    margin-bottom: 10px;
+  }
+
+  .score-bar {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  .score-box {
+    background: white;
+    border-radius: 16px;
+    padding: 8px 20px;
+    font-size: 1.1rem;
+    color: #555;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .score-box span { font-weight: bold; color: #e06c00; }
+
+  .card {
+    background: white;
+    border-radius: 24px;
+    padding: 30px 40px;
+    width: 100%;
+    max-width: 700px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    margin-bottom: 20px;
+  }
+
+  /* ---- Problem display ---- */
+  .problem {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    font-size: 3.5rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  .problem .num1 { color: #4a90d9; }
+  .problem .op   { color: #e06c00; }
+  .problem .num2 { color: #e0497a; }
+  .problem .eq   { color: #888; }
+
+  #answer-input {
+    width: 90px;
+    font-size: 3rem;
+    font-family: inherit;
+    text-align: center;
+    border: 4px solid #ddd;
+    border-radius: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  #answer-input:focus { border-color: #4a90d9; }
+  #answer-input.correct { border-color: #4caf50; background: #f0fff4; }
+  #answer-input.wrong   { border-color: #f44336; background: #fff0f0; }
+
+  /* ---- Dot visualizer ---- */
+  .section-title {
+    font-size: 1.1rem;
+    color: #888;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+
+  .dots-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .dot-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    min-height: 44px;
+  }
+  .dot {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    transition: all 0.3s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  }
+  .dot.blue   { background: #4a90d9; color: white; }
+  .dot.pink   { background: #e0497a; color: white; }
+  .dot.gone   { opacity: 0.15; background: #ddd; color: #bbb; }
+  .dot.result { background: #4caf50; color: white; animation: pop 0.4s ease; }
+
+  @keyframes pop {
+    0%   { transform: scale(0); }
+    60%  { transform: scale(1.25); }
+    100% { transform: scale(1); }
+  }
+
+  .op-label {
+    font-size: 2rem;
+    color: #e06c00;
+    font-weight: bold;
+  }
+
+  /* ---- Number line ---- */
+  .numberline-wrap {
+    overflow-x: auto;
+    padding: 10px 0;
+  }
+  .numberline {
+    position: relative;
+    height: 80px;
+    min-width: 460px;
+    display: flex;
+    align-items: flex-end;
+    padding-bottom: 10px;
+  }
+  .nl-line {
+    position: absolute;
+    bottom: 28px;
+    left: 10px;
+    right: 10px;
+    height: 4px;
+    background: #bbb;
+    border-radius: 2px;
+  }
+  .nl-tick {
+    position: absolute;
+    bottom: 22px;
+    width: 2px;
+    height: 14px;
+    background: #888;
+    transform: translateX(-50%);
+  }
+  .nl-label {
+    position: absolute;
+    bottom: 4px;
+    font-size: 0.8rem;
+    color: #555;
+    transform: translateX(-50%);
+  }
+  .nl-marker {
+    position: absolute;
+    bottom: 38px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: bold;
+    color: white;
+    transition: left 0.5s ease;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+  .nl-marker.start  { background: #4a90d9; }
+  .nl-marker.jump   { background: #e0497a; }
+  .nl-marker.result { background: #4caf50; bottom: 54px; }
+  .nl-arc {
+    position: absolute;
+    bottom: 48px;
+    border-top: 3px dashed;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  /* ---- Buttons ---- */
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+  button {
+    font-family: inherit;
+    font-size: 1.1rem;
+    padding: 12px 28px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  }
+  button:active { transform: scale(0.95); box-shadow: 0 2px 5px rgba(0,0,0,0.15); }
+
+  #btn-check  { background: #4a90d9; color: white; }
+  #btn-hint   { background: #f9a825; color: white; }
+  #btn-next   { background: #4caf50; color: white; }
+  #btn-add    { background: #4a90d9; color: white; }
+  #btn-sub    { background: #e0497a; color: white; }
+  #btn-finish { background: #9e9e9e; color: white; }
+  button small { opacity: 0.7; font-size: 0.72em; margin-left: 4px; }
+
+  /* Session summary overlay */
+  #summary-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45); z-index: 100;
+    align-items: center; justify-content: center;
+  }
+  #summary-overlay.visible { display: flex; }
+  #summary-box {
+    background: white; border-radius: 24px; padding: 40px 48px;
+    max-width: 440px; width: 90%; text-align: center;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.25); animation: popIn 0.35s ease;
+  }
+  #summary-box h2 { font-size: 1.8rem; color: #e06c00; margin-bottom: 20px; }
+  .sum-row { display: flex; justify-content: space-between; font-size: 1.15rem; color: #555; padding: 6px 0; border-bottom: 1px solid #f0f0f0; }
+  .sum-row:last-of-type { border-bottom: none; }
+  .sum-row span { font-weight: bold; color: #e06c00; }
+  #summary-box .sum-grade { font-size: 2.8rem; margin: 18px 0 6px; }
+  #summary-box .sum-msg   { font-size: 1rem; color: #888; margin-bottom: 24px; }
+  #btn-restart { background: #4a90d9; color: white; font-size: 1.1rem; padding: 12px 32px; border: none; border-radius: 50px; cursor: pointer; font-family: inherit; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+
+  .mode-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+  .mode-btn {
+    padding: 8px 22px;
+    border-radius: 50px;
+    border: 3px solid transparent;
+    font-size: 1rem;
+    cursor: pointer;
+    font-family: inherit;
+    background: #f5f5f5;
+    color: #555;
+    transition: all 0.2s;
+  }
+  .mode-btn.active { border-color: #e06c00; background: #fff3e0; color: #e06c00; font-weight: bold; }
+
+  .feedback {
+    text-align: center;
+    font-size: 1.4rem;
+    min-height: 2rem;
+    margin-top: 10px;
+    transition: all 0.3s;
+  }
+  .feedback.ok  { color: #4caf50; }
+  .feedback.err { color: #f44336; }
+
+  /* ---- Step counter ---- */
+  .step-bar {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .step-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #ddd;
+    transition: background 0.3s;
+  }
+  .step-dot.done { background: #4caf50; }
+
+  /* ---- Ten-frame ---- */
+  .tenframe-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .tenframe-label {
+    font-size: 0.95rem;
+    color: #888;
+    font-style: italic;
+  }
+  .tenframe-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .tenframe {
+    display: grid;
+    grid-template-columns: repeat(5, 34px);
+    grid-template-rows: repeat(2, 34px);
+    gap: 4px;
+    background: #e0e0e0;
+    border: 3px solid #aaa;
+    border-radius: 8px;
+    padding: 5px;
+  }
+  .tf-cell {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 2px dashed #ccc;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    transition: background 0.3s, border 0.3s;
+  }
+  .tf-cell.filled-blue { background: #4a90d9; border: 2px solid #2c6fad; color: white; }
+  .tf-cell.filled-pink { background: #e0497a; border: 2px solid #b02d58; color: white; }
+  .tf-cell.filled-green { background: #4caf50; border: 2px solid #357a38; color: white; animation: pop 0.4s ease; }
+
+  /* ---- Bridge through 10 ---- */
+  .bridge-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .bridge-step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .bridge-step-label {
+    font-size: 0.82rem;
+    color: #aaa;
+    font-style: italic;
+    text-align: center;
+    margin-bottom: 2px;
+  }
+  .bridge-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: white;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  }
+  .bridge-10 {
+    background: #e06c00;
+    color: white;
+    padding: 6px 18px;
+    border-radius: 20px;
+    font-size: 1.4rem;
+    font-weight: bold;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  }
+  .bridge-op {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #e06c00;
+  }
+  .bridge-eq {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #888;
+  }
+  .bridge-arrow {
+    font-size: 1.8rem;
+    color: #ccc;
+    line-height: 1;
+  }
+  .bridge-note {
+    font-size: 0.82rem;
+    color: #aaa;
+    font-style: italic;
+  }
+
+  /* ---- Bead string ---- */
+  .beads-wrap {
+    padding: 8px 0 4px;
+    width: 100%;
+  }
+  .beads-svg { display: block; width: 100%; }
+
+  /* ---- Three-column layout ---- */
+  .page-columns {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    width: 100%;
+    max-width: 1500px;
+  }
+  .col-left, .col-mid, .col-right {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  .col-left .card,  .col-left .score-bar,
+  .col-mid  .card,
+  .col-right .bonds-section { width: 100%; }
+  @media (max-width: 1000px) {
+    .page-columns { flex-wrap: wrap; }
+    .col-left, .col-mid { flex: 1 1 45%; }
+    .col-right { flex: 1 1 100%; }
+  }
+  @media (max-width: 600px) {
+    .col-left, .col-mid, .col-right { flex: 1 1 100%; }
+  }
+
+  /* ---- Bond modal ---- */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: white;
+    border-radius: 28px;
+    padding: 32px 40px;
+    box-shadow: 0 16px 60px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    max-width: 95vw;
+    position: relative;
+    animation: popIn 0.25s ease;
+  }
+  @keyframes popIn {
+    from { transform: scale(0.7); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+  }
+  .modal-close {
+    position: absolute;
+    top: 14px; right: 18px;
+    font-size: 1.6rem;
+    cursor: pointer;
+    color: #aaa;
+    line-height: 1;
+    background: none;
+    border: none;
+    padding: 0;
+    box-shadow: none;
+  }
+  .modal-close:hover { color: #555; }
+  .modal-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #e06c00;
+  }
+  .modal-pairs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 20px;
+    font-size: 1.1rem;
+    font-weight: bold;
+  }
+  .modal-pair-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .bond-card { cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; }
+  .bond-card:hover { transform: scale(1.04); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+
+  /* ---- Number bonds section ---- */
+  .bonds-section {
+    width: 100%;
+    max-width: 900px;
+    margin-bottom: 30px;
+  }
+  .bonds-section h2 {
+    text-align: center;
+    color: #fff;
+    text-shadow: 2px 2px 0 #e06c00;
+    font-size: 1.6rem;
+    margin-bottom: 16px;
+  }
+  .bonds-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    justify-items: center;
+  }
+  .bond-card {
+    background: white;
+    border-radius: 20px;
+    padding: 14px 16px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.13);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    min-width: 205px;
+  }
+  .bond-total {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #e06c00;
+    line-height: 1;
+  }
+  .bond-pairs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px 10px;
+    width: 100%;
+  }
+  .bond-pairs.single-col {
+    grid-template-columns: 1fr;
+  }
+  .bond-pair {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .bond-pie {
+    display: block;
+    flex-shrink: 0;
+  }
+  .bond-equation {
+    font-size: 0.85rem;
+    color: #555;
+    white-space: nowrap;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+
+<h1>🌟 Pomocník s matematikou 🌟</h1>
+
+<div class="score-bar">
+  <div class="score-box">✅ Správne: <span id="score-ok">0</span></div>
+  <div class="score-box">❌ Pokusy: <span id="score-tries">0</span></div>
+</div>
+
+<div class="card">
+  <div class="mode-row">
+    <button class="mode-btn active" id="mode-add" onclick="setMode('add')">➕ Sčítanie</button>
+    <button class="mode-btn" id="mode-sub" onclick="setMode('sub')">➖ Odčítanie</button>
+    <button class="mode-btn" id="mode-mix" onclick="setMode('mix')">🎲 Mix</button>
+  </div>
+  <div class="problem">
+    <span class="num1" id="p-num1">7</span>
+    <span class="op"   id="p-op">+</span>
+    <span class="num2" id="p-num2">5</span>
+    <span class="eq">=</span>
+    <input type="number" id="answer-input" min="0" max="20" placeholder="?" autocomplete="off">
+  </div>
+  <div class="feedback" id="feedback"></div>
+  <div class="btn-row">
+    <button id="btn-check" onclick="checkAnswer()">Skontrolovať ✔ <small>Enter</small></button>
+    <button id="btn-hint"  onclick="showHint()">Nápoveda 💡 <small>H</small></button>
+    <button id="btn-next"  onclick="nextProblem()">Ďalší ➡ <small>N</small></button>
+    <button id="btn-finish" onclick="finishSession()">Koniec 🏁 <small>F</small></button>
+  </div>
+</div>
+
+<div id="bridge-card" class="card" style="display:none">
+  <div class="section-title">🌉 Premostenie cez 10</div>
+  <div class="bridge-area" id="bridge-area"></div>
+</div>
+
+<div class="card" id="vis-card">
+  <div class="section-title">👀 Zobraz bodkami</div>
+  <div class="dots-area" id="dots-area"></div>
+</div>
+
+<div class="card">
+  <div class="section-title">🔢 Skok na číselnej osi</div>
+  <div class="numberline-wrap">
+    <div class="numberline" id="numberline"></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="section-title">📦 Desaťpole — najprv naplň desiatku!</div>
+  <div class="tenframe-area" id="tenframe-area"></div>
+</div>
+
+<div class="card">
+  <div class="section-title">📿 Korálkový prút — spočítaj korálky!</div>
+  <div class="beads-wrap">
+    <svg class="beads-svg" id="beads-svg" viewBox="0 0 660 90" preserveAspectRatio="xMidYMid meet"></svg>
+  </div>
+</div>
+
+<div class="bonds-section">
+  <h2>🍕 Číselné dvojice</h2>
+  <div class="bonds-grid" id="bonds-grid"></div>
+</div>
+
+<div class="modal-overlay" id="bond-modal" onclick="closeBondModal(event)">
+  <div class="modal-box" id="bond-modal-box">
+    <button class="modal-close" onclick="closeBondModal()">✕</button>
+    <div class="modal-title" id="modal-title"></div>
+    <div id="modal-pie"></div>
+    <div class="modal-pairs" id="modal-pairs"></div>
+  </div>
+</div>
+
+<div id="summary-overlay">
+  <div id="summary-box">
+    <h2>Koniec relácie! 🏁</h2>
+    <div class="sum-row">Riešených príkladov <span id="sum-tries">0</span></div>
+    <div class="sum-row">Správnych odpovedí <span id="sum-ok">0</span></div>
+    <div class="sum-row">Chybných pokusov <span id="sum-wrong">0</span></div>
+    <div class="sum-row">Úspešnosť <span id="sum-pct">—</span></div>
+    <div class="sum-grade" id="sum-grade"></div>
+    <div class="sum-msg"  id="sum-msg"></div>
+    <button id="btn-restart" onclick="restartSession()">Hrať znova ▶</button>
+  </div>
+</div>
+
+<script>
+  let mode = 'add';
+  let num1, num2, op, correctAnswer;
+  let scoreOk = 0, scoreTries = 0;
+  let hintShown = false;
+  let answered = false;
+
+  function setMode(m) {
+    mode = m;
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('mode-' + m).classList.add('active');
+    nextProblem();
+  }
+
+  function generate() {
+    const useAdd = mode === 'add' || (mode === 'mix' && Math.random() < 0.5);
+    op = useAdd ? '+' : '-';
+
+    if (op === '+') {
+      num1 = Math.floor(Math.random() * 11);        // 0-10
+      num2 = Math.floor(Math.random() * (20 - num1 + 1));
+      num2 = Math.min(num2, 20 - num1);
+    } else {
+      num1 = Math.floor(Math.random() * 11) + 5;    // 5-15
+      num2 = Math.floor(Math.random() * (num1 + 1));
+    }
+    correctAnswer = op === '+' ? num1 + num2 : num1 - num2;
+  }
+
+  function render() {
+    document.getElementById('p-num1').textContent = num1;
+    document.getElementById('p-op').textContent = op;
+    document.getElementById('p-num2').textContent = num2;
+    const inp = document.getElementById('answer-input');
+    inp.value = '';
+    inp.className = '';
+    inp.disabled = false;
+    document.getElementById('feedback').textContent = '';
+    document.getElementById('feedback').className = 'feedback';
+    hintShown = false;
+    answered = false;
+    renderDots(false);
+    renderNumberLine(false);
+    renderTenFrame(false);
+    renderBridge(false);
+    renderBeads(false);
+    inp.focus();
+  }
+
+  function nextProblem() {
+    generate();
+    render();
+  }
+
+  function checkAnswer() {
+    const inp = document.getElementById('answer-input');
+    const val = parseInt(inp.value);
+    const fb = document.getElementById('feedback');
+    if (isNaN(val)) { fb.textContent = 'Najprv napíš číslo! 😊'; fb.className = 'feedback'; return; }
+
+    scoreTries++;
+    document.getElementById('score-tries').textContent = scoreTries;
+
+    if (val === correctAnswer) {
+      inp.className = 'correct';
+      fb.textContent = '🎉 Výborne! Správna odpoveď!';
+      fb.className = 'feedback ok';
+      if (!answered) { scoreOk++; document.getElementById('score-ok').textContent = scoreOk; }
+      answered = true;
+      inp.disabled = true;
+      renderDots(true);
+      renderNumberLine(true);
+      renderTenFrame(true);
+      renderBridge(true);
+      renderBeads(true);
+    } else {
+      inp.className = 'wrong';
+      fb.textContent = '🙈 Nie je to tak, skús znova!';
+      fb.className = 'feedback err';
+      inp.select();
+    }
+  }
+
+  function showHint() {
+    hintShown = true;
+    renderDots(true);
+    renderNumberLine(true);
+    renderTenFrame(true);
+    renderBridge(true);
+    renderBeads(true);
+    document.getElementById('feedback').textContent = '💡 Pozri sa na všetky zobrazenia nižšie!';
+    document.getElementById('feedback').className = 'feedback';
+  }
+
+  // ---- Dot rendering ----
+  function renderDots(reveal) {
+    const area = document.getElementById('dots-area');
+    area.innerHTML = '';
+
+    const rowA = makeDotRow(num1, 'blue');
+    area.appendChild(rowA);
+
+    const opLabel = document.createElement('div');
+    opLabel.className = 'op-label';
+    opLabel.textContent = op === '+' ? '➕' : '➖';
+    area.appendChild(opLabel);
+
+    if (op === '+') {
+      const rowB = makeDotRow(num2, 'pink');
+      area.appendChild(rowB);
+
+      if (reveal) {
+        const label = document.createElement('div');
+        label.className = 'op-label';
+        label.style.color = '#4caf50';
+        label.textContent = '= ' + correctAnswer;
+        area.appendChild(label);
+
+        const rowC = makeDotRow(correctAnswer, 'result');
+        area.appendChild(rowC);
+      }
+    } else {
+      // odčítanie: zobraz num1 bodiek, preškrtni num2 z nich
+      const rowA2 = document.createElement('div');
+      rowA2.className = 'dot-row';
+      for (let i = 1; i <= num1; i++) {
+        const d = document.createElement('div');
+        const crossed = reveal && i > correctAnswer;
+        d.className = 'dot ' + (crossed ? 'gone' : 'blue');
+        d.textContent = crossed ? '✖' : '●';
+        rowA2.appendChild(d);
+      }
+      area.innerHTML = '';
+      area.appendChild(rowA2);
+
+      if (reveal) {
+        const label = document.createElement('div');
+        label.className = 'op-label';
+        label.style.color = '#e0497a';
+        label.textContent = '✖ ' + num2 + ' preškrtnutých';
+        area.appendChild(label);
+
+        const label2 = document.createElement('div');
+        label2.className = 'op-label';
+        label2.style.color = '#4caf50';
+        label2.textContent = '= ' + correctAnswer + ' zostatok';
+        area.appendChild(label2);
+      }
+    }
+  }
+
+  function makeDotRow(count, cls, offset) {
+    const start = offset || 0;
+    const row = document.createElement('div');
+    row.className = 'dot-row';
+    for (let i = 0; i < count; i++) {
+      const d = document.createElement('div');
+      d.className = 'dot ' + cls;
+      d.textContent = start + i + 1;
+      row.appendChild(d);
+    }
+    return row;
+  }
+
+  // ---- Number line ----
+  function renderNumberLine(reveal) {
+    const nl = document.getElementById('numberline');
+    nl.innerHTML = '';
+
+    const max = Math.max(20, num1 + (op === '+' ? num2 : 0));
+    const NUMS = 21;
+    const W = nl.clientWidth || 660;
+    const padL = 20, padR = 20;
+    const step = (W - padL - padR) / 20;
+
+    const line = document.createElement('div');
+    line.className = 'nl-line';
+    nl.appendChild(line);
+
+    for (let i = 0; i <= 20; i++) {
+      const x = padL + i * step;
+
+      const tick = document.createElement('div');
+      tick.className = 'nl-tick';
+      tick.style.left = x + 'px';
+      nl.appendChild(tick);
+
+      const lbl = document.createElement('div');
+      lbl.className = 'nl-label';
+      lbl.style.left = x + 'px';
+      lbl.textContent = i;
+      nl.appendChild(lbl);
+    }
+
+    // Start marker
+    addMarker(nl, num1, step, padL, 'start', num1);
+
+    if (reveal) {
+      // Draw arc
+      if (op === '+') {
+        drawArc(nl, num1, num2, step, padL, '#e0497a');
+      } else {
+        drawArc(nl, num1, -num2, step, padL, '#e0497a');
+      }
+      // Result marker
+      addMarker(nl, correctAnswer, step, padL, 'result', correctAnswer);
+    }
+  }
+
+  function addMarker(nl, val, step, padL, cls, label) {
+    if (val < 0 || val > 20) return;
+    const x = padL + val * step;
+    const m = document.createElement('div');
+    m.className = 'nl-marker ' + cls;
+    m.style.left = x + 'px';
+    m.textContent = label;
+    nl.appendChild(m);
+  }
+
+  function drawArc(nl, from, delta, step, padL, color) {
+    const absD = Math.abs(delta);
+    if (absD === 0) return;
+
+    const x1 = padL + from * step;
+    const x2 = padL + (from + delta) * step;
+    const left = Math.min(x1, x2);
+    const width = Math.abs(x2 - x1);
+    const height = Math.min(40, width * 0.6);
+
+    const arc = document.createElement('div');
+    arc.className = 'nl-arc';
+    arc.style.left = left + 'px';
+    arc.style.width = width + 'px';
+    arc.style.height = height + 'px';
+    arc.style.borderColor = color;
+    arc.style.bottom = '28px';
+
+    // One jump marker per integer step between start and result
+    for (let i = 1; i <= absD; i++) {
+      const pos = from + (delta > 0 ? i : -i);
+      const jx = padL + pos * step;
+      const jm = document.createElement('div');
+      jm.className = 'nl-marker jump';
+      jm.style.left = jx + 'px';
+      jm.style.width = '14px';
+      jm.style.height = '14px';
+      jm.style.fontSize = '0.6rem';
+      jm.style.bottom = '38px';
+      jm.textContent = delta > 0 ? '+' : '-';
+      nl.appendChild(jm);
+    }
+
+    nl.appendChild(arc);
+  }
+
+  // Enter key = check
+  document.getElementById('answer-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') checkAnswer();
+    if (e.key === 'n' || e.key === 'N') nextProblem();
+    if (e.key === 'h' || e.key === 'H') showHint();
+    if (e.key === 'f' || e.key === 'F') finishSession();
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.target === document.getElementById('answer-input')) return;
+    if (e.key === 'Enter') checkAnswer();
+    if (e.key === 'n' || e.key === 'N') nextProblem();
+    if (e.key === 'h' || e.key === 'H') showHint();
+    if (e.key === 'f' || e.key === 'F') finishSession();
+  });
+
+  // ---- Ten-frame ----
+  function renderTenFrame(reveal) {
+    const area = document.getElementById('tenframe-area');
+    area.innerHTML = '';
+
+    const count1 = num1;
+    const count2 = (reveal && op === '+') ? num2 : 0;
+    const countSub = (reveal && op === '-') ? num2 : 0;
+    const frames = op === '+' ? Math.ceil((count1 + count2) / 10) : Math.ceil(count1 / 10);
+    const needed = Math.max(frames, 1);
+
+    const container = document.createElement('div');
+    container.style.cssText = 'display:flex;align-items:center;gap:20px;flex-wrap:wrap;justify-content:center;';
+
+    const framesCol = document.createElement('div');
+    framesCol.style.cssText = 'display:flex;flex-direction:column;gap:8px;align-items:center;';
+
+    for (let f = 0; f < needed; f++) {
+      const frameDiv = document.createElement('div');
+      frameDiv.className = 'tenframe';
+
+      for (let cell = 0; cell < 10; cell++) {
+        const idx = f * 10 + cell + 1;
+        const div = document.createElement('div');
+        div.className = 'tf-cell';
+
+        if (op === '+') {
+          if (idx <= count1) {
+            div.className = 'tf-cell filled-blue';
+          } else if (reveal && idx <= count1 + count2) {
+            div.className = 'tf-cell filled-pink';
+          }
+        } else {
+          if (idx <= count1) {
+            const crossed = reveal && idx > (count1 - countSub);
+            div.className = 'tf-cell ' + (crossed ? 'filled-pink' : 'filled-blue');
+            if (crossed) div.textContent = '✖';
+          }
+        }
+        frameDiv.appendChild(div);
+      }
+
+      const row = document.createElement('div');
+      row.className = 'tenframe-row';
+      row.appendChild(frameDiv);
+
+      const lbl = document.createElement('div');
+      lbl.className = 'tenframe-label';
+      lbl.textContent = `${f * 10 + 1}–${Math.min((f + 1) * 10, 20)}`;
+      row.appendChild(lbl);
+
+      framesCol.appendChild(row);
+    }
+    container.appendChild(framesCol);
+
+    // Legend
+    const legend = document.createElement('div');
+    legend.style.cssText = 'display:flex;flex-direction:column;gap:10px;font-size:0.95rem;font-weight:bold;';
+
+    function makeLegendRow(bg, border, text) {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:8px;';
+      const dot = document.createElement('div');
+      dot.style.cssText = `width:28px;height:28px;border-radius:50%;background:${bg};border:2px solid ${border};flex-shrink:0;`;
+      row.appendChild(dot);
+      const span = document.createElement('span');
+      span.style.color = '#555';
+      span.textContent = text;
+      row.appendChild(span);
+      return row;
+    }
+
+    if (op === '+') {
+      legend.appendChild(makeLegendRow('#4a90d9', '#2c6fad', `${num1}  — prvé číslo`));
+      legend.appendChild(makeLegendRow('#e0497a', '#b02d58', `${num2}  — pričítame`));
+    } else {
+      legend.appendChild(makeLegendRow('#4a90d9', '#2c6fad', `${num1}  — začíname`));
+      if (reveal) {
+        legend.appendChild(makeLegendRow('#e0497a', '#b02d58', `${num2}  — odčítame`));
+      }
+    }
+
+    container.appendChild(legend);
+    area.appendChild(container);
+
+    if (reveal) {
+      const msg = document.createElement('div');
+      msg.style.cssText = 'font-size:1.1rem;font-weight:bold;color:#4caf50;margin-top:4px';
+      msg.textContent = op === '+' ? `${num1} + ${num2} = ${correctAnswer}` : `${num1} − ${num2} = ${correctAnswer} zostatok`;
+      area.appendChild(msg);
+    }
+  }
+
+  // ---- Bridge through 10 ----
+  function renderBridge(reveal) {
+    const card = document.getElementById('bridge-card');
+    const area = document.getElementById('bridge-area');
+    area.innerHTML = '';
+
+    // addition: num1 < 10, result crosses 10
+    const addBridge = op === '+' && (10 - num1) > 0 && (10 - num1) < num2;
+    // subtraction: num1 > 10, result crosses below 10
+    const subBridge = op === '-' && num1 > 10 && correctAnswer < 10;
+
+    if (!addBridge && !subBridge) {
+      card.style.display = 'none';
+      return;
+    }
+
+    card.style.display = '';
+
+    function num(n, color) {
+      const el = document.createElement('span');
+      el.className = 'bridge-num';
+      el.style.background = color;
+      el.textContent = n;
+      return el;
+    }
+    function op_(t) {
+      const el = document.createElement('span'); el.className = 'bridge-op'; el.textContent = t; return el;
+    }
+    function eq() {
+      const el = document.createElement('span'); el.className = 'bridge-eq'; el.textContent = '='; return el;
+    }
+    function arrow() {
+      const el = document.createElement('div'); el.className = 'bridge-arrow'; el.textContent = '↓'; return el;
+    }
+    function label(t) {
+      const el = document.createElement('div'); el.className = 'bridge-step-label'; el.textContent = t; return el;
+    }
+    function ten() {
+      const el = document.createElement('span'); el.className = 'bridge-10'; el.textContent = '10'; return el;
+    }
+    function row(children) {
+      const el = document.createElement('div'); el.className = 'bridge-step';
+      children.forEach(c => el.appendChild(c)); return el;
+    }
+    function step(lbl, rowEl) {
+      const el = document.createElement('div');
+      el.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:4px;';
+      el.appendChild(label(lbl)); el.appendChild(rowEl); return el;
+    }
+
+    if (addBridge) {
+      const gap      = 10 - num1;
+      const leftover = num2 - gap;
+
+      // Krok 0 — pôvodný príklad
+      area.appendChild(step(`pôvodný príklad`,
+        row([num(num1,'#4a90d9'), op_('+'), num(num2,'#e0497a')])));
+      area.appendChild(arrow());
+
+      // Krok 1 — rozdeľ num2
+      area.appendChild(step(`rozdeľ ${num2} na ${gap} + ${leftover}`,
+        row([num(num1,'#4a90d9'), op_('+'), num(gap,'#e0497a'), op_('+'), num(leftover,'#e0497a')])));
+
+      if (!reveal) return;
+      area.appendChild(arrow());
+
+      // Krok 2 — dosiahni 10
+      area.appendChild(step(`${num1} + ${gap} = 10`,
+        row([num(num1,'#4a90d9'), op_('+'), num(gap,'#e0497a'), eq(), ten()])));
+      area.appendChild(arrow());
+
+      // Krok 3 — pričítaj zvyšok
+      const ans = document.createElement('span');
+      ans.className = 'bridge-num';
+      ans.style.cssText = 'background:#4caf50;animation:pop 0.4s ease;width:54px;height:54px;font-size:1.6rem;';
+      ans.textContent = correctAnswer;
+      area.appendChild(step(`10 + ${leftover} = ${correctAnswer}`,
+        row([ten(), op_('+'), num(leftover,'#e0497a'), eq(), ans])));
+
+    } else {
+      // subtraction bridge
+      const gap      = num1 - 10;   // subtract this much to reach 10
+      const leftover = num2 - gap;  // then subtract this from 10
+
+      // Krok 0 — pôvodný príklad
+      area.appendChild(step(`pôvodný príklad`,
+        row([num(num1,'#4a90d9'), op_('−'), num(num2,'#e0497a')])));
+      area.appendChild(arrow());
+
+      // Krok 1 — rozdeľ num2
+      area.appendChild(step(`rozdeľ ${num2} na ${gap} + ${leftover}`,
+        row([num(num1,'#4a90d9'), op_('−'), num(gap,'#e0497a'), op_('−'), num(leftover,'#e0497a')])));
+
+      if (!reveal) return;
+      area.appendChild(arrow());
+
+      // Krok 2 — dosiahni 10
+      area.appendChild(step(`${num1} − ${gap} = 10`,
+        row([num(num1,'#4a90d9'), op_('−'), num(gap,'#e0497a'), eq(), ten()])));
+      area.appendChild(arrow());
+
+      // Krok 3 — odčítaj zvyšok
+      const ans = document.createElement('span');
+      ans.className = 'bridge-num';
+      ans.style.cssText = 'background:#4caf50;animation:pop 0.4s ease;width:54px;height:54px;font-size:1.6rem;';
+      ans.textContent = correctAnswer;
+      area.appendChild(step(`10 − ${leftover} = ${correctAnswer}`,
+        row([ten(), op_('−'), num(leftover,'#e0497a'), eq(), ans])));
+    }
+  }
+
+  // ---- Bead string ----
+  function renderBeads(reveal) {
+    const svg = document.getElementById('beads-svg');
+    svg.innerHTML = '';
+
+    const W = 640, H = 90;
+    const beadR = 14, gap = 4;
+    const total = 20;
+    const startX = 20 + beadR;
+    const cy = H / 2;
+    const pitch = beadR * 2 + gap;
+
+    // string line
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', 10); line.setAttribute('y1', cy);
+    line.setAttribute('x2', W - 10); line.setAttribute('y2', cy);
+    line.setAttribute('stroke', '#aaa'); line.setAttribute('stroke-width', '4');
+    line.setAttribute('stroke-linecap', 'round');
+    svg.appendChild(line);
+
+    for (let i = 0; i < 20; i++) {
+      const bx = startX + i * pitch;
+      const groupOf5 = Math.floor(i / 5); // 0,1,2,3
+      // alternating color within each group of 5: warm/cool
+      const baseColor = groupOf5 % 2 === 0 ? '#f9a825' : '#4a90d9';
+
+      let fill = baseColor;
+      let stroke = groupOf5 % 2 === 0 ? '#c17900' : '#2c6fad';
+      let opacity = '1';
+
+      const beadNum = i + 1; // 1-based
+
+      if (op === '+') {
+        if (beadNum <= num1) {
+          fill = '#4a90d9'; stroke = '#2c6fad';
+        } else if (reveal && beadNum <= num1 + num2) {
+          fill = '#e0497a'; stroke = '#b02d58';
+        } else {
+          fill = '#ddd'; stroke = '#bbb'; opacity = '0.4';
+        }
+      } else {
+        if (reveal && beadNum > correctAnswer && beadNum <= num1) {
+          fill = '#e0497a'; stroke = '#b02d58'; opacity = '0.5';
+        } else if (beadNum <= num1) {
+          fill = '#4a90d9'; stroke = '#2c6fad';
+        } else {
+          fill = '#ddd'; stroke = '#bbb'; opacity = '0.4';
+        }
+      }
+
+      const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      circle.setAttribute('cx', bx); circle.setAttribute('cy', cy);
+      circle.setAttribute('r', beadR);
+      circle.setAttribute('fill', fill);
+      circle.setAttribute('stroke', stroke);
+      circle.setAttribute('stroke-width', '2');
+      circle.setAttribute('opacity', opacity);
+      svg.appendChild(circle);
+
+      // number under every bead
+      const tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      tick.setAttribute('x', bx);
+      tick.setAttribute('y', cy + beadR + 13);
+      tick.setAttribute('text-anchor', 'middle');
+      tick.setAttribute('font-size', '11');
+      tick.setAttribute('fill', '#999');
+      tick.textContent = i + 1;
+      svg.appendChild(tick);
+    }
+
+    // legend — centered above the beads
+    const legend = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    legend.setAttribute('x', W / 2);
+    legend.setAttribute('y', cy - 22);
+    legend.setAttribute('text-anchor', 'middle');
+    legend.setAttribute('font-size', '12');
+    legend.setAttribute('font-weight', 'bold');
+    if (reveal) {
+      legend.setAttribute('fill', '#4caf50');
+      legend.textContent = op === '+' ? `${num1} + ${num2} = ${correctAnswer}` : `${num1} − ${num2} = ${correctAnswer}`;
+    } else {
+      legend.setAttribute('fill', '#4a90d9');
+      legend.textContent = `Začíname: ${num1}`;
+    }
+    svg.appendChild(legend);
+  }
+
+  // ---- Number bonds ----
+  // Each pair index (1+9, 2+8, …) gets a consistent color across all totals.
+  // Pair index 0 = smallest pair (1 + total-1), up to floor(total/2).
+  // The big pie for each total has `total` equal slices; symmetric positions share a color.
+  const PAIR_PALETTE = [
+    '#e91e63', // pair 1  — pink
+    '#f9a825', // pair 2  — yellow
+    '#4a90d9', // pair 3  — blue
+    '#4caf50', // pair 4  — green
+    '#9c27b0', // pair 5  — purple
+    '#ff5722', // pair 6  — orange-red
+    '#00bcd4', // pair 7  — cyan
+    '#8bc34a', // pair 8  — light green
+    '#ff9800', // pair 9  — amber
+    '#3f51b5', // pair 10 — indigo
+  ];
+
+  // Returns the color for a 1-based slice number within a given total.
+  // A slice is "valid" if both n and (total-n) are in 1..9.
+  // Invalid slices (one side would be ≥10 or 0) get grey.
+  // Special case: for even totals where total/2 ≤ 9, the last slice (n=total)
+  // acts as the "second half" of the equal pair and shares its color + label.
+  function isEqualPartner(n, total) {
+    return total % 2 === 0 && n === total && total / 2 <= 9;
+  }
+
+  function validSlice(n, total) {
+    if (isEqualPartner(n, total)) return true;
+    const b = total - n;
+    return n >= 1 && n <= 9 && b >= 1 && b <= 9;
+  }
+
+  function sliceColor(n, total) {
+    if (!validSlice(n, total)) return '#e0e0e0';
+    const eff = isEqualPartner(n, total) ? total / 2 : n;
+    const pairIdx = Math.min(eff, total - eff) - 1;
+    return PAIR_PALETTE[pairIdx % PAIR_PALETTE.length];
+  }
+
+  function buildBigPie(total) {
+    const R = 70;          // circle radius
+    const pad = 28;        // room for labels outside
+    const size = (R + pad) * 2;
+    const cx = size / 2, cy = size / 2;
+
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('width', size);
+    svg.setAttribute('height', size);
+    svg.setAttribute('viewBox', `0 0 ${size} ${size}`);
+
+    const sliceDeg = 360 / total;
+
+    for (let n = 1; n <= total; n++) {
+      const startDeg = -90 + (n - 1) * sliceDeg;
+      const endDeg   = startDeg + sliceDeg;
+      const start = startDeg * Math.PI / 180;
+      const end   = endDeg   * Math.PI / 180;
+
+      const x1 = cx + R * Math.cos(start);
+      const y1 = cy + R * Math.sin(start);
+      const x2 = cx + R * Math.cos(end);
+      const y2 = cy + R * Math.sin(end);
+      const large = sliceDeg > 180 ? 1 : 0;
+
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', `M${cx},${cy} L${x1},${y1} A${R},${R} 0 ${large},1 ${x2},${y2} Z`);
+      path.setAttribute('fill', sliceColor(n, total));
+      path.setAttribute('stroke', 'white');
+      path.setAttribute('stroke-width', '2');
+      svg.appendChild(path);
+
+      // Label: the slice number, just outside the rim
+      const midDeg = startDeg + sliceDeg / 2;
+      const mid    = midDeg * Math.PI / 180;
+      const lx = cx + (R + 16) * Math.cos(mid);
+      const ly = cy + (R + 16) * Math.sin(mid);
+
+      const txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      txt.setAttribute('x', lx);
+      txt.setAttribute('y', ly);
+      txt.setAttribute('text-anchor', 'middle');
+      txt.setAttribute('dominant-baseline', 'central');
+      txt.setAttribute('font-size', '11');
+      txt.setAttribute('font-weight', 'bold');
+      txt.setAttribute('fill', sliceColor(n, total));
+      txt.textContent = isEqualPartner(n, total) ? total / 2 : n;
+      svg.appendChild(txt);
+    }
+
+    // Centre: small white circle + number
+    const innerR = 18;
+    const circleBg = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circleBg.setAttribute('cx', cx);
+    circleBg.setAttribute('cy', cy);
+    circleBg.setAttribute('r', innerR);
+    circleBg.setAttribute('fill', 'white');
+    circleBg.setAttribute('stroke', '#ddd');
+    circleBg.setAttribute('stroke-width', '2');
+    svg.appendChild(circleBg);
+
+    const centre = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    centre.setAttribute('x', cx);
+    centre.setAttribute('y', cy);
+    centre.setAttribute('text-anchor', 'middle');
+    centre.setAttribute('dominant-baseline', 'central');
+    centre.setAttribute('font-size', '16');
+    centre.setAttribute('font-weight', 'bold');
+    centre.setAttribute('fill', '#e06c00');
+    centre.textContent = total;
+    svg.appendChild(centre);
+
+    return svg;
+  }
+
+  function openBondModal(total) {
+    document.getElementById('modal-title').textContent = total;
+
+    const pieEl = document.getElementById('modal-pie');
+    pieEl.innerHTML = '';
+    // Build a larger pie (R=120)
+    const R = 120, pad = 36, size = (R + pad) * 2;
+    const cx = size / 2, cy = size / 2;
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('width', size); svg.setAttribute('height', size);
+    svg.setAttribute('viewBox', `0 0 ${size} ${size}`);
+    const sliceDeg = 360 / total;
+    for (let n = 1; n <= total; n++) {
+      const startDeg = -90 + (n - 1) * sliceDeg;
+      const endDeg   = startDeg + sliceDeg;
+      const s = startDeg * Math.PI / 180, e = endDeg * Math.PI / 180;
+      const x1 = cx + R * Math.cos(s), y1 = cy + R * Math.sin(s);
+      const x2 = cx + R * Math.cos(e), y2 = cy + R * Math.sin(e);
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', `M${cx},${cy} L${x1},${y1} A${R},${R} 0 ${sliceDeg > 180 ? 1 : 0},1 ${x2},${y2} Z`);
+      path.setAttribute('fill', sliceColor(n, total));
+      path.setAttribute('stroke', 'white'); path.setAttribute('stroke-width', '2.5');
+      svg.appendChild(path);
+      const midDeg = startDeg + sliceDeg / 2;
+      const mid = midDeg * Math.PI / 180;
+      const lx = cx + (R + 22) * Math.cos(mid), ly = cy + (R + 22) * Math.sin(mid);
+      const txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      txt.setAttribute('x', lx); txt.setAttribute('y', ly);
+      txt.setAttribute('text-anchor', 'middle'); txt.setAttribute('dominant-baseline', 'central');
+      txt.setAttribute('font-size', '16'); txt.setAttribute('font-weight', 'bold');
+      txt.setAttribute('fill', sliceColor(n, total));
+      txt.textContent = isEqualPartner(n, total) ? total / 2 : n;
+      svg.appendChild(txt);
+    }
+    const innerR = 28;
+    const bg = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    bg.setAttribute('cx', cx); bg.setAttribute('cy', cy); bg.setAttribute('r', innerR);
+    bg.setAttribute('fill', 'white'); bg.setAttribute('stroke', '#ddd'); bg.setAttribute('stroke-width', '2');
+    svg.appendChild(bg);
+    const ct = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    ct.setAttribute('x', cx); ct.setAttribute('y', cy);
+    ct.setAttribute('text-anchor', 'middle'); ct.setAttribute('dominant-baseline', 'central');
+    ct.setAttribute('font-size', '22'); ct.setAttribute('font-weight', 'bold'); ct.setAttribute('fill', '#e06c00');
+    ct.textContent = total;
+    svg.appendChild(ct);
+    pieEl.appendChild(svg);
+
+    const pairsEl = document.getElementById('modal-pairs');
+    pairsEl.innerHTML = '';
+    for (let a = 1; a <= Math.floor(total / 2); a++) {
+      if (!validSlice(a, total)) continue;
+      const b = total - a;
+      const color = sliceColor(a, total);
+      const row = document.createElement('div');
+      row.className = 'modal-pair-row';
+      const sw = document.createElement('span');
+      sw.style.cssText = `display:inline-block;width:16px;height:16px;border-radius:50%;background:${color};flex-shrink:0`;
+      row.appendChild(sw);
+      const eq = document.createElement('span');
+      eq.innerHTML = `<span style="color:${color}">${a}</span> + <span style="color:${color}">${b}</span> = ${total}`;
+      row.appendChild(eq);
+      pairsEl.appendChild(row);
+    }
+
+    document.getElementById('bond-modal').classList.add('open');
+  }
+
+  function closeBondModal(e) {
+    if (e && e.target !== document.getElementById('bond-modal') && e.target !== document.querySelector('.modal-close')) return;
+    document.getElementById('bond-modal').classList.remove('open');
+  }
+
+  function buildBonds() {
+    const grid = document.getElementById('bonds-grid');
+    grid.innerHTML = '';
+
+    for (let total = 10; total <= 18; total++) {
+      const card = document.createElement('div');
+      card.className = 'bond-card';
+      card.addEventListener('click', () => openBondModal(total));
+
+      // Big pie
+      card.appendChild(buildBigPie(total));
+
+      // Pair equations — only show pairs where both numbers are 1..9
+      const pairsDiv = document.createElement('div');
+      const validPairs = [];
+      for (let a = 1; a <= Math.floor(total / 2); a++) {
+        if (validSlice(a, total)) validPairs.push(a);
+      }
+      pairsDiv.className = 'bond-pairs' + (validPairs.length <= 4 ? ' single-col' : '');
+
+      for (const a of validPairs) {
+        const b = total - a;
+        const color = sliceColor(a, total);
+
+        const row = document.createElement('div');
+        row.className = 'bond-pair';
+
+        // Tiny color swatch
+        const swatch = document.createElement('span');
+        swatch.style.cssText = `display:inline-block;width:12px;height:12px;border-radius:50%;background:${color};flex-shrink:0`;
+        row.appendChild(swatch);
+
+        const eq = document.createElement('div');
+        eq.className = 'bond-equation';
+        eq.innerHTML =
+          `<span style="color:${color}">${a}</span>` +
+          ` + ` +
+          `<span style="color:${color}">${b}</span>` +
+          ` = ${total}`;
+        row.appendChild(eq);
+
+        pairsDiv.appendChild(row);
+      }
+
+      card.appendChild(pairsDiv);
+      grid.appendChild(card);
+    }
+  }
+
+  function finishSession() {
+    const wrong = scoreTries - scoreOk;
+    const pct = scoreTries > 0 ? Math.round((scoreOk / scoreTries) * 100) : 0;
+    let grade, msg;
+    if (scoreTries === 0)  { grade = '🤔'; msg = 'Ešte si neskúsil žiadny príklad!'; }
+    else if (pct === 100)  { grade = '🏆'; msg = 'Perfektné skóre — úžasná práca!'; }
+    else if (pct >= 80)    { grade = '⭐'; msg = 'Skvelá práca — pokračuj takto!'; }
+    else if (pct >= 60)    { grade = '👍'; msg = 'Dobrá snaha — cvičenie robí majstra!'; }
+    else                   { grade = '💪'; msg = 'Nevzdávaj sa — zvládneš to!'; }
+
+    document.getElementById('sum-tries').textContent = scoreTries;
+    document.getElementById('sum-ok').textContent    = scoreOk;
+    document.getElementById('sum-wrong').textContent = wrong;
+    document.getElementById('sum-pct').textContent   = scoreTries > 0 ? pct + '%' : '—';
+    document.getElementById('sum-grade').textContent = grade;
+    document.getElementById('sum-msg').textContent   = msg;
+    document.getElementById('summary-overlay').classList.add('visible');
+  }
+
+  function restartSession() {
+    scoreOk = 0; scoreTries = 0;
+    document.getElementById('score-ok').textContent    = 0;
+    document.getElementById('score-tries').textContent = 0;
+    document.getElementById('summary-overlay').classList.remove('visible');
+    nextProblem();
+  }
+
+  // Start
+  nextProblem();
+  buildBonds();
+</script>
+</body>
+</html>

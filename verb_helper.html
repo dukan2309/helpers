@@ -1,0 +1,1670 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Slovesník – English Verb Helper</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-1: #fef3f7;
+    --bg-2: #eef2ff;
+    --bg-3: #ecfeff;
+    --card: #ffffff;
+    --ink: #2b2b3f;
+    --muted: #6c6e89;
+    --line: #e7e9f4;
+
+    --primary: #7c6cf2;       /* lavender */
+    --primary-soft: #ece9ff;
+    --accent: #ff7aa8;         /* pink */
+    --accent-soft: #ffe4ef;
+    --warn: #ffb86b;
+    --ok: #4cc38a;
+    --bad: #ef5b6d;
+
+    --sing: #5b8def;           /* singular blue */
+    --sing-soft: #e7f0ff;
+    --plur: #ff7aa8;           /* plural pink */
+    --plur-soft: #ffe4ef;
+
+    --highlight: #ff5d8f;      /* ending change color */
+    --highlight-bg: #fff0f6;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Quicksand', system-ui, -apple-system, sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(ellipse at 10% 0%, var(--bg-1) 0%, transparent 55%),
+      radial-gradient(ellipse at 95% 10%, var(--bg-3) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 100%, var(--bg-2) 0%, transparent 60%),
+      #fafbff;
+    min-height: 100vh;
+    padding: 28px 18px 80px;
+  }
+
+  .wrap { max-width: 1080px; margin: 0 auto; }
+
+  header.title { text-align: center; margin-bottom: 22px; }
+  header.title h1 {
+    margin: 0;
+    font-weight: 700;
+    font-size: clamp(28px, 4vw, 38px);
+    letter-spacing: -0.5px;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  header.title p { margin: 6px 0 0; color: var(--muted); font-size: 15px; }
+
+  .card {
+    background: var(--card);
+    border-radius: 22px;
+    box-shadow: 0 6px 24px rgba(60, 50, 120, 0.08);
+    border: 1px solid var(--line);
+    padding: 20px 22px;
+    margin-bottom: 18px;
+  }
+
+  /* Translator row */
+  .translator {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 14px;
+    align-items: end;
+  }
+  .field label {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: var(--muted);
+    margin-bottom: 6px;
+    font-weight: 600; letter-spacing: 0.3px; text-transform: uppercase;
+  }
+  .flag { font-size: 16px; }
+  .field input {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 14px;
+    border: 2px solid var(--line);
+    background: #fbfbff;
+    font: 600 22px 'Quicksand', sans-serif;
+    color: var(--ink);
+    outline: none;
+    transition: border-color .15s, background .15s, box-shadow .15s;
+  }
+  .field input:focus {
+    border-color: var(--primary);
+    background: #fff;
+    box-shadow: 0 0 0 4px var(--primary-soft);
+  }
+  .swap {
+    align-self: end;
+    margin-bottom: 4px;
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    border: none; cursor: pointer;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: white; font-size: 22px;
+    box-shadow: 0 4px 12px rgba(124, 108, 242, .35);
+    transition: transform .15s;
+  }
+  .swap:hover { transform: rotate(180deg); }
+
+  .translator-status {
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--muted);
+    min-height: 18px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .translator-status.online { color: var(--primary); }
+  .translator-status.offline { color: var(--ok); }
+  .translator-status.err { color: var(--bad); }
+
+  /* Tense tabs */
+  .tense-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 4px; }
+  .tense {
+    padding: 10px 16px;
+    border-radius: 999px;
+    background: var(--card);
+    border: 2px solid var(--line);
+    color: var(--muted);
+    font: 600 14px 'Quicksand', sans-serif;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .tense:hover { border-color: var(--primary); color: var(--primary); }
+  .tense.active {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(124, 108, 242, .35);
+  }
+  .tense-hint { color: var(--muted); font-size: 13px; padding: 6px 4px 0; }
+
+  /* Conjugation grid */
+  .conjugation { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 10px; }
+  .col { border-radius: 16px; padding: 14px 16px; border: 2px solid; }
+  .col.sing { background: var(--sing-soft); border-color: #cfe0ff; }
+  .col.plur { background: var(--plur-soft); border-color: #ffd0e1; }
+  .col h3 {
+    margin: 0 0 10px;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .col.sing h3 { color: var(--sing); }
+  .col.plur h3 { color: var(--plur); }
+
+  .row {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    align-items: baseline;
+    padding: 8px 4px;
+    border-bottom: 1px dashed rgba(0,0,0,.06);
+    font-size: 19px;
+  }
+  .row:last-child { border-bottom: none; }
+  .pron { font-weight: 700; opacity: .85; }
+  .col.sing .pron { color: var(--sing); }
+  .col.plur .pron { color: var(--plur); }
+  .form { font-weight: 500; }
+  .form .stem { color: var(--ink); }
+  .form .ending {
+    color: var(--highlight);
+    background: var(--highlight-bg);
+    padding: 1px 5px;
+    border-radius: 6px;
+    font-weight: 700;
+  }
+  .form .aux { color: var(--primary); font-weight: 600; margin-right: 4px; }
+  .form .removed {
+    text-decoration: line-through;
+    color: #c0c0d0;
+    margin-right: 2px;
+    font-weight: 400;
+  }
+  .form .doubled { color: var(--highlight); font-weight: 700; }
+
+  /* Slovak column shown beside each English form when checkbox is checked */
+  .row.with-sk { grid-template-columns: 90px 1fr 1.2fr; column-gap: 10px; }
+  .form-sk {
+    color: var(--muted);
+    font-size: 14px;
+    font-style: italic;
+    border-left: 2px dashed rgba(0,0,0,.08);
+    padding-left: 10px;
+    align-self: center;
+  }
+
+  /* Inline toggle row above the conjugation grid */
+  .conj-toggles {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 4px 0;
+    margin-top: 4px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 36px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .switch .slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background: var(--line);
+    border-radius: 999px;
+    transition: background .15s;
+  }
+  .switch .slider::before {
+    content: '';
+    position: absolute;
+    height: 14px; width: 14px;
+    left: 3px; top: 3px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0,0,0,.15);
+    transition: transform .15s;
+  }
+  .switch input:checked + .slider { background: linear-gradient(135deg, var(--primary), var(--accent)); }
+  .switch input:checked + .slider::before { transform: translateX(16px); }
+  .conj-toggles label.toggle-label {
+    cursor: pointer;
+    user-select: none;
+    display: flex; align-items: center; gap: 8px;
+    font-weight: 600;
+  }
+
+  .empty-state { text-align: center; padding: 30px 10px; color: var(--muted); }
+  .empty-state .big { font-size: 42px; margin-bottom: 6px; }
+
+  /* Quiz */
+  .quiz { display: grid; gap: 14px; }
+  .quiz-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+  .quiz-head h2 { margin: 0; font-size: 22px; }
+  .quiz-head .score {
+    background: var(--primary-soft); color: var(--primary);
+    padding: 6px 12px; border-radius: 999px;
+    font-weight: 700; font-size: 14px;
+  }
+  .quiz-q {
+    font-size: 22px;
+    background: linear-gradient(135deg, #fff, #fafbff);
+    padding: 18px;
+    border-radius: 14px;
+    border: 2px dashed var(--line);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .quiz-prompt {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed var(--line);
+  }
+  .quiz-prompt .sk-flag { font-size: 20px; }
+  .quiz-prompt .sk-word {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary);
+    letter-spacing: -0.3px;
+  }
+  .quiz-prompt .sk-tense {
+    background: var(--primary-soft);
+    color: var(--primary);
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-left: auto;
+  }
+  .quiz-answer {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 22px;
+  }
+  .quiz-answer .en-flag { font-size: 18px; }
+  .quiz-q .pron { font-weight: 700; }
+  .quiz-q input {
+    width: 200px;
+    padding: 8px 12px;
+    font: 600 22px 'Quicksand', sans-serif;
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    background: #fff;
+    text-align: center;
+    outline: none;
+  }
+  .quiz-q input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-soft); }
+  .quiz-q .hint-base { color: var(--muted); font-size: 16px; font-style: italic; }
+  .quiz-q .tail { color: var(--muted); }
+
+  .feedback { min-height: 24px; font-weight: 600; font-size: 16px; }
+  .feedback.ok { color: var(--ok); }
+  .feedback.bad { color: var(--bad); }
+
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; }
+  button.btn {
+    padding: 11px 18px;
+    border-radius: 12px;
+    border: none;
+    font: 700 15px 'Quicksand', sans-serif;
+    cursor: pointer;
+    transition: transform .12s, box-shadow .12s, background .12s;
+  }
+  button.btn.primary {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(124, 108, 242, .35);
+  }
+  button.btn.primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(124, 108, 242, .45); }
+  button.btn.ghost { background: #fff; border: 2px solid var(--line); color: var(--muted); }
+  button.btn.ghost:hover { border-color: var(--primary); color: var(--primary); }
+  button.btn.danger {
+    background: linear-gradient(135deg, #ef5b6d, #ff7aa8);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(239, 91, 109, .35);
+  }
+  button.btn.danger:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(239, 91, 109, .45); }
+  button.btn:disabled { opacity: .5; cursor: not-allowed; }
+
+  /* Summary overlay */
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(43, 43, 63, 0.55);
+    display: none;
+    align-items: center; justify-content: center;
+    padding: 20px;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+  }
+  .overlay.show { display: flex; }
+  .summary {
+    background: var(--card);
+    border-radius: 22px;
+    padding: 28px 28px 24px;
+    max-width: 460px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 12px 40px rgba(60, 50, 120, 0.25);
+    animation: pop .25s ease-out;
+  }
+  @keyframes pop {
+    from { transform: scale(.92); opacity: 0; }
+    to   { transform: scale(1);    opacity: 1; }
+  }
+  .summary .grade-emoji {
+    font-size: 64px;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .summary h2 {
+    margin: 0 0 4px;
+    font-size: 26px;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .summary .grade-msg {
+    color: var(--muted);
+    font-size: 15px;
+    margin-bottom: 18px;
+  }
+  .summary .stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .summary .stat {
+    background: #fafbff;
+    border: 2px solid var(--line);
+    border-radius: 14px;
+    padding: 12px 8px;
+  }
+  .summary .stat .num {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary);
+    line-height: 1;
+  }
+  .summary .stat.bad .num { color: var(--bad); }
+  .summary .stat.good .num { color: var(--ok); }
+  .summary .stat .lbl {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .summary .summary-actions {
+    display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+  }
+
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 14px;
+    font-size: 13px; color: var(--muted);
+    margin-top: 10px;
+  }
+  .legend .swatch {
+    display: inline-block; width: 12px; height: 12px;
+    border-radius: 4px; margin-right: 6px; vertical-align: middle;
+  }
+
+  .quiz-toggle {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 14px; flex-wrap: wrap;
+  }
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 12px; font-weight: 700;
+    margin-left: 6px;
+  }
+  .badge.local { background: #e8f5ee; color: #2f9961; }
+  .badge.online { background: var(--primary-soft); color: var(--primary); }
+  .badge.irreg { background: #ffeede; color: #b56600; }
+
+  /* Irregular forms card */
+  .irreg-card { display: none; }
+  .irreg-card.show { display: block; }
+  .irreg-card h2 {
+    margin: 0 0 4px;
+    font-size: 22px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .irreg-card h2 .stars { font-size: 18px; }
+  .irreg-card .sub {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 16px;
+  }
+  .irreg-forms {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr;
+    gap: 10px;
+    align-items: stretch;
+  }
+  .form-pill {
+    background: linear-gradient(135deg, #fff, #fafbff);
+    border: 2px solid var(--line);
+    border-radius: 16px;
+    padding: 16px 14px 14px;
+    text-align: center;
+    position: relative;
+    transition: transform .15s, box-shadow .15s;
+  }
+  .form-pill:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(124, 108, 242, .15); }
+  .form-pill .vlabel {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 999px;
+    letter-spacing: 0.5px;
+  }
+  .form-pill .meaning {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 6px;
+    margin-top: 4px;
+  }
+  .form-pill .word {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--highlight);
+    margin: 4px 0;
+    word-break: break-word;
+  }
+  .form-pill .example {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 6px;
+    font-style: italic;
+  }
+  .form-pill .example b { color: var(--ink); font-style: normal; }
+  .arrow {
+    align-self: center;
+    color: var(--primary);
+    font-size: 22px;
+    font-weight: 700;
+    user-select: none;
+  }
+  .irreg-tip {
+    margin-top: 14px;
+    padding: 10px 14px;
+    background: #fff5e6;
+    border-left: 3px solid var(--warn);
+    border-radius: 8px;
+    font-size: 13px;
+    color: #8a5a1a;
+  }
+
+  .footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 18px; }
+  .key {
+    display: inline-block;
+    padding: 1px 6px;
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    font-family: ui-monospace, SFMono-Regular, monospace;
+    background: #fff;
+    font-size: 11px;
+    margin: 0 2px;
+  }
+
+  @media (max-width: 720px) {
+    .translator { grid-template-columns: 1fr; }
+    .swap { justify-self: center; transform: rotate(90deg); }
+    .swap:hover { transform: rotate(270deg); }
+    .conjugation { grid-template-columns: 1fr; }
+    .row { grid-template-columns: 90px 1fr; }
+    .irreg-forms {
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+    .arrow { transform: rotate(90deg); justify-self: center; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="title">
+    <h1>🌈 Slovesník</h1>
+    <p>Anglické slovesá — preklad, časovanie, precvičovanie</p>
+  </header>
+
+  <!-- TRANSLATOR -->
+  <section class="card">
+    <div class="translator">
+      <div class="field">
+        <label><span class="flag">🇸🇰</span> Slovensky</label>
+        <input id="sk" type="text" placeholder="napr. hrať" autocomplete="off" spellcheck="false" />
+      </div>
+      <button class="swap" id="swap" title="Vymeniť">⇄</button>
+      <div class="field">
+        <label><span class="flag">🇬🇧</span> English</label>
+        <input id="en" type="text" placeholder="e.g. play" autocomplete="off" spellcheck="false" />
+      </div>
+    </div>
+    <div class="translator-status" id="status">Napíš sloveso v slovenčine alebo angličtine.</div>
+  </section>
+
+  <!-- TENSE BAR -->
+  <section class="card">
+    <div class="tense-bar" id="tenseBar">
+      <button class="tense active" data-t="pres">Prítomný čas</button>
+      <button class="tense" data-t="presc">Prítomný priebehový</button>
+      <button class="tense" data-t="past">Minulý čas</button>
+      <button class="tense" data-t="fut">Budúci čas</button>
+    </div>
+    <div class="tense-hint" id="tenseHint">Present simple — bežné, opakujúce sa činnosti.</div>
+
+    <div class="conj-toggles">
+      <label class="toggle-label">
+        <span class="switch">
+          <input type="checkbox" id="showSk" />
+          <span class="slider"></span>
+        </span>
+        Zobraziť po slovensky
+      </label>
+    </div>
+
+    <div id="conjArea">
+      <div class="empty-state">
+        <div class="big">✨</div>
+        <div>Zadaj sloveso a uvidíš jeho časovanie.</div>
+      </div>
+    </div>
+
+    <div class="legend" id="legend" style="display:none">
+      <div><span class="swatch" style="background:var(--sing)"></span>Singular (jednotné číslo)</div>
+      <div><span class="swatch" style="background:var(--plur)"></span>Plural (množné číslo)</div>
+      <div><span class="swatch" style="background:var(--highlight)"></span>Zmena koncovky</div>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="card">
+    <div class="quiz-head">
+      <h2>🎯 Skúška</h2>
+      <div class="score" id="score">0 / 0</div>
+    </div>
+
+    <div class="quiz-toggle">
+      <button class="btn ghost" id="quizStart">Spustiť kvíz</button>
+      <button class="btn ghost" id="quizReset" disabled>Vynulovať skóre</button>
+      <span style="color:var(--muted); font-size:13px">Doplň správny tvar slovesa.</span>
+    </div>
+
+    <div class="quiz" id="quizArea" style="display:none">
+      <div class="quiz-q" id="quizQ"></div>
+      <div class="feedback" id="feedback"></div>
+      <div class="actions">
+        <button class="btn primary" id="check">Skontrolovať</button>
+        <button class="btn ghost" id="next">Ďalšia ➜</button>
+        <button class="btn danger" id="finish">Koniec</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- IRREGULAR FORMS (only shown for irregular verbs) -->
+  <section class="card irreg-card" id="irregCard">
+    <h2><span class="stars">⭐</span> Tri tvary nepravidelného slovesa</h2>
+    <div class="sub">Toto sloveso sa nečasuje pravidelne — zapamätaj si všetky tri tvary naspamäť.</div>
+    <div class="irreg-forms" id="irregForms"></div>
+    <div class="irreg-tip" id="irregTip"></div>
+  </section>
+
+  <div class="footer">
+    Skratky: <span class="key">Enter</span> skontrolovať · <span class="key">N</span> ďalšia · <span class="key">F</span> koniec · <span class="key">Esc</span> zrušiť kvíz
+  </div>
+</div>
+
+<!-- Quiz summary overlay -->
+<div class="overlay" id="overlay">
+  <div class="summary">
+    <div class="grade-emoji" id="gradeEmoji">🎉</div>
+    <h2 id="gradeTitle">Skvelá práca!</h2>
+    <div class="grade-msg" id="gradeMsg"></div>
+    <div class="stats">
+      <div class="stat"><div class="num" id="stTotal">0</div><div class="lbl">Otázok</div></div>
+      <div class="stat good"><div class="num" id="stOk">0</div><div class="lbl">Správne</div></div>
+      <div class="stat bad"><div class="num" id="stBad">0</div><div class="lbl">Chybné</div></div>
+      <div class="stat"><div class="num" id="stPct">0%</div><div class="lbl">Úspešnosť</div></div>
+    </div>
+    <div class="summary-actions">
+      <button class="btn primary" id="playAgain">Hrať znova</button>
+      <button class="btn ghost" id="closeSummary">Zavrieť</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------------------------------------------------------------- *
+ * Local Slovak ↔ English verb dictionary (~150 common verbs)        *
+ * Each entry: en (base), past, sk (one or more — first is primary)  *
+ * ---------------------------------------------------------------- */
+const VERBS = [
+  // basics
+  ['be','was/were',['byť']],
+  ['have','had',['mať']],
+  ['do','did',['robiť']],
+  ['go','went',['ísť','chodiť']],
+  ['come','came',['prísť','prichádzať']],
+  ['get','got',['dostať','získať']],
+  ['make','made',['robiť','vyrobiť','spraviť']],
+  ['take','took',['vziať','zobrať','brať']],
+  ['give','gave',['dať','dávať']],
+  ['put','put',['položiť']],
+  ['say','said',['povedať']],
+  ['tell','told',['povedať','rozprávať']],
+  ['ask','asked',['pýtať sa','spýtať sa']],
+  ['answer','answered',['odpovedať']],
+  ['know','knew',['vedieť','poznať']],
+  ['think','thought',['myslieť','premýšľať']],
+  ['want','wanted',['chcieť']],
+  ['need','needed',['potrebovať']],
+  ['like','liked',['mať rád','páčiť sa']],
+  ['love','loved',['ľúbiť','milovať']],
+  ['hate','hated',['nenávidieť']],
+  ['hope','hoped',['dúfať']],
+
+  // movement
+  ['walk','walked',['kráčať','chodiť']],
+  ['run','ran',['behať','bežať']],
+  ['jump','jumped',['skákať','skočiť']],
+  ['swim','swam',['plávať']],
+  ['fly','flew',['letieť','lietať']],
+  ['drive','drove',['šoférovať','viezť']],
+  ['ride','rode',['jazdiť']],
+  ['climb','climbed',['liezť','šplhať']],
+  ['fall','fell',['padať','spadnúť']],
+  ['dance','danced',['tancovať']],
+  ['sit','sat',['sedieť']],
+  ['stand','stood',['stáť']],
+  ['lie','lay',['ležať']],
+  ['move','moved',['hýbať sa','presťahovať sa']],
+
+  // daily
+  ['eat','ate',['jesť']],
+  ['drink','drank',['piť']],
+  ['cook','cooked',['variť']],
+  ['bake','baked',['piecť']],
+  ['sleep','slept',['spať']],
+  ['wake','woke',['zobudiť sa']],
+  ['wash','washed',['umývať','prať']],
+  ['clean','cleaned',['čistiť','upratovať']],
+  ['brush','brushed',['kefovať','čistiť']],
+  ['dress','dressed',['obliecť sa']],
+  ['open','opened',['otvoriť']],
+  ['close','closed',['zavrieť']],
+
+  // school / mind
+  ['read','read',['čítať']],
+  ['write','wrote',['písať']],
+  ['draw','drew',['kresliť']],
+  ['paint','painted',['maľovať']],
+  ['count','counted',['počítať','rátať']],
+  ['learn','learned',['učiť sa']],
+  ['teach','taught',['učiť']],
+  ['study','studied',['študovať','učiť sa']],
+  ['listen','listened',['počúvať']],
+  ['hear','heard',['počuť']],
+  ['speak','spoke',['hovoriť']],
+  ['talk','talked',['rozprávať']],
+  ['sing','sang',['spievať']],
+  ['play','played',['hrať','hrať sa']],
+  ['watch','watched',['pozerať','sledovať']],
+  ['see','saw',['vidieť']],
+  ['look','looked',['pozerať sa']],
+  ['find','found',['nájsť']],
+  ['lose','lost',['stratiť','prehrať']],
+  ['win','won',['vyhrať']],
+  ['try','tried',['skúsiť','snažiť sa']],
+  ['help','helped',['pomáhať','pomôcť']],
+  ['work','worked',['pracovať']],
+
+  // feelings
+  ['laugh','laughed',['smiať sa']],
+  ['cry','cried',['plakať']],
+  ['smile','smiled',['usmievať sa']],
+  ['feel','felt',['cítiť']],
+  ['enjoy','enjoyed',['užívať si','tešiť sa']],
+
+  // interactions
+  ['meet','met',['stretnúť']],
+  ['call','called',['volať','zavolať']],
+  ['visit','visited',['navštíviť']],
+  ['invite','invited',['pozvať']],
+  ['live','lived',['žiť','bývať']],
+  ['stay','stayed',['zostať','ostať']],
+  ['leave','left',['odísť','nechať']],
+  ['arrive','arrived',['prísť','dorazi']],
+  ['return','returned',['vrátiť sa']],
+  ['travel','travelled',['cestovať']],
+
+  // common verbs
+  ['buy','bought',['kúpiť']],
+  ['sell','sold',['predať']],
+  ['pay','paid',['platiť','zaplatiť']],
+  ['cost','cost',['stáť (cena)']],
+  ['use','used',['používať','využívať']],
+  ['build','built',['stavať','postaviť']],
+  ['break','broke',['rozbiť','zlomiť']],
+  ['fix','fixed',['opraviť','spraviť']],
+  ['cut','cut',['krájať','strihať']],
+  ['carry','carried',['niesť']],
+  ['bring','brought',['priniesť','priviesť']],
+  ['send','sent',['poslať']],
+  ['catch','caught',['chytiť']],
+  ['throw','threw',['hodiť','hádzať']],
+  ['kick','kicked',['kopnúť','kopať']],
+  ['hit','hit',['udrieť','zasiahnuť']],
+  ['push','pushed',['tlačiť']],
+  ['pull','pulled',['ťahať']],
+  ['hold','held',['držať']],
+  ['drop','dropped',['pustiť','spadnúť']],
+  ['choose','chose',['vybrať si','zvoliť']],
+  ['change','changed',['meniť','zmeniť']],
+  ['start','started',['začať']],
+  ['begin','began',['začať']],
+  ['stop','stopped',['zastaviť','prestať']],
+  ['finish','finished',['skončiť','dokončiť']],
+  ['wait','waited',['čakať']],
+  ['show','showed',['ukázať']],
+
+  // weather / nature
+  ['rain','rained',['pršať']],
+  ['snow','snowed',['snežiť']],
+  ['shine','shone',['svietiť']],
+  ['grow','grew',['rásť','pestovať']],
+  ['plant','planted',['zasadiť','sadiť']],
+
+  // small ones
+  ['can','could',['môcť','vedieť']],
+  ['must','must',['musieť']],
+
+  // animals/sounds
+  ['bark','barked',['štekať']],
+  ['miaow','miaowed',['mňaukať']],
+];
+
+/* ---------------------------------------------------------------- *
+ * Build lookup maps (en→entry and sk→entry)                        *
+ * ---------------------------------------------------------------- */
+const norm = s => (s || '').trim().toLowerCase()
+  .replace(/^to\s+/, '')
+  .replace(/\s+sa$/, '')   // strip Slovak reflexive "sa" for matching
+  .replace(/\s+/g, ' ');
+
+const enMap = new Map();
+const skMap = new Map();
+for (const [en, past, skList] of VERBS) {
+  const entry = { en, past, sk: skList };
+  enMap.set(norm(en), entry);
+  for (const s of skList) {
+    if (!skMap.has(norm(s))) skMap.set(norm(s), entry);
+  }
+}
+
+/* ---------------------------------------------------------------- *
+ * Conjugation helpers                                              *
+ * ---------------------------------------------------------------- */
+const VOWELS = 'aeiou';
+const isVowel = c => c && VOWELS.includes(c.toLowerCase());
+
+function isConsonantY(verb) {
+  return verb.length >= 2 && verb.endsWith('y') && !isVowel(verb.charAt(verb.length - 2));
+}
+function endsInSibilant(verb) {
+  return /(s|x|z|ch|sh|o)$/.test(verb);
+}
+function isCVC(verb) {
+  if (verb.length < 3) return false;
+  const a = verb[verb.length - 3], b = verb[verb.length - 2], c = verb[verb.length - 1];
+  if (isVowel(a) || !isVowel(b) || isVowel(c)) return false;
+  if ('wxy'.includes(c)) return false;
+  return true;
+}
+
+/* Returns parts: { stem, ending, removed?, doubled? } so we can highlight */
+function thirdPersonS(verb) {
+  if (verb === 'be') return { whole:'is', irregular:true };
+  if (verb === 'have') return { stem:'ha', ending:'s', whole:'has', removed:'ve' };
+  if (verb === 'do') return { stem:'do', ending:'es', whole:'does' };
+  if (verb === 'go') return { stem:'go', ending:'es', whole:'goes' };
+  if (verb === 'can') return { whole:'can', irregular:true };
+  if (verb === 'must') return { whole:'must', irregular:true };
+  if (isConsonantY(verb)) {
+    return { stem: verb.slice(0, -1), ending: 'ies', whole: verb.slice(0, -1) + 'ies', removed: 'y' };
+  }
+  if (endsInSibilant(verb)) {
+    return { stem: verb, ending: 'es', whole: verb + 'es' };
+  }
+  return { stem: verb, ending: 's', whole: verb + 's' };
+}
+
+function ingForm(verb) {
+  if (verb === 'be') return { stem:'be', ending:'ing', whole:'being' };
+  if (verb === 'lie') return { stem:'l', ending:'ying', whole:'lying', removed:'ie' };
+  if (verb === 'die') return { stem:'d', ending:'ying', whole:'dying', removed:'ie' };
+  if (verb === 'tie') return { stem:'t', ending:'ying', whole:'tying', removed:'ie' };
+  if (verb.endsWith('ie')) {
+    const stem = verb.slice(0, -2);
+    return { stem, ending:'ying', whole: stem + 'ying', removed:'ie' };
+  }
+  if (verb.endsWith('e') && verb.length > 2) {
+    const stem = verb.slice(0, -1);
+    return { stem, ending:'ing', whole: stem + 'ing', removed:'e' };
+  }
+  if (isCVC(verb)) {
+    const last = verb[verb.length - 1];
+    return { stem: verb, ending: 'ing', whole: verb + last + 'ing', doubled: last };
+  }
+  return { stem: verb, ending: 'ing', whole: verb + 'ing' };
+}
+
+function regularPast(verb) {
+  if (verb.endsWith('e')) {
+    return { stem: verb, ending: 'd', whole: verb + 'd' };
+  }
+  if (isConsonantY(verb)) {
+    return { stem: verb.slice(0, -1), ending:'ied', whole: verb.slice(0, -1) + 'ied', removed:'y' };
+  }
+  if (isCVC(verb)) {
+    const last = verb[verb.length - 1];
+    return { stem: verb, ending:'ed', whole: verb + last + 'ed', doubled: last };
+  }
+  return { stem: verb, ending:'ed', whole: verb + 'ed' };
+}
+
+/* ---------------------------------------------------------------- *
+ * Past participles (V3) for irregular verbs                        *
+ * Regular verbs use the same form as past simple (e.g. played).    *
+ * ---------------------------------------------------------------- */
+const IRREGULAR_PP = {
+  'be': 'been',
+  'have': 'had',
+  'do': 'done',
+  'go': 'gone',
+  'come': 'come',
+  'get': 'got',           // BrE; AmE "gotten" — keeping "got" for simplicity
+  'make': 'made',
+  'take': 'taken',
+  'give': 'given',
+  'put': 'put',
+  'say': 'said',
+  'tell': 'told',
+  'know': 'known',
+  'think': 'thought',
+  'run': 'run',
+  'swim': 'swum',
+  'fly': 'flown',
+  'drive': 'driven',
+  'ride': 'ridden',
+  'fall': 'fallen',
+  'sit': 'sat',
+  'stand': 'stood',
+  'lie': 'lain',
+  'eat': 'eaten',
+  'drink': 'drunk',
+  'sleep': 'slept',
+  'wake': 'woken',
+  'read': 'read',
+  'write': 'written',
+  'draw': 'drawn',
+  'teach': 'taught',
+  'hear': 'heard',
+  'speak': 'spoken',
+  'sing': 'sung',
+  'see': 'seen',
+  'find': 'found',
+  'lose': 'lost',
+  'win': 'won',
+  'feel': 'felt',
+  'meet': 'met',
+  'leave': 'left',
+  'buy': 'bought',
+  'sell': 'sold',
+  'pay': 'paid',
+  'cost': 'cost',
+  'build': 'built',
+  'break': 'broken',
+  'cut': 'cut',
+  'bring': 'brought',
+  'send': 'sent',
+  'catch': 'caught',
+  'throw': 'thrown',
+  'hit': 'hit',
+  'hold': 'held',
+  'choose': 'chosen',
+  'begin': 'begun',
+  'shine': 'shone',
+  'grow': 'grown',
+  'can': 'been able to',
+  'must': 'had to',
+};
+
+/* True if this verb's past simple differs from "base + -ed". */
+function isIrregular(entry) {
+  if (!entry || !entry.past) return false;
+  if (entry.past.includes('/')) return true;       // be → was/were
+  return entry.past !== regularPast(entry.en).whole;
+}
+
+function pastParticiple(entry) {
+  if (!entry) return '';
+  if (IRREGULAR_PP[entry.en]) return IRREGULAR_PP[entry.en];
+  // Regular verbs: V2 == V3
+  return regularPast(entry.en).whole;
+}
+
+/* ---------------------------------------------------------------- *
+ * Slovak conjugation (for quiz prompts)                            *
+ * Pragmatic: hand-table for irregulars + class-based fallback.     *
+ * Past tense uses gender-correct -l form per pronoun.              *
+ * ---------------------------------------------------------------- */
+const SK_PRONS = {
+  i:   { sk: 'Ja',  pastAux: 'som',  pastL: 'l'  },
+  ty:  { sk: 'Ty',  pastAux: 'si',   pastL: 'l'  },
+  on:  { sk: 'On',  pastAux: '',     pastL: 'l'  },
+  ona: { sk: 'Ona', pastAux: '',     pastL: 'la' },
+  ono: { sk: 'Ono', pastAux: '',     pastL: 'lo' },
+  my:  { sk: 'My',  pastAux: 'sme',  pastL: 'li' },
+  vy:  { sk: 'Vy',  pastAux: 'ste',  pastL: 'li' },
+  oni: { sk: 'Oni', pastAux: '',     pastL: 'li' },
+};
+
+const SK_FUT_AUX = {
+  i:'budem', ty:'budeš', on:'bude', ona:'bude', ono:'bude',
+  my:'budeme', vy:'budete', oni:'budú'
+};
+
+/* Irregular present forms keyed by infinitive (without "sa"). */
+const SK_PRES_IRREG = {
+  'byť':    {i:'som',     ty:'si',       on:'je',       ona:'je',       ono:'je',       my:'sme',       vy:'ste',       oni:'sú'},
+  'mať':    {i:'mám',     ty:'máš',      on:'má',       ona:'má',       ono:'má',       my:'máme',      vy:'máte',      oni:'majú'},
+  'ísť':    {i:'idem',    ty:'ideš',     on:'ide',      ona:'ide',      ono:'ide',      my:'ideme',     vy:'idete',     oni:'idú'},
+  'jesť':   {i:'jem',     ty:'ješ',      on:'je',       ona:'je',       ono:'je',       my:'jeme',      vy:'jete',      oni:'jedia'},
+  'piť':    {i:'pijem',   ty:'piješ',    on:'pije',     ona:'pije',     ono:'pije',     my:'pijeme',    vy:'pijete',    oni:'pijú'},
+  'vedieť': {i:'viem',    ty:'vieš',     on:'vie',      ona:'vie',      ono:'vie',      my:'vieme',     vy:'viete',     oni:'vedia'},
+  'môcť':   {i:'môžem',   ty:'môžeš',    on:'môže',     ona:'môže',     ono:'môže',     my:'môžeme',    vy:'môžete',    oni:'môžu'},
+  'musieť': {i:'musím',   ty:'musíš',    on:'musí',     ona:'musí',     ono:'musí',     my:'musíme',    vy:'musíte',    oni:'musia'},
+  'chcieť': {i:'chcem',   ty:'chceš',    on:'chce',     ona:'chce',     ono:'chce',     my:'chceme',    vy:'chcete',    oni:'chcú'},
+  'vidieť': {i:'vidím',   ty:'vidíš',    on:'vidí',     ona:'vidí',     ono:'vidí',     my:'vidíme',    vy:'vidíte',    oni:'vidia'},
+  'spať':   {i:'spím',    ty:'spíš',     on:'spí',      ona:'spí',      ono:'spí',      my:'spíme',     vy:'spíte',     oni:'spia'},
+  'stáť':   {i:'stojím',  ty:'stojíš',   on:'stojí',    ona:'stojí',    ono:'stojí',    my:'stojíme',   vy:'stojíte',   oni:'stoja'},
+  'sedieť': {i:'sedím',   ty:'sedíš',    on:'sedí',     ona:'sedí',     ono:'sedí',     my:'sedíme',    vy:'sedíte',    oni:'sedia'},
+  'ležať':  {i:'ležím',   ty:'ležíš',    on:'leží',     ona:'leží',     ono:'leží',     my:'ležíme',    vy:'ležíte',    oni:'ležia'},
+  'bežať':  {i:'bežím',   ty:'bežíš',    on:'beží',     ona:'beží',     ono:'beží',     my:'bežíme',    vy:'bežíte',    oni:'bežia'},
+  'písať':  {i:'píšem',   ty:'píšeš',    on:'píše',     ona:'píše',     ono:'píše',     my:'píšeme',    vy:'píšete',    oni:'píšu'},
+  'plakať': {i:'plačem',  ty:'plačeš',   on:'plače',    ona:'plače',    ono:'plače',    my:'plačeme',   vy:'plačete',   oni:'plačú'},
+  'niesť':  {i:'nesiem',  ty:'nesieš',   on:'nesie',    ona:'nesie',    ono:'nesie',    my:'nesieme',   vy:'nesiete',   oni:'nesú'},
+  'priniesť':{i:'prinesiem',ty:'prinesieš',on:'prinesie',ona:'prinesie',ono:'prinesie',my:'prinesieme',vy:'prinesiete',oni:'prinesú'},
+  'začať':  {i:'začnem',  ty:'začneš',   on:'začne',    ona:'začne',    ono:'začne',    my:'začneme',   vy:'začnete',   oni:'začnú'},
+  'piecť':  {i:'pečiem',  ty:'pečieš',   on:'pečie',    ona:'pečie',    ono:'pečie',    my:'pečieme',   vy:'pečiete',   oni:'pečú'},
+  'rásť':   {i:'rastiem', ty:'rastieš',  on:'rastie',   ona:'rastie',   ono:'rastie',   my:'rastieme',  vy:'rastiete',  oni:'rastú'},
+  'liezť':  {i:'leziem',  ty:'lezieš',   on:'lezie',    ona:'lezie',    ono:'lezie',    my:'leziem ',   vy:'leziete',   oni:'lezú'},
+  'zavrieť':{i:'zavriem', ty:'zavrieš',  on:'zavrie',   ona:'zavrie',   ono:'zavrie',   my:'zavrieme',  vy:'zavriete',  oni:'zavrú'},
+  'stretnúť':{i:'stretnem',ty:'stretneš',on:'stretne',  ona:'stretne',  ono:'stretne',  my:'stretneme', vy:'stretnete', oni:'stretnú'},
+};
+
+/* Irregular past stems — forms keyed by ending (l/la/lo/li). */
+const SK_PAST_IRREG = {
+  'byť':     { l:'bol',     la:'bola',     lo:'bolo',     li:'boli'     },
+  'mať':     { l:'mal',     la:'mala',     lo:'malo',     li:'mali'     },
+  'ísť':     { l:'išiel',   la:'išla',     lo:'išlo',     li:'išli'     },
+  'jesť':    { l:'jedol',   la:'jedla',    lo:'jedlo',    li:'jedli'    },
+  'piť':     { l:'pil',     la:'pila',     lo:'pilo',     li:'pili'     },
+  'vedieť':  { l:'vedel',   la:'vedela',   lo:'vedelo',   li:'vedeli'   },
+  'vidieť':  { l:'videl',   la:'videla',   lo:'videlo',   li:'videli'   },
+  'môcť':    { l:'mohol',   la:'mohla',    lo:'mohlo',    li:'mohli'    },
+  'musieť':  { l:'musel',   la:'musela',   lo:'muselo',   li:'museli'   },
+  'chcieť':  { l:'chcel',   la:'chcela',   lo:'chcelo',   li:'chceli'   },
+  'piecť':   { l:'piekol',  la:'piekla',   lo:'pieklo',   li:'piekli'   },
+  'niesť':   { l:'niesol',  la:'niesla',   lo:'nieslo',   li:'niesli'   },
+  'priniesť':{ l:'priniesol',la:'priniesla',lo:'prinieslo',li:'priniesli' },
+  'rásť':    { l:'rástol',  la:'rástla',   lo:'rástlo',   li:'rástli'   },
+  'liezť':   { l:'liezol',  la:'liezla',   lo:'liezlo',   li:'liezli'   },
+  'stretnúť':{ l:'stretol', la:'stretla',  lo:'stretlo',  li:'stretli'  },
+  'začať':   { l:'začal',   la:'začala',   lo:'začalo',   li:'začali'   },
+};
+
+function skPresent(inf, key) {
+  if (SK_PRES_IRREG[inf]) return SK_PRES_IRREG[inf][key];
+  // -ovať → uj-em pattern
+  if (inf.endsWith('ovať')) {
+    const stem = inf.slice(0, -4) + 'uj';
+    return stem + ({ i:'em', ty:'eš', on:'e', ona:'e', ono:'e', my:'eme', vy:'ete', oni:'ú' })[key];
+  }
+  // -iť → -ím pattern
+  if (inf.endsWith('iť')) {
+    const stem = inf.slice(0, -2);
+    return stem + ({ i:'ím', ty:'íš', on:'í', ona:'í', ono:'í', my:'íme', vy:'íte', oni:'ia' })[key];
+  }
+  // -ieť → -iem pattern (rozumieť → rozumiem)
+  if (inf.endsWith('ieť')) {
+    const stem = inf.slice(0, -3);
+    return stem + ({ i:'iem', ty:'ieš', on:'ie', ona:'ie', ono:'ie', my:'ieme', vy:'iete', oni:'ejú' })[key];
+  }
+  // -núť → -nem pattern
+  if (inf.endsWith('núť')) {
+    const stem = inf.slice(0, -3) + 'n';
+    return stem + ({ i:'em', ty:'eš', on:'e', ona:'e', ono:'e', my:'eme', vy:'ete', oni:'ú' })[key];
+  }
+  // -ať default → -ám pattern
+  if (inf.endsWith('ať')) {
+    const stem = inf.slice(0, -2);
+    return stem + ({ i:'ám', ty:'áš', on:'á', ona:'á', ono:'á', my:'áme', vy:'áte', oni:'ajú' })[key];
+  }
+  // catch-all
+  if (inf.endsWith('ť')) {
+    const stem = inf.slice(0, -1);
+    return stem + ({ i:'em', ty:'eš', on:'e', ona:'e', ono:'e', my:'eme', vy:'ete', oni:'ú' })[key];
+  }
+  return inf;
+}
+
+function skPastForm(inf, key) {
+  const ending = SK_PRONS[key].pastL;            // 'l' | 'la' | 'lo' | 'li'
+  if (SK_PAST_IRREG[inf]) return SK_PAST_IRREG[inf][ending];
+  // -núť verbs: drop -núť, add -ol/-la/-lo/-li (masc gets 'ol' connector)
+  if (inf.endsWith('núť')) {
+    const stem = inf.slice(0, -3);
+    return stem + (ending === 'l' ? 'ol' : ending);
+  }
+  // -ieť verbs: drop -ieť, add -el/-ela/-elo/-eli
+  if (inf.endsWith('ieť')) {
+    const stem = inf.slice(0, -3);
+    return stem + 'e' + ending;
+  }
+  // -ať / -iť / -ovať / -ť: drop ť, add ending
+  if (inf.endsWith('ť')) return inf.slice(0, -1) + ending;
+  return inf + ending;
+}
+
+function skConjugate(skBaseRaw, key, tense) {
+  if (!skBaseRaw || !SK_PRONS[key]) return skBaseRaw || '';
+  const skBase = skBaseRaw.trim();
+  const refl = / sa$/.test(skBase) ? ' sa' : '';
+  const inf = skBase.replace(/ sa$/, '');
+  const pron = SK_PRONS[key];
+
+  if (tense === 'pres')  return pron.sk + ' ' + skPresent(inf, key) + refl;
+  if (tense === 'presc') return pron.sk + ' práve ' + skPresent(inf, key) + refl;
+  if (tense === 'past') {
+    const aux = pron.pastAux ? ' ' + pron.pastAux : '';
+    return pron.sk + aux + ' ' + skPastForm(inf, key) + refl;
+  }
+  if (tense === 'fut')   return pron.sk + ' ' + SK_FUT_AUX[key] + ' ' + inf + refl;
+  return skBase;
+}
+
+/* ---------------------------------------------------------------- *
+ * Render the conjugation card                                      *
+ * ---------------------------------------------------------------- */
+/* Each tuple: [English label, English pron key, Slovak pron key, Slovak label]
+   - English key drives the formatters (i/you/heshe/we/they)
+   - Slovak key drives skConjugate (i/ty/on/ona/ono/my/vy/oni)               */
+const PRONOUNS_S = [
+  ['I',              'i',     'i',  'Ja'],
+  ['You',            'you',   'ty', 'Ty'],
+  ['He / She / It',  'heshe', 'on', 'On / Ona / Ono'],
+];
+const PRONOUNS_P = [
+  ['We',   'we',   'my',  'My'],
+  ['You',  'you',  'vy',  'Vy'],
+  ['They', 'they', 'oni', 'Oni'],
+];
+
+let currentTense = 'pres';
+let currentVerb = null;
+let currentSource = null;
+
+const TENSE_HINTS = {
+  pres:  'Present simple — bežné, opakujúce sa činnosti. <b>He / She / It</b> má koncovku.',
+  presc: 'Present continuous — práve teraz. Používa sa <b>am / is / are</b> + sloveso s <b>-ing</b>.',
+  past:  'Past simple — to, čo sa stalo. Pravidelné slovesá majú <b>-ed</b>, nepravidelné majú vlastný tvar.',
+  fut:   'Future simple — to, čo bude. Používa sa <b>will</b> + základný tvar slovesa pre všetky osoby.'
+};
+
+function renderConjugation() {
+  const area = document.getElementById('conjArea');
+  document.getElementById('legend').style.display = currentVerb ? 'flex' : 'none';
+  document.getElementById('tenseHint').innerHTML = TENSE_HINTS[currentTense];
+
+  if (!currentVerb) {
+    area.innerHTML = `<div class="empty-state"><div class="big">✨</div><div>Zadaj sloveso a uvidíš jeho časovanie.</div></div>`;
+    return;
+  }
+
+  const v = currentVerb.en;
+  const past = currentVerb.past;
+  const skBase = currentVerb.sk[0];
+  const showSk = !!document.getElementById('showSk')?.checked;
+
+  const fmtMap = {
+    pres:  (pron) => formatPresent(v, pron),
+    presc: (pron) => formatPresentCont(v, pron),
+    past:  (pron) => formatPast(v, past, pron),
+    fut:   (pron) => formatFuture(v, pron),
+  };
+  const fmt = fmtMap[currentTense];
+
+  // For "He / She / It" — show all three Slovak forms together
+  // (past tense produces gender-different endings: varil / varila / varilo).
+  const skLineFor = (skKey) => {
+    if (skKey === 'on') {
+      const a = skConjugate(skBase, 'on',  currentTense);
+      const b = skConjugate(skBase, 'ona', currentTense);
+      const c = skConjugate(skBase, 'ono', currentTense);
+      return `${a} / ${b} / ${c}`;
+    }
+    return skConjugate(skBase, skKey, currentTense);
+  };
+
+  const rowHtml = (label, pron, skKey) => {
+    const skLine = showSk
+      ? `<div class="form-sk">${skLineFor(skKey)}</div>`
+      : '';
+    return `<div class="row${showSk ? ' with-sk' : ''}">
+              <div class="pron">${label}</div>
+              <div class="form">${fmt(pron)}</div>
+              ${skLine}
+            </div>`;
+  };
+
+  area.innerHTML = `
+    <div class="conjugation">
+      <div class="col sing">
+        <h3>👤 Singular</h3>
+        ${PRONOUNS_S.map(([l, p, sk]) => rowHtml(l, p, sk)).join('')}
+      </div>
+      <div class="col plur">
+        <h3>👥 Plural</h3>
+        ${PRONOUNS_P.map(([l, p, sk]) => rowHtml(l, p, sk)).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function partsToHtml(parts) {
+  if (parts.irregular) return `<span class="ending">${parts.whole}</span>`;
+  let html = '';
+  if (parts.removed) {
+    html += `<span class="stem">${parts.stem}</span>`;
+    html += `<span class="removed">${parts.removed}</span>`;
+    html += `<span class="ending">${parts.ending}</span>`;
+    return html;
+  }
+  if (parts.doubled) {
+    html += `<span class="stem">${parts.stem}</span>`;
+    html += `<span class="doubled">${parts.doubled}</span>`;
+    html += `<span class="ending">${parts.ending}</span>`;
+    return html;
+  }
+  html += `<span class="stem">${parts.stem}</span>`;
+  if (parts.ending) html += `<span class="ending">${parts.ending}</span>`;
+  return html;
+}
+
+function formatPresent(verb, pron) {
+  if (verb === 'be') {
+    const map = { i:'am', you:'are', heshe:'is', we:'are', they:'are' };
+    return `<span class="ending">${map[pron]}</span>`;
+  }
+  if (pron === 'heshe') {
+    return partsToHtml(thirdPersonS(verb));
+  }
+  return `<span class="stem">${verb}</span>`;
+}
+
+function formatPresentCont(verb, pron) {
+  if (verb === 'be') {
+    const map = { i:'am being', you:'are being', heshe:'is being', we:'are being', they:'are being' };
+    return `<span class="ending">${map[pron]}</span>`;
+  }
+  const aux = ({ i:'am', you:'are', heshe:'is', we:'are', they:'are' })[pron];
+  return `<span class="aux">${aux}</span>` + partsToHtml(ingForm(verb));
+}
+
+function formatPast(verb, pastRaw, pron) {
+  if (verb === 'be') {
+    const map = { i:'was', you:'were', heshe:'was', we:'were', they:'were' };
+    return `<span class="ending">${map[pron]}</span>`;
+  }
+  if (verb === 'can')  return `<span class="ending">could</span>`;
+  if (verb === 'must') return `<span class="ending">had to</span>`;
+
+  const reg = regularPast(verb);
+  if (pastRaw && pastRaw !== reg.whole) {
+    return `<span class="ending">${pastRaw}</span>`;
+  }
+  return partsToHtml(reg);
+}
+
+function formatFuture(verb, _pron) {
+  return `<span class="aux">will</span><span class="stem">${verb}</span>`;
+}
+
+/* ---------------------------------------------------------------- *
+ * Render the irregular-forms card (V1 / V2 / V3)                    *
+ * Shown only when the current verb is irregular.                    *
+ * ---------------------------------------------------------------- */
+function renderIrregular() {
+  const card = document.getElementById('irregCard');
+  const titleEl = card.querySelector('h2');
+  const subEl = card.querySelector('.sub');
+
+  if (!currentVerb) {
+    card.classList.remove('show');
+    return;
+  }
+  card.classList.add('show');
+
+  const irregular = isIrregular(currentVerb);
+  const v1 = currentVerb.en;
+  let v2 = currentVerb.past || regularPast(v1).whole;
+  const v3 = pastParticiple(currentVerb);
+
+  // Adapt heading + subtitle to regular vs irregular verbs
+  if (irregular) {
+    titleEl.innerHTML = `<span class="stars">⭐</span> Tri tvary nepravidelného slovesa`;
+    subEl.textContent = 'Toto sloveso sa nečasuje pravidelne — zapamätaj si všetky tri tvary naspamäť.';
+  } else {
+    titleEl.innerHTML = `<span class="stars">✅</span> Tri tvary slovesa`;
+    subEl.innerHTML = `Toto je <b>pravidelné sloveso</b> — V2 a V3 sa tvoria príponou <b>-ed</b>, sú rovnaké.`;
+  }
+
+  const ex1 = `I <b>${v1}</b> every day.`;
+  const v2Example = currentVerb.past && currentVerb.past.includes('/')
+    ? `I <b>was</b> / We <b>were</b> there.`
+    : `Yesterday I <b>${v2}</b>.`;
+  const v3Example = `I have <b>${v3}</b> it before.`;
+
+  document.getElementById('irregForms').innerHTML = `
+    <div class="form-pill">
+      <span class="vlabel">V1</span>
+      <div class="meaning">Základný tvar</div>
+      <div class="word">${v1}</div>
+      <div class="example">${ex1}</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="form-pill">
+      <span class="vlabel">V2</span>
+      <div class="meaning">Minulý čas</div>
+      <div class="word">${v2}</div>
+      <div class="example">${v2Example}</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="form-pill">
+      <span class="vlabel">V3</span>
+      <div class="meaning">Príčastie minulé</div>
+      <div class="word">${v3}</div>
+      <div class="example">${v3Example}</div>
+    </div>
+  `;
+
+  document.getElementById('irregTip').innerHTML = irregular
+    ? `💡 <b>V3</b> sa používa po <b>have / has / had</b> (predprítomný čas) — napr. <i>I have ${v3} it.</i>`
+    : `💡 Pri pravidelných slovesách stačí pridať <b>-ed</b>. <b>V3</b> sa používa po <b>have / has / had</b> — napr. <i>I have ${v3} it.</i>`;
+}
+
+/* ---------------------------------------------------------------- *
+ * Translation flow                                                 *
+ * ---------------------------------------------------------------- */
+const $ = id => document.getElementById(id);
+const skInput = $('sk');
+const enInput = $('en');
+const status = $('status');
+
+let typingTimer = null;
+
+function setStatus(text, cls = '') {
+  status.className = 'translator-status ' + cls;
+  status.innerHTML = text;
+}
+
+function updateFromVerb(entry, source) {
+  currentVerb = entry;
+  currentSource = source;
+  const badge = source === 'local'
+    ? '<span class="badge local">slovník</span>'
+    : source === 'online'
+      ? '<span class="badge online">online</span>'
+      : '';
+  const irregNote = isIrregular(entry) ? ' <span class="badge irreg">nepravidelné</span>' : '';
+  setStatus(`✓ <b>${entry.en}</b> ↔ <b>${entry.sk[0]}</b>${badge}${irregNote}`, 'online');
+  renderConjugation();
+  renderIrregular();
+}
+
+async function translateSlovakToEnglish(skText) {
+  const t = norm(skText);
+  if (!t) return;
+  // 1. Local dictionary first
+  const hit = skMap.get(t);
+  if (hit) {
+    enInput.value = hit.en;
+    updateFromVerb(hit, 'local');
+    return;
+  }
+  // 2. Online fallback
+  setStatus('🌐 Hľadám online…', 'online');
+  try {
+    const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(skText)}&langpair=sk|en`);
+    const data = await res.json();
+    let raw = (data?.responseData?.translatedText || '').trim();
+    raw = raw.replace(/^to\s+/i, '').toLowerCase().split(/[,;\/]/)[0].trim();
+    if (!raw) throw new Error('empty');
+    enInput.value = raw;
+    const local = enMap.get(norm(raw));
+    if (local) updateFromVerb(local, 'local');
+    else updateFromVerb({ en: raw, past: regularPast(raw).whole, sk: [skText.trim()] }, 'online');
+  } catch (e) {
+    setStatus('⚠️ Online preklad zlyhal. Skús iné sloveso alebo zadaj angličtinu priamo.', 'err');
+  }
+}
+
+async function translateEnglishToSlovak(enText) {
+  const t = norm(enText);
+  if (!t) return;
+  const hit = enMap.get(t);
+  if (hit) {
+    skInput.value = hit.sk[0];
+    updateFromVerb(hit, 'local');
+    return;
+  }
+  setStatus('🌐 Hľadám online…', 'online');
+  try {
+    const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(enText)}&langpair=en|sk`);
+    const data = await res.json();
+    let raw = (data?.responseData?.translatedText || '').trim();
+    raw = raw.split(/[,;\/]/)[0].trim();
+    if (!raw) throw new Error('empty');
+    skInput.value = raw;
+    updateFromVerb({ en: t, past: regularPast(t).whole, sk: [raw] }, 'online');
+  } catch (e) {
+    setStatus('⚠️ Online preklad zlyhal. Skús iné sloveso.', 'err');
+  }
+}
+
+function debounce(fn, wait = 500) {
+  return (...args) => {
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(() => fn(...args), wait);
+  };
+}
+
+const debouncedSk = debounce(() => {
+  if (skInput.value.trim()) translateSlovakToEnglish(skInput.value);
+});
+const debouncedEn = debounce(() => {
+  if (enInput.value.trim()) translateEnglishToSlovak(enInput.value);
+});
+
+skInput.addEventListener('input', debouncedSk);
+enInput.addEventListener('input', debouncedEn);
+skInput.addEventListener('keydown', e => { if (e.key === 'Enter') { clearTimeout(typingTimer); translateSlovakToEnglish(skInput.value); } });
+enInput.addEventListener('keydown', e => { if (e.key === 'Enter') { clearTimeout(typingTimer); translateEnglishToSlovak(enInput.value); } });
+
+$('swap').addEventListener('click', () => {
+  const a = skInput.value, b = enInput.value;
+  skInput.value = b;
+  enInput.value = a;
+  if (skInput.value.trim()) translateSlovakToEnglish(skInput.value);
+});
+
+/* ---------------------------------------------------------------- *
+ * Tense bar                                                        *
+ * ---------------------------------------------------------------- */
+document.querySelectorAll('.tense').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.tense').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    currentTense = b.dataset.t;
+    renderConjugation();
+    // If the quiz is open, regenerate the question in the newly selected tense
+    if (quizActive) newQuizQuestion();
+  });
+});
+
+/* "Zobraziť po slovensky" toggle — re-render conjugation when switched */
+document.getElementById('showSk').addEventListener('change', renderConjugation);
+
+/* ---------------------------------------------------------------- *
+ * Quiz                                                             *
+ * ---------------------------------------------------------------- */
+let quizActive = false;
+let quizScore = 0, quizTries = 0;
+let quizQuestion = null;
+
+const quizArea = $('quizArea'), quizQ = $('quizQ'), feedback = $('feedback'), score = $('score');
+
+function pickQuizVerb() {
+  // Always pick a random verb from the local dictionary so each new
+  // question is a fresh challenge (independent of the translator above).
+  const all = Array.from(enMap.values());
+  return all[Math.floor(Math.random() * all.length)];
+}
+
+/* Each entry: [English label, English pron key, Slovak pron key]
+   English keys: i/you/heshe/we/they (used by formatters and expectedAnswer)
+   Slovak keys:  i/ty/on/ona/ono/my/vy/oni (used by skConjugate)         */
+function pickPron() {
+  const all = [
+    ['I',   'i',     'i'  ],
+    ['You', 'you',   'ty' ],
+    ['He',  'heshe', 'on' ],
+    ['She', 'heshe', 'ona'],
+    ['It',  'heshe', 'ono'],
+    ['We',  'we',    'my' ],
+    ['You', 'you',   'vy' ],
+    ['They','they',  'oni'],
+  ];
+  return all[Math.floor(Math.random() * all.length)];
+}
+
+function expectedAnswer(entry, tense, pronKey) {
+  const verb = entry.en;
+  if (tense === 'pres') {
+    if (verb === 'be') return ({ i:'am', you:'are', heshe:'is', we:'are', they:'are' })[pronKey];
+    if (pronKey === 'heshe') return thirdPersonS(verb).whole;
+    return verb;
+  }
+  if (tense === 'presc') {
+    if (verb === 'be') return ({ i:'am being', you:'are being', heshe:'is being', we:'are being', they:'are being' })[pronKey];
+    const aux = ({ i:'am', you:'are', heshe:'is', we:'are', they:'are' })[pronKey];
+    return `${aux} ${ingForm(verb).whole}`;
+  }
+  if (tense === 'past') {
+    if (verb === 'be') return ({ i:'was', you:'were', heshe:'was', we:'were', they:'were' })[pronKey];
+    if (verb === 'can')  return 'could';
+    if (verb === 'must') return 'had to';
+    const reg = regularPast(verb).whole;
+    if (entry.past && entry.past !== reg) return entry.past;
+    return reg;
+  }
+  if (tense === 'fut') {
+    return `will ${verb}`;
+  }
+}
+
+function newQuizQuestion() {
+  feedback.textContent = '';
+  feedback.className = 'feedback';
+  const entry = pickQuizVerb();
+  const [label, pronKey, skKey] = pickPron();
+  // Quiz tense follows the upper-section tab selection
+  const tense = currentTense;
+  const expected = expectedAnswer(entry, tense, pronKey);
+
+  const skPhrase = skConjugate(entry.sk[0], skKey, tense);
+
+  quizQuestion = { entry, label, pronKey, skKey, tense, expected, skPhrase };
+
+  const tenseLabel = ({pres:'prítomný', presc:'priebehový', past:'minulý', fut:'budúci'})[tense];
+  quizQ.innerHTML = `
+    <div class="quiz-prompt">
+      <span class="sk-flag">🇸🇰</span>
+      <span class="sk-word">${skPhrase}</span>
+      <span class="sk-tense">${tenseLabel} čas</span>
+    </div>
+    <div class="quiz-answer">
+      <span class="en-flag">🇬🇧</span>
+      <span class="pron">${label}</span>
+      <input id="quizInput" type="text" placeholder="…" autocomplete="off" spellcheck="false" />
+    </div>
+  `;
+  setTimeout(() => $('quizInput')?.focus(), 30);
+}
+
+function checkQuiz() {
+  if (!quizQuestion) return;
+  const inp = $('quizInput');
+  if (!inp) return;
+  const given = inp.value.trim().toLowerCase();
+  if (!given) return;
+  quizTries++;
+  const expected = quizQuestion.expected.toLowerCase();
+  if (given === expected) {
+    quizScore++;
+    feedback.textContent = '✅ Výborne! ' + quizQuestion.label + ' ' + quizQuestion.expected;
+    feedback.className = 'feedback ok';
+    setTimeout(newQuizQuestion, 1100);
+  } else {
+    feedback.textContent = '❌ Skús znova. Správne: ' + quizQuestion.label + ' ' + quizQuestion.expected
+                         + '  (' + quizQuestion.entry.en + ')';
+    feedback.className = 'feedback bad';
+  }
+  score.textContent = quizScore + ' / ' + quizTries;
+}
+
+$('quizStart').addEventListener('click', () => {
+  quizActive = true;
+  quizArea.style.display = 'grid';
+  $('quizReset').disabled = false;
+  $('quizStart').textContent = 'Pokračovať v kvíze';
+  newQuizQuestion();
+});
+$('quizReset').addEventListener('click', () => {
+  quizScore = 0; quizTries = 0;
+  score.textContent = '0 / 0';
+  feedback.textContent = '';
+});
+$('check').addEventListener('click', checkQuiz);
+$('next').addEventListener('click', newQuizQuestion);
+$('finish').addEventListener('click', finishQuiz);
+
+/* ---------------------------------------------------------------- *
+ * Finish-quiz summary overlay                                      *
+ * ---------------------------------------------------------------- */
+function gradeFor(pct, total) {
+  if (total === 0) return { emoji: '🤔', title: 'Žiadne otázky', msg: 'Skús odpovedať aspoň jednu otázku.' };
+  if (pct === 100) return { emoji: '🏆', title: 'Bezchybne!',     msg: 'Všetko správne — fantastické!' };
+  if (pct >= 80)   return { emoji: '🌟', title: 'Skvelá práca!',  msg: 'Skoro všetko správne — len tak ďalej!' };
+  if (pct >= 60)   return { emoji: '😊', title: 'Dobrá práca',    msg: 'Pekné, skús to ešte raz a bude to lepšie.' };
+  if (pct >= 40)   return { emoji: '💪', title: 'Trénuj ďalej',   msg: 'Skús to znova — každý pokus pomáha.' };
+  return            { emoji: '🌱', title: 'Začiatok je ťažký',  msg: 'Nič sa nedeje, skús to znova.' };
+}
+
+function finishQuiz() {
+  const total = quizTries;
+  const ok    = quizScore;
+  const bad   = total - ok;
+  const pct   = total === 0 ? 0 : Math.round(100 * ok / total);
+  const g     = gradeFor(pct, total);
+
+  $('stTotal').textContent = total;
+  $('stOk').textContent    = ok;
+  $('stBad').textContent   = bad;
+  $('stPct').textContent   = pct + '%';
+  $('gradeEmoji').textContent = g.emoji;
+  $('gradeTitle').textContent = g.title;
+  $('gradeMsg').textContent   = g.msg;
+
+  $('overlay').classList.add('show');
+}
+
+$('playAgain').addEventListener('click', () => {
+  quizScore = 0; quizTries = 0;
+  score.textContent = '0 / 0';
+  feedback.textContent = '';
+  $('overlay').classList.remove('show');
+  quizActive = true;
+  quizArea.style.display = 'grid';
+  $('quizStart').textContent = 'Pokračovať v kvíze';
+  newQuizQuestion();
+});
+$('closeSummary').addEventListener('click', () => {
+  $('overlay').classList.remove('show');
+  quizActive = false;
+  quizArea.style.display = 'none';
+  $('quizStart').textContent = 'Spustiť kvíz';
+});
+
+/* Global keyboard shortcuts */
+document.addEventListener('keydown', e => {
+  // Esc closes the summary overlay if it's open
+  if (e.key === 'Escape' && $('overlay').classList.contains('show')) {
+    e.preventDefault();
+    $('overlay').classList.remove('show');
+    return;
+  }
+  const tag = e.target.tagName;
+  const isQuizInput = e.target.id === 'quizInput';
+  if (tag === 'INPUT' && !isQuizInput) {
+    if (e.key === 'Escape') e.target.blur();
+    return;
+  }
+  if (e.key === 'Enter') {
+    if (quizActive) { e.preventDefault(); checkQuiz(); }
+  } else if (e.key.toLowerCase() === 'n') {
+    if (quizActive && !isQuizInput) { e.preventDefault(); newQuizQuestion(); }
+  } else if (e.key.toLowerCase() === 'f') {
+    if (quizActive && !isQuizInput) { e.preventDefault(); finishQuiz(); }
+  } else if (e.key === 'Escape') {
+    quizActive = false;
+    quizArea.style.display = 'none';
+    $('quizStart').textContent = 'Spustiť kvíz';
+  }
+});
+
+/* Demo seed: load "play" so the page isn't empty on first open */
+window.addEventListener('DOMContentLoaded', () => {
+  enInput.value = 'play';
+  translateEnglishToSlovak('play');
+});
+</script>
+</body>
+</html>
