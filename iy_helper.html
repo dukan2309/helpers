@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>I a Y – Pomocníci</title>
+<meta name="theme-color" content="#7c6cf2" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-1: #fef3f7;
+    --bg-2: #eef2ff;
+    --bg-3: #ecfeff;
+    --card: #ffffff;
+    --ink: #2b2b3f;
+    --muted: #6c6e89;
+    --line: #e7e9f4;
+    --primary: #7c6cf2;
+    --accent:  #ff7aa8;
+    --tvrde:   #f07d3a;
+    --makke:   #4a90d9;
+    --oboiake: #7c6cf2;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Quicksand', system-ui, sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(ellipse at 10% 0%,  var(--bg-1) 0%, transparent 55%),
+      radial-gradient(ellipse at 95% 10%, var(--bg-3) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 100%,var(--bg-2) 0%, transparent 60%),
+      #fafbff;
+    min-height: 100vh;
+    padding: 28px 18px 64px;
+  }
+
+  .wrap { max-width: 860px; margin: 0 auto; }
+
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 22px;
+    transition: color .15s;
+  }
+  .back:hover { color: var(--primary); }
+
+  header.hero { text-align: center; margin-bottom: 36px; }
+  header.hero h1 {
+    margin: 0;
+    font-weight: 700;
+    font-size: clamp(28px, 5vw, 44px);
+    letter-spacing: -0.5px;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  header.hero p {
+    margin: 8px 0 0;
+    color: var(--muted);
+    font-size: 16px;
+  }
+  header.hero p strong { color: var(--ink); }
+
+  .section-title {
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 40px 0 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* ── Rule cards ─────────────────────────────────────────────── */
+  .rules-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  @media (max-width: 650px) { .rules-grid { grid-template-columns: 1fr; } }
+
+  .rule-card {
+    background: var(--card);
+    border-radius: 18px;
+    padding: 20px 16px 18px;
+    border: 2px solid var(--line);
+    box-shadow: 0 4px 18px rgba(60,50,120,0.07);
+  }
+  .rule-card.tvrde  { border-color: #fac8a0; }
+  .rule-card.makke  { border-color: #a8c8f0; }
+  .rule-card.oboiake{ border-color: #c8c0f8; }
+
+  .rule-card .rule-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .rule-dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .tvrde  .rule-dot { background: var(--tvrde); }
+  .makke  .rule-dot { background: var(--makke); }
+  .oboiake.rule-dot { background: var(--oboiake); }
+  .rule-card h3 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .vowel-tag {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 999px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 14px;
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+  .tvrde  .vowel-tag { background: var(--tvrde); }
+  .makke  .vowel-tag { background: var(--makke); }
+  .oboiake .vowel-tag { background: var(--oboiake); }
+
+  .cons-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 12px;
+  }
+  .cons-chip {
+    padding: 3px 9px;
+    border-radius: 7px;
+    font-size: 14px;
+    font-weight: 700;
+    background: #f4f5fb;
+    color: var(--ink);
+    border: 1px solid var(--line);
+  }
+
+  .rule-note {
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .rule-note strong { color: var(--ink); white-space: nowrap; }
+
+  /* ── Vybrané slová accordion ────────────────────────────────── */
+  .vs-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  @media (max-width: 640px) { .vs-grid { grid-template-columns: repeat(2, 1fr); } }
+
+  .vs-tile {
+    background: var(--card);
+    border-radius: 14px;
+    border: 2px solid var(--line);
+    overflow: hidden;
+    box-shadow: 0 3px 12px rgba(60,50,120,0.06);
+    transition: border-color .15s, box-shadow .15s;
+    cursor: pointer;
+  }
+  .vs-tile:hover { border-color: var(--primary); box-shadow: 0 6px 20px rgba(60,50,120,0.13); }
+
+  .vs-btn {
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 14px 14px 14px 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: inherit;
+    color: var(--ink);
+    text-align: left;
+  }
+  .vs-btn:hover { background: #f7f6ff; }
+
+  .letter-badge {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: #fff;
+    font-size: 20px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .vs-btn-text {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    line-height: 1.3;
+  }
+  .vs-btn-text strong { color: var(--ink); font-size: 15px; display: block; }
+
+  .arrow {
+    font-size: 15px;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+
+  .vs-body { display: none; }
+
+  .word-list {
+    columns: 2;
+    column-gap: 16px;
+  }
+  .wc {
+    display: block;
+    padding: 5px 4px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    border-bottom: 1px solid #eef0fa;
+    break-inside: avoid;
+    line-height: 1.4;
+  }
+  .wc .hl { color: var(--primary); font-weight: 700; }
+
+  /* ── Výnimky po L ───────────────────────────────────────────── */
+  .vynimky-card {
+    background: var(--card);
+    border-radius: 18px;
+    padding: 22px 20px;
+    border: 2px solid #fac8a0;
+    box-shadow: 0 4px 18px rgba(60,50,120,0.07);
+    cursor: pointer;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .vynimky-card:hover {
+    border-color: var(--tvrde);
+    box-shadow: 0 8px 28px rgba(60,50,120,0.14);
+  }
+
+  .vynimky-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .l-badge {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--tvrde), #ffb86b);
+    color: #fff;
+    font-size: 20px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .vynimky-header h3 { margin: 0 0 4px; font-size: 16px; }
+  .vynimky-header p  { margin: 0; font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+
+  .wc-orange {
+    border-bottom-color: #f5d5b8;
+  }
+  .wc-orange .hl { color: var(--tvrde); }
+
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 48px;
+  }
+  footer .heart { color: var(--accent); }
+
+  /* ── Modal ──────────────────────────────────────────────────── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(30, 25, 60, 0.45);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal-box {
+    background: var(--card);
+    border-radius: 22px;
+    box-shadow: 0 20px 56px rgba(30, 25, 60, 0.24);
+    width: 100%;
+    max-width: 500px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: modal-in .18s ease;
+  }
+  @keyframes modal-in {
+    from { opacity: 0; transform: scale(.93); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  .modal-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 18px 16px;
+    border-bottom: 1px solid var(--line);
+    flex-shrink: 0;
+  }
+  .modal-head-text { flex: 1; }
+  .modal-head-text h2 { margin: 0; font-size: 16px; font-weight: 700; }
+  .modal-head-text span { font-size: 12px; color: var(--muted); font-weight: 600; }
+
+  .modal-close {
+    background: #f0f1fb;
+    border: none;
+    border-radius: 8px;
+    width: 32px; height: 32px;
+    font-size: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+  .modal-close:hover { background: #e2e3f5; color: var(--ink); }
+
+  .modal-body {
+    overflow-y: auto;
+    padding: 16px 20px 22px;
+  }
+
+  /* ── Quiz / Exercise ──────────────────────────────────── */
+  .quiz-card {
+    background: var(--card);
+    border-radius: 22px;
+    padding: 28px 24px 24px;
+    border: 2px solid #c8c0f8;
+    box-shadow: 0 6px 24px rgba(60,50,120,0.10);
+    margin-bottom: 40px;
+  }
+  .quiz-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px;
+  }
+  .quiz-title { font-size: 18px; font-weight: 700; color: var(--ink); }
+  .quiz-prog {
+    font-size: 13px; font-weight: 700;
+    color: var(--muted); background: #f0f1fb;
+    padding: 4px 12px; border-radius: 999px;
+  }
+  .quiz-prompt {
+    font-size: 13px; color: var(--muted); font-weight: 600;
+    text-align: center; margin-bottom: 14px;
+  }
+  .quiz-word-display {
+    font-size: 38px; font-weight: 700;
+    text-align: center; margin-bottom: 24px;
+    color: var(--ink); letter-spacing: 3px;
+  }
+  .quiz-gap {
+    display: inline-block;
+    min-width: 34px; text-align: center;
+    border-bottom: 3px solid var(--primary);
+    color: var(--primary);
+    transition: color .15s, border-color .15s;
+    letter-spacing: 0;
+  }
+  .quiz-gap.correct { color: #3db87a; border-color: #3db87a; }
+  .quiz-btns {
+    display: flex; justify-content: center;
+    gap: 12px; margin-bottom: 16px; flex-wrap: wrap;
+  }
+  .qbtn {
+    width: 66px; height: 58px;
+    border-radius: 14px;
+    border: 2px solid var(--line);
+    background: #f8f7ff;
+    font-family: inherit; font-size: 22px; font-weight: 700;
+    color: var(--ink); cursor: pointer;
+    transition: all .12s; flex-shrink: 0;
+  }
+  .qbtn:not(:disabled):hover { border-color: var(--primary); background: #f0edff; transform: translateY(-2px); }
+  .qbtn.q-correct { background: #d4f5e5; border-color: #3db87a; color: #1d7a50; }
+  .qbtn.q-wrong   { background: #ffe8ee; border-color: #e05580; color: #b02250; }
+  .qbtn:disabled  { cursor: default; }
+  .quiz-feedback {
+    min-height: 44px; text-align: center;
+    font-size: 13.5px; font-weight: 600; line-height: 1.5;
+    border-radius: 12px; padding: 10px 16px;
+  }
+  .quiz-feedback.fb-correct { background: #d4f5e5; color: #1d7a50; }
+  .quiz-feedback.fb-wrong   { background: #ffe8ee; color: #b02250; }
+  .quiz-feedback .quiz-hl   { font-weight: 800; text-decoration: underline; }
+  .quiz-next-btn {
+    margin-top: 12px;
+    background: rgba(255,255,255,0.35);
+    color: inherit; border: 2px solid currentColor; border-radius: 10px;
+    padding: 8px 22px; font-size: 14px; font-weight: 700;
+    font-family: inherit; cursor: pointer;
+    transition: background .12s;
+    display: inline-block;
+  }
+  .quiz-next-btn:hover { background: rgba(255,255,255,0.55); }
+  .quiz-done { text-align: center; padding: 8px 0 4px; }
+  .quiz-done .done-emoji { font-size: 52px; margin-bottom: 12px; }
+  .quiz-done .done-score { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .quiz-done .done-sub   { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+  .quiz-restart {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: #fff; border: none; border-radius: 14px;
+    padding: 13px 30px; font-size: 16px; font-weight: 700;
+    font-family: inherit; cursor: pointer;
+    transition: transform .12s, box-shadow .12s;
+  }
+  .quiz-restart:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(124,108,242,0.3); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a class="back" href="index.html">← Späť</a>
+
+  <header class="hero">
+    <h1>📝 I a Y v slovenčine</h1>
+    <p>Kedy píšeme mäkké <strong>i/í</strong> a kedy tvrdé <strong>y/ý</strong>?</p>
+  </header>
+
+  <!-- ── Exercise ─────────────────────────────────────── -->
+  <div class="quiz-card" id="quiz-card"></div>
+
+  <!-- ── Section 1: Základné pravidlo ───────────────────── -->
+  <div class="section-title">📚 Základné pravidlo</div>
+
+  <div class="rules-grid">
+
+    <div class="rule-card tvrde">
+      <div class="rule-label">
+        <div class="rule-dot"></div>
+        <h3>Tvrdé spoluhlásky</h3>
+      </div>
+      <div class="vowel-tag">y &nbsp;/&nbsp; ý</div>
+      <div class="cons-list">
+        <span class="cons-chip">h</span>
+        <span class="cons-chip">ch</span>
+        <span class="cons-chip">k</span>
+        <span class="cons-chip">g</span>
+        <span class="cons-chip">d</span>
+        <span class="cons-chip">t</span>
+        <span class="cons-chip">n</span>
+        <span class="cons-chip">l</span>
+      </div>
+      <div class="rule-note">Po týchto spoluhláskach píšeme <strong>vždy y/ý</strong>.</div>
+    </div>
+
+    <div class="rule-card makke">
+      <div class="rule-label">
+        <div class="rule-dot" style="background:var(--makke)"></div>
+        <h3>Mäkké spoluhlásky</h3>
+      </div>
+      <div class="vowel-tag">i &nbsp;/&nbsp; í</div>
+      <div class="cons-list">
+        <span class="cons-chip">ž</span>
+        <span class="cons-chip">š</span>
+        <span class="cons-chip">č</span>
+        <span class="cons-chip">dž</span>
+        <span class="cons-chip">c</span>
+        <span class="cons-chip">dz</span>
+        <span class="cons-chip">j</span>
+        <span class="cons-chip">ď</span>
+        <span class="cons-chip">ť</span>
+        <span class="cons-chip">ň</span>
+        <span class="cons-chip">ľ</span>
+      </div>
+      <div class="rule-note">Po týchto spoluhláskach píšeme <strong>vždy i/í</strong>.</div>
+    </div>
+
+    <div class="rule-card oboiake">
+      <div class="rule-label">
+        <div class="rule-dot" style="background:var(--oboiake)"></div>
+        <h3>Obojaké spoluhlásky</h3>
+      </div>
+      <div class="vowel-tag">i&nbsp; alebo&nbsp; y?</div>
+      <div class="cons-list">
+        <span class="cons-chip">b</span>
+        <span class="cons-chip">m</span>
+        <span class="cons-chip">p</span>
+        <span class="cons-chip">r</span>
+        <span class="cons-chip">s</span>
+        <span class="cons-chip">v</span>
+        <span class="cons-chip">z</span>
+        <span class="cons-chip">f</span>
+      </div>
+      <div class="rule-note">Záleží na slove. Ak je to <strong>vybrané slovo</strong> → y/ý. Ostatné → i/í.</div>
+    </div>
+
+  </div>
+
+  <!-- ── Section 2: Vybrané slová ───────────────────────── -->
+  <div class="section-title">⭐ Vybrané slová</div>
+
+  <div class="vs-grid">
+
+    <!-- B -->
+    <div class="vs-tile" id="vs-b">
+      <button class="vs-btn" onclick="openModal('vs-b')">
+        <span class="letter-badge">B</span>
+        <span class="vs-btn-text"><strong>vybrané slová po B</strong></span>
+        <span class="arrow">›</span>
+      </button>
+      <div class="vs-body">
+        <div class="word-list">
+          <span class="wc"><span class="hl">by</span></span>
+          <span class="wc">a<span class="hl">by</span></span>
+          <span class="wc"><span class="hl">bý</span>k</span>
+          <span class="wc"><span class="hl">bý</span>čí</span>
+          <span class="wc"><span class="hl">by</span>vol</span>
+          <span class="wc"><span class="hl">by</span>ľ</span>
+          <span class="wc"><span class="hl">by</span>lina</span>
+          <span class="wc"><span class="hl">by</span>strý</span>
+          <span class="wc"><span class="hl">by</span>strina</span>
+          <span class="wc"><span class="hl">By</span>strica</span>
+          <span class="wc"><span class="hl">By</span>tča</span>
+          <span class="wc"><span class="hl">by</span>ť</span>
+          <span class="wc">živo<span class="hl">by</span>tie</span>
+          <span class="wc"><span class="hl">by</span>tosť</span>
+          <span class="wc"><span class="hl">by</span>tostný</span>
+          <span class="wc"><span class="hl">bý</span>valý</span>
+          <span class="wc"><span class="hl">bý</span>vať</span>
+          <span class="wc">o<span class="hl">bý</span>vať</span>
+          <span class="wc">o<span class="hl">by</span>vateľ</span>
+          <span class="wc">pre<span class="hl">bý</span>vať</span>
+          <span class="wc"><span class="hl">by</span>dlo</span>
+          <span class="wc"><span class="hl">by</span>dlisko</span>
+          <span class="wc"><span class="hl">by</span>t</span>
+          <span class="wc"><span class="hl">by</span>tná</span>
+          <span class="wc">prí<span class="hl">by</span>tok</span>
+          <span class="wc">do<span class="hl">by</span>ť</span>
+          <span class="wc">vydo<span class="hl">by</span>ť</span>
+          <span class="wc">výdo<span class="hl">by</span>tok</span>
+          <span class="wc">do<span class="hl">bý</span>vať</span>
+          <span class="wc">do<span class="hl">bý</span>jať</span>
+          <span class="wc">do<span class="hl">by</span>tok</span>
+          <span class="wc">ná<span class="hl">by</span>tok</span>
+          <span class="wc">z<span class="hl">by</span>točný</span>
+          <span class="wc">nad<span class="hl">by</span>točný</span>
+          <span class="wc">pre<span class="hl">by</span>tok</span>
+          <span class="wc">ú<span class="hl">by</span>tok</span>
+          <span class="wc">od<span class="hl">by</span>t</span>
+          <span class="wc">neod<span class="hl">by</span>tný</span>
+          <span class="wc">prvo<span class="hl">by</span>tný</span>
+          <span class="wc">ko<span class="hl">by</span>la</span>
+          <span class="wc">o<span class="hl">by</span>čaj</span>
+          <span class="wc">o<span class="hl">by</span>čajný</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- M -->
+    <div class="vs-tile" id="vs-m">
+      <button class="vs-btn" onclick="openModal('vs-m')">
+        <span class="letter-badge">M</span>
+        <span class="vs-btn-text"><strong>vybrané slová po M</strong></span>
+        <span class="arrow">›</span>
+      </button>
+      <div class="vs-body">
+        <div class="word-list">
+          <span class="wc"><span class="hl">my</span></span>
+          <span class="wc"><span class="hl">my</span>kať</span>
+          <span class="wc"><span class="hl">my</span>knúť</span>
+          <span class="wc">za<span class="hl">my</span>kať</span>
+          <span class="wc">od<span class="hl">my</span>kať</span>
+          <span class="wc">po<span class="hl">my</span>kov</span>
+          <span class="wc"><span class="hl">mý</span>liť sa</span>
+          <span class="wc"><span class="hl">my</span>lný</span>
+          <span class="wc">o<span class="hl">my</span>l</span>
+          <span class="wc"><span class="hl">my</span>slieť</span>
+          <span class="wc"><span class="hl">my</span>šlienka</span>
+          <span class="wc"><span class="hl">my</span>seľ</span>
+          <span class="wc">pre<span class="hl">mý</span>šľať</span>
+          <span class="wc">z<span class="hl">my</span>sel</span>
+          <span class="wc">ú<span class="hl">my</span>sel</span>
+          <span class="wc">vý<span class="hl">my</span>sel</span>
+          <span class="wc">prie<span class="hl">my</span>sel</span>
+          <span class="wc"><span class="hl">my</span>s</span>
+          <span class="wc"><span class="hl">my</span>š</span>
+          <span class="wc">u<span class="hl">my</span>ť</span>
+          <span class="wc">u<span class="hl">mý</span>vať</span>
+          <span class="wc">po<span class="hl">my</span>je</span>
+          <span class="wc"><span class="hl">my</span>dlo</span>
+          <span class="wc"><span class="hl">My</span>java</span>
+          <span class="wc"><span class="hl">mý</span>to</span>
+          <span class="wc"><span class="hl">mý</span>tnik</span>
+          <span class="wc">č<span class="hl">mý</span>riť sa</span>
+          <span class="wc">h<span class="hl">mý</span>riť sa</span>
+          <span class="wc">h<span class="hl">my</span>z</span>
+          <span class="wc">s<span class="hl">my</span>k</span>
+          <span class="wc">pries<span class="hl">my</span>k</span>
+          <span class="wc">š<span class="hl">mý</span>kať sa</span>
+          <span class="wc">š<span class="hl">my</span>knúť sa</span>
+          <span class="wc">š<span class="hl">my</span>k</span>
+          <span class="wc">š<span class="hl">my</span>kľavka</span>
+          <span class="wc">ž<span class="hl">mý</span>kať</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- P -->
+    <div class="vs-tile" id="vs-p">
+      <button class="vs-btn" onclick="openModal('vs-p')">
+        <span class="letter-badge">P</span>
+        <span class="vs-btn-text"><strong>vybrané slová po P</strong></span>
+        <span class="arrow">›</span>
+      </button>
+      <div class="vs-body">
+        <div class="word-list">
+          <span class="wc"><span class="hl">pý</span>cha</span>
+          <span class="wc"><span class="hl">pý</span>šiť sa</span>
+          <span class="wc"><span class="hl">py</span>šnieť</span>
+          <span class="wc"><span class="hl">py</span>šný</span>
+          <span class="wc">pre<span class="hl">py</span>ch</span>
+          <span class="wc"><span class="hl">py</span>kať</span>
+          <span class="wc"><span class="hl">pý</span>r</span>
+          <span class="wc"><span class="hl">pý</span>riť sa</span>
+          <span class="wc"><span class="hl">py</span>sk</span>
+          <span class="wc"><span class="hl">py</span>skatý</span>
+          <span class="wc"><span class="hl">py</span>štek</span>
+          <span class="wc"><span class="hl">pý</span>tať sa</span>
+          <span class="wc">s<span class="hl">py</span>tovať sa</span>
+          <span class="wc">o<span class="hl">py</span>tovať sa</span>
+          <span class="wc">do<span class="hl">py</span>t</span>
+          <span class="wc"><span class="hl">py</span>tliak</span>
+          <span class="wc">ko<span class="hl">py</span>to</span>
+          <span class="wc"><span class="hl">py</span>žamo</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- R -->
+    <div class="vs-tile" id="vs-r">
+      <button class="vs-btn" onclick="openModal('vs-r')">
+        <span class="letter-badge">R</span>
+        <span class="vs-btn-text"><strong>vybrané slová po R</strong></span>
+        <span class="arrow">›</span>
+      </button>
+      <div class="vs-body">
+        <div class="word-list">
+          <span class="wc"><span class="hl">ry</span>ba</span>
+          <span class="wc"><span class="hl">ry</span>bník</span>
+          <span class="wc"><span class="hl">ry</span>bina</span>
+          <span class="wc"><span class="hl">ry</span>čať</span>
+          <span class="wc"><span class="hl">ry</span>k</span>
+          <span class="wc"><span class="hl">rý</span>dzi</span>
+          <span class="wc"><span class="hl">rý</span>dzik</span>
+          <span class="wc"><span class="hl">ry</span>ha</span>
+          <span class="wc"><span class="hl">rý</span>chly</span>
+          <span class="wc">z<span class="hl">rý</span>chliť</span>
+          <span class="wc">z<span class="hl">rý</span>chľovať</span>
+          <span class="wc"><span class="hl">ry</span>s</span>
+          <span class="wc"><span class="hl">ry</span>sovať</span>
+          <span class="wc"><span class="hl">ry</span>šavý</span>
+          <span class="wc"><span class="hl">ry</span>ť</span>
+          <span class="wc">roz<span class="hl">rý</span>vať</span>
+          <span class="wc"><span class="hl">rý</span>ľ</span>
+          <span class="wc">ú<span class="hl">ry</span>vok</span>
+          <span class="wc">po<span class="hl">ry</span>v</span>
+          <span class="wc">b<span class="hl">rý</span>zgať</span>
+          <span class="wc">h<span class="hl">rý</span>zť</span>
+          <span class="wc">ko<span class="hl">ry</span>to</span>
+          <span class="wc">ko<span class="hl">ry</span>tnačka</span>
+          <span class="wc">Ko<span class="hl">ry</span>tnica</span>
+          <span class="wc">k<span class="hl">ry</span>ť</span>
+          <span class="wc">sk<span class="hl">ry</span>ť</span>
+          <span class="wc">pok<span class="hl">ry</span>ť</span>
+          <span class="wc">pok<span class="hl">rý</span>vka</span>
+          <span class="wc">prik<span class="hl">ry</span>ť</span>
+          <span class="wc">prik<span class="hl">rý</span>vka</span>
+          <span class="wc">sk<span class="hl">rý</span>ša</span>
+          <span class="wc">úk<span class="hl">ry</span>t</span>
+          <span class="wc">k<span class="hl">ry</span>ha</span>
+          <span class="wc">p<span class="hl">rý</span>štiť</span>
+          <span class="wc">st<span class="hl">rý</span>ko</span>
+          <span class="wc">st<span class="hl">rý</span>c</span>
+          <span class="wc">st<span class="hl">ry</span>ná</span>
+          <span class="wc">t<span class="hl">rý</span>zniť</span>
+          <span class="wc">t<span class="hl">ry</span>zna</span>
+          <span class="wc">t<span class="hl">ry</span>sk</span>
+          <span class="wc">va<span class="hl">ry</span>to</span>
+          <span class="wc"><span class="hl">rý</span>m</span>
+          <span class="wc"><span class="hl">rý</span>movať sa</span>
+          <span class="wc"><span class="hl">rý</span>pať</span>
+          <span class="wc"><span class="hl">ry</span>tier</span>
+          <span class="wc"><span class="hl">ry</span>ža</span>
+          <span class="wc">b<span class="hl">ry</span>ndza</span>
+          <span class="wc">To<span class="hl">ry</span>sa</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- S -->
+    <div class="vs-tile" id="vs-s">
+      <button class="vs-btn" onclick="openModal('vs-s')">
+        <span class="letter-badge">S</span>
+        <span class="vs-btn-text"><strong>vybrané slová po S</strong></span>
+        <span class="arrow">›</span>
+      </button>
+      <div class="vs-body">
+        <div class="word-list">
+          <span class="wc"><span class="hl">sy</span>chravý</span>
+          <span class="wc"><span class="hl">sy</span>čať</span>
+          <span class="wc"><span class="hl">sy</span>kať</span>
+          <span class="wc"><span class="hl">sy</span>kavý</span>
+          <span class="wc"><span class="hl">sy</span>kot</span>
+          <span class="wc"><span class="hl">sý</span>korka</span>
+          <span class="wc"><span class="hl">sy</span>n</span>
+          <span class="wc"><span class="hl">sy</span>pať</span>
+          <span class="wc"><span class="hl">sý</span>pka</span>
+          <span class="wc">o<span class="hl">sý</span>pky</span>
+          <span class="wc"><span class="hl">sy</span>pký</span>
+          <span class="wc"><span class="hl">sy</span>r</span>
+          <span class="wc"><span class="hl">sy</span>rovník</span>
+          <span class="wc"><span class="hl">sy</span>seľ</span>
+          <span class="wc"><span class="hl">sý</span>ty</span>
+          <span class="wc">na<span class="hl">sý</span>tiť</span>
+          <span class="wc">nená<span class="hl">sy</span>tný</span>
+          <span class="wc">vy<span class="hl">sy</span>chať</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- V -->
+    <div class="vs-tile" id="vs-v">
+      <button class="vs-btn" onclick="openModal('vs-v')">
+        <span class="letter-badge">V</span>
+        <span class="vs-btn-text"><strong>vybrané slová po V</strong></span>
+        <span class="arrow">›</span>
+      </button>
+      <div class="vs-body">
+        <div class="word-list">
+          <span class="wc"><span class="hl">vy</span></span>
+          <span class="wc"><span class="hl">vy</span>kať</span>
+          <span class="wc"><span class="hl">vy</span>dra</span>
+          <span class="wc"><span class="hl">vy</span>hňa</span>
+          <span class="wc"><span class="hl">vý</span>r</span>
+          <span class="wc"><span class="hl">vý</span>skať</span>
+          <span class="wc"><span class="hl">vý</span>skot</span>
+          <span class="wc"><span class="hl">vy</span>soký</span>
+          <span class="wc"><span class="hl">vý</span>ška</span>
+          <span class="wc"><span class="hl">vý</span>šina</span>
+          <span class="wc"><span class="hl">Vy</span>šehrad</span>
+          <span class="wc"><span class="hl">vy</span>še</span>
+          <span class="wc"><span class="hl">vy</span>ť</span>
+          <span class="wc">za<span class="hl">vý</span>jať</span>
+          <span class="wc"><span class="hl">vy</span>žla</span>
+          <span class="wc">z<span class="hl">vý</span>šiť sa</span>
+          <span class="wc">z<span class="hl">vy</span>šovať</span>
+          <span class="wc">z<span class="hl">vy</span>šok</span>
+          <span class="wc">z<span class="hl">vy</span>k</span>
+          <span class="wc">z<span class="hl">vy</span>kať</span>
+          <span class="wc">z<span class="hl">vy</span>knúť</span>
+          <span class="wc">z<span class="hl">vy</span>čajný</span>
+          <span class="wc">ná<span class="hl">vy</span>k</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Z -->
+    <div class="vs-tile" id="vs-z">
+      <button class="vs-btn" onclick="openModal('vs-z')">
+        <span class="letter-badge">Z</span>
+        <span class="vs-btn-text"><strong>vybrané slová po Z</strong></span>
+        <span class="arrow">›</span>
+      </button>
+      <div class="vs-body">
+        <div class="word-list">
+          <span class="wc">ja<span class="hl">zy</span>k</span>
+          <span class="wc">ja<span class="hl">zy</span>čný</span>
+          <span class="wc">ja<span class="hl">zy</span>čnica</span>
+          <span class="wc">na<span class="hl">zý</span>vať</span>
+          <span class="wc">po<span class="hl">zý</span>vať</span>
+          <span class="wc">vy<span class="hl">zý</span>vať</span>
+          <span class="wc">pre<span class="hl">zý</span>vať</span>
+          <span class="wc">v<span class="hl">zý</span>vať</span>
+          <span class="wc">o<span class="hl">zý</span>vať sa</span>
+          <span class="wc">pri<span class="hl">zý</span>vať</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Section 3: Výnimky po L ────────────────────────── -->
+  <div class="section-title">⚠️ Výnimky po L</div>
+
+  <div class="vynimky-card" onclick="openModalL()">
+    <div class="vynimky-header">
+      <div class="l-badge">L</div>
+      <div>
+        <h3>Slová s Y/Ý po L</h3>
+        <p>L je tvrdá spoluhláska. Tieto slová si treba zapamätať ako výnimky — píšeme v nich Y/Ý po L.</p>
+      </div>
+      <span style="font-size:18px;color:var(--muted);flex-shrink:0">›</span>
+    </div>
+    <div class="word-list" id="vynimky-words" style="display:none">
+      <span class="wc wc-orange"><span class="hl">ly</span>ko</span>
+      <span class="wc wc-orange"><span class="hl">ly</span>sý</span>
+      <span class="wc wc-orange"><span class="hl">ly</span>sina</span>
+      <span class="wc wc-orange"><span class="hl">lý</span>tko</span>
+      <span class="wc wc-orange"><span class="hl">ly</span>že</span>
+      <span class="wc wc-orange"><span class="hl">ly</span>žica</span>
+      <span class="wc wc-orange">b<span class="hl">lý</span>skať sa</span>
+      <span class="wc wc-orange">b<span class="hl">lý</span>skavý</span>
+      <span class="wc wc-orange">b<span class="hl">ly</span>šťať sa</span>
+      <span class="wc wc-orange">m<span class="hl">ly</span>n</span>
+      <span class="wc wc-orange">m<span class="hl">ly</span>nica</span>
+      <span class="wc wc-orange">p<span class="hl">ly</span>n</span>
+      <span class="wc wc-orange">p<span class="hl">ly</span>nný</span>
+      <span class="wc wc-orange">p<span class="hl">ly</span>náreň</span>
+      <span class="wc wc-orange">p<span class="hl">ly</span>núť</span>
+      <span class="wc wc-orange">p<span class="hl">ly</span>š</span>
+      <span class="wc wc-orange">vp<span class="hl">ly</span>v</span>
+      <span class="wc wc-orange">vp<span class="hl">ly</span>vný</span>
+      <span class="wc wc-orange">vp<span class="hl">lý</span>vať</span>
+      <span class="wc wc-orange">ovp<span class="hl">ly</span>vniť</span>
+      <span class="wc wc-orange">op<span class="hl">lý</span>vať</span>
+      <span class="wc wc-orange">sp<span class="hl">lý</span>vať</span>
+      <span class="wc wc-orange">p<span class="hl">ly</span>tký</span>
+      <span class="wc wc-orange">p<span class="hl">ly</span>tčina</span>
+      <span class="wc wc-orange">s<span class="hl">lý</span>chať</span>
+      <span class="wc wc-orange">vz<span class="hl">ly</span>kať</span>
+      <span class="wc wc-orange">vz<span class="hl">ly</span>k</span>
+      <span class="wc wc-orange">z<span class="hl">ly</span>hať</span>
+    </div>
+  </div>
+
+  <footer>
+    Spravil ocko s láskou <span class="heart">❤️</span>
+  </footer>
+
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <div class="letter-badge" id="modal-badge"></div>
+      <div class="modal-head-text">
+        <h2 id="modal-title"></h2>
+        <span id="modal-count"></span>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+<script>
+  // ── Quiz ──────────────────────────────────────────────────────
+  const QW = [
+    { b:'d',  a:'m',      ans:'y',       err_fam:'d je tvrdá spoluhláska → píšeme y',                    err_dlz:'dym nemá dĺžeň → píšeme y (nie ý)' },
+    { b:'ch', a:'ba',     ans:['y','ý'], err_fam:'ch je tvrdá spoluhláska → píšeme y alebo ý' },
+    { b:'t',  a:'čka',    ans:'y',       err_fam:'t je tvrdá spoluhláska → píšeme y',                    err_dlz:'tyčka nemá dĺžeň → píšeme y (nie ý)' },
+    { b:'h',  a:'bať',    ans:'ý',       err_fam:'h je tvrdá spoluhláska → píšeme ý',                    err_dlz:'hýbať má dĺžeň → píšeme ý (nie y)' },
+    { b:'ž',  a:'ak',     ans:'i',       err_fam:'ž je mäkká spoluhláska → píšeme i',                    err_dlz:'žiak nemá dĺžeň → píšeme i (nie í)' },
+    { b:'č',  a:'stý',    ans:'i',       err_fam:'č je mäkká spoluhláska → píšeme i',                    err_dlz:'čistý nemá dĺžeň → píšeme i (nie í)' },
+    { b:'š',  a:'kovný',  ans:'i',       err_fam:'š je mäkká spoluhláska → píšeme i',                    err_dlz:'šikovný nemá dĺžeň → píšeme i (nie í)' },
+    { b:'c',  a:'buľa',   ans:'i',       err_fam:'c je mäkká spoluhláska → píšeme i',                    err_dlz:'cibuľa nemá dĺžeň → píšeme i (nie í)' },
+    { b:'r',  a:'ba',     ans:'y',       err_fam:'ryba je vybrané slovo po "r" → píšeme y',              err_dlz:'ryba nemá dĺžeň → píšeme y (nie ý)' },
+    { b:'b',  a:'ť',      ans:'y',       err_fam:'byť je vybrané slovo po "b" → píšeme y',               err_dlz:'byť nemá dĺžeň → píšeme y (nie ý)' },
+    { b:'s',  a:'n',      ans:'y',       err_fam:'syn je vybrané slovo po "s" → píšeme y',               err_dlz:'syn nemá dĺžeň → píšeme y (nie ý)' },
+    { b:'m',  a:'š',      ans:'y',       err_fam:'myš je vybrané slovo po "m" → píšeme y',               err_dlz:'myš nemá dĺžeň → píšeme y (nie ý)' },
+    { b:'p',  a:'šný',    ans:'y',       err_fam:'pyšný je vybrané slovo po "p" → píšeme y',             err_dlz:'pyšný nemá dĺžeň → píšeme y (nie ý)' },
+    { b:'v',  a:'dra',    ans:'y',       err_fam:'vydra je vybrané slovo po "v" → píšeme y',             err_dlz:'vydra nemá dĺžeň → píšeme y (nie ý)' },
+    { b:'p',  a:'la',     ans:'í',       err_fam:'píla nie je vybrané slovo → po "p" píšeme í',         err_dlz:'píla má dĺžeň → píšeme í (nie i)' },
+    { b:'s',  a:'to',     ans:'i',       err_fam:'sito nie je vybrané slovo → po "s" píšeme i',         err_dlz:'sito nemá dĺžeň → píšeme i (nie í)' },
+    { b:'z',  a:'ma',     ans:'i',       err_fam:'zima nie je vybrané slovo → po "z" píšeme i',         err_dlz:'zima nemá dĺžeň → píšeme i (nie í)' },
+    { b:'v',  a:'la',     ans:'í',       err_fam:'víla nie je vybrané slovo → po "v" píšeme í',         err_dlz:'víla má dĺžeň → píšeme í (nie i)' },
+    { b:'b',  a:'č',      ans:'i',       err_fam:'bič nie je vybrané slovo → po "b" píšeme i',          err_dlz:'bič nemá dĺžeň → píšeme i (nie í)' },
+    { b:'m',  a:'sa',     ans:'i',       err_fam:'misa nie je vybrané slovo → po "m" píšeme i',         err_dlz:'misa nemá dĺžeň → píšeme i (nie í)' },
+  ];
+
+  let qDeck = [], qIdx = 0, qFirst = true, qScore = 0;
+
+  function shuffle(a) {
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function chooseCount() {
+    document.getElementById('quiz-card').innerHTML = `
+      <div class="quiz-header">
+        <span class="quiz-title">✏️ Cvičenie</span>
+      </div>
+      <div class="quiz-prompt" style="margin-bottom:20px;">Koľko slov chceš precvičiť?</div>
+      <div class="quiz-btns" style="margin-bottom:0;">
+        <button class="qbtn" style="width:72px;font-size:18px;" onclick="startQuiz(10)">10</button>
+        <button class="qbtn" style="width:72px;font-size:18px;" onclick="startQuiz(15)">15</button>
+        <button class="qbtn" style="width:72px;font-size:18px;" onclick="startQuiz(20)">20</button>
+      </div>`;
+  }
+
+  function startQuiz(n) {
+    qDeck = shuffle([...QW]).slice(0, n);
+    qIdx = 0; qScore = 0;
+    document.getElementById('quiz-card').innerHTML = `
+      <div class="quiz-header">
+        <span class="quiz-title">✏️ Cvičenie</span>
+        <span class="quiz-prog" id="quiz-prog"></span>
+      </div>
+      <div class="quiz-prompt">Doplň správne písmeno:</div>
+      <div class="quiz-word-display" id="quiz-word"></div>
+      <div class="quiz-btns">
+        <button class="qbtn" onclick="checkAnswer('i')">i</button>
+        <button class="qbtn" onclick="checkAnswer('í')">í</button>
+        <button class="qbtn" onclick="checkAnswer('y')">y</button>
+        <button class="qbtn" onclick="checkAnswer('ý')">ý</button>
+      </div>
+      <div class="quiz-feedback" id="quiz-feedback"></div>`;
+    showQ();
+  }
+
+  function showQ() {
+    const q = qDeck[qIdx];
+    document.getElementById('quiz-prog').textContent = (qIdx + 1) + ' / ' + qDeck.length;
+    document.getElementById('quiz-word').innerHTML =
+      q.b + '<span class="quiz-gap" id="quiz-gap"> </span>' + q.a;
+    document.querySelectorAll('.qbtn').forEach(b => {
+      b.classList.remove('q-correct', 'q-wrong');
+      b.disabled = false;
+    });
+    const fb = document.getElementById('quiz-feedback');
+    fb.textContent = '';
+    fb.className = 'quiz-feedback';
+    qFirst = true;
+  }
+
+  function checkAnswer(letter) {
+    const q = qDeck[qIdx];
+    const gap = document.getElementById('quiz-gap');
+    const fb  = document.getElementById('quiz-feedback');
+    if (!gap) return;
+
+    if (letter === q.ans || (Array.isArray(q.ans) && q.ans.includes(letter))) {
+      gap.textContent = letter;
+      gap.classList.add('correct');
+      if (qFirst) qScore++;
+      document.querySelectorAll('.qbtn').forEach(b => {
+        if (b.textContent === letter) b.classList.add('q-correct');
+        b.disabled = true;
+      });
+      const okMsg = q.err_fam.replace(q.b, `<strong class="quiz-hl">${q.b}</strong>`);
+      fb.innerHTML = '✓ Správne! &nbsp;·&nbsp; ' + okMsg +
+        '<div><button class="quiz-next-btn" onclick="nextWord()">Ďalšie slovo →</button></div>';
+      fb.className = 'quiz-feedback fb-correct';
+    } else {
+      qFirst = false;
+      document.querySelectorAll('.qbtn').forEach(b => {
+        if (b.textContent === letter) b.classList.add('q-wrong');
+      });
+      const isY = l => l === 'y' || l === 'ý';
+      const ref = Array.isArray(q.ans) ? q.ans[0] : q.ans;
+      const wrongFamily = isY(letter) !== isY(ref);
+      const msg = wrongFamily
+        ? q.err_fam.replace(q.b, `<strong class="quiz-hl">${q.b}</strong>`) + ` (nie ${letter})`
+        : q.err_dlz;
+      fb.innerHTML = '✗ ' + msg +
+        '<div><button class="quiz-next-btn" onclick="nextWord()">Ďalšie slovo →</button></div>';
+      fb.className = 'quiz-feedback fb-wrong';
+      setTimeout(() => {
+        document.querySelectorAll('.qbtn').forEach(b => {
+          if (b.textContent === letter) b.classList.remove('q-wrong');
+        });
+      }, 1500);
+    }
+  }
+
+  function nextWord() {
+    qIdx++;
+    qIdx >= qDeck.length ? showDone() : showQ();
+  }
+
+  function showDone() {
+    const pct = Math.round(qScore / qDeck.length * 100);
+    const em = pct >= 80 ? '🎉' : pct >= 60 ? '😊' : '💪';
+    document.getElementById('quiz-card').innerHTML = `
+      <div class="quiz-done">
+        <div class="done-emoji">${em}</div>
+        <div class="done-score">${qScore} / ${qDeck.length} správne</div>
+        <div class="done-sub">na prvý pokus</div>
+        <button class="quiz-restart" onclick="chooseCount()">Znova 🔄</button>
+      </div>`;
+  }
+
+  // ── Modal ──────────────────────────────────────────────────────
+  function openModal(id) {
+    const tile = document.getElementById(id);
+    const letter = tile.querySelector('.letter-badge').textContent.trim();
+    const words = tile.querySelector('.word-list').innerHTML;
+    const count = tile.querySelectorAll('.wc').length;
+
+    const badge = document.getElementById('modal-badge');
+    badge.textContent = letter;
+    badge.style.background = 'linear-gradient(135deg, var(--primary), var(--accent))';
+
+    document.getElementById('modal-title').textContent = 'Vybrané slová po ' + letter;
+    document.getElementById('modal-count').textContent = count + ' slov';
+    document.getElementById('modal-body').innerHTML = '<div class="word-list">' + words + '</div>';
+    document.getElementById('modal-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function openModalL() {
+    const words = document.getElementById('vynimky-words').innerHTML;
+    const count = document.querySelectorAll('#vynimky-words .wc').length;
+
+    const badge = document.getElementById('modal-badge');
+    badge.textContent = 'L';
+    badge.style.background = 'linear-gradient(135deg, var(--tvrde), #ffb86b)';
+
+    document.getElementById('modal-title').textContent = 'Výnimky po L';
+    document.getElementById('modal-count').textContent = count + ' slov';
+    document.getElementById('modal-body').innerHTML = '<div class="word-list wc-orange-list">' + words + '</div>';
+    document.getElementById('modal-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    document.getElementById('modal-overlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  chooseCount();
+</script>
+</body>
+</html>
