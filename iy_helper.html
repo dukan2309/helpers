@@ -379,8 +379,16 @@
   }
   .quiz-word-display {
     font-size: 38px; font-weight: 700;
-    text-align: center; margin-bottom: 24px;
+    text-align: center; margin-bottom: 10px;
     color: var(--ink); letter-spacing: 3px;
+  }
+  .quiz-ctx {
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+    min-height: 18px;
   }
   .quiz-gap {
     display: inline-block;
@@ -898,7 +906,7 @@
     { b:'š',   a:'pka',      ans:'í',       err_fam:'š je mäkká spoluhláska → píšeme í',         err_dlz:'šípka má dĺžeň → píšeme í (nie i)' },
     { b:'c',   a:'buľa',     ans:'i',       err_fam:'c je mäkká spoluhláska → píšeme i',         err_dlz:'cibuľa nemá dĺžeň → píšeme i (nie í)' },
     // ── Vybrané slová po B ────────────────────────────────────────
-    { b:'b',   a:'ť',        ans:'y',       err_fam:'byť je vybrané slovo po "b" → píšeme y',    err_dlz:'byť nemá dĺžeň → píšeme y (nie ý)' },
+    { b:'b',   a:'ť',        ans:'y',       ctx:'b_ť doma', err_fam:'byť je vybrané slovo po "b" → píšeme y',    err_dlz:'byť nemá dĺžeň → píšeme y (nie ý)' },
     { b:'b',   a:'strý',     ans:'y',       err_fam:'bystrý je vybrané slovo po "b" → píšeme y', err_dlz:'bystrý nemá dĺžeň → píšeme y (nie ý)' },
     { b:'b',   a:'lina',     ans:'y',       err_fam:'bylina je vybrané slovo po "b" → píšeme y', err_dlz:'bylina nemá dĺžeň → píšeme y (nie ý)' },
     { b:'b',   a:'vol',      ans:'y',       err_fam:'byvol je vybrané slovo po "b" → píšeme y',  err_dlz:'byvol nemá dĺžeň → píšeme y (nie ý)' },
@@ -926,7 +934,7 @@
     { b:'p',   a:'šný',      ans:'y',       err_fam:'pyšný je vybrané slovo po "p" → píšeme y',  err_dlz:'pyšný nemá dĺžeň → píšeme y (nie ý)' },
     { b:'p',   a:'cha',      ans:'ý',       err_fam:'pýcha je vybrané slovo po "p" → píšeme ý',  err_dlz:'pýcha má dĺžeň → píšeme ý (nie y)' },
     { b:'p',   a:'kať',      ans:'y',       err_fam:'pykať je vybrané slovo po "p" → píšeme y',  err_dlz:'pykať nemá dĺžeň → píšeme y (nie ý)' },
-    { b:'p',   a:'sk',       ans:'y',       err_fam:'pysk je vybrané slovo po "p" → píšeme y',   err_dlz:'pysk nemá dĺžeň → píšeme y (nie ý)' },
+    { b:'p',   a:'sk',       ans:'y',       ctx:'pohladil poníka po p_sku', err_fam:'pysk je vybrané slovo po "p" → píšeme y',   err_dlz:'pysk nemá dĺžeň → píšeme y (nie ý)' },
     { b:'kop', a:'to',       ans:'y', hl:'"p"', err_fam:'kopyto je vybrané slovo po "p" → píšeme y',   err_dlz:'kopyto nemá dĺžeň → píšeme y (nie ý)' },
     // ── Vybrané slová po R ────────────────────────────────────────
     { b:'r',   a:'ba',       ans:'y',       err_fam:'ryba je vybrané slovo po "r" → píšeme y',   err_dlz:'ryba nemá dĺžeň → píšeme y (nie ý)' },
@@ -963,7 +971,7 @@
     { b:'s',   a:'to',       ans:'i',       err_fam:'sito nie je vybrané slovo → po "s" píšeme i',  err_dlz:'sito nemá dĺžeň → píšeme i (nie í)' },
     { b:'s',   a:'la',       ans:'i',       err_fam:'sila nie je vybrané slovo → po "s" píšeme i',  err_dlz:'sila nemá dĺžeň → píšeme i (nie í)' },
     { b:'z',   a:'ma',       ans:'i',       err_fam:'zima nie je vybrané slovo → po "z" píšeme i',  err_dlz:'zima nemá dĺžeň → píšeme i (nie í)' },
-    { b:'v',   a:'la',       ans:'í',       err_fam:'víla nie je vybrané slovo → po "v" píšeme í',  err_dlz:'víla má dĺžeň → píšeme í (nie i)' },
+    { b:'v',   a:'la',       ans:'í',       ctx:'krásna v_la', err_fam:'víla nie je vybrané slovo → po "v" píšeme í',  err_dlz:'víla má dĺžeň → píšeme í (nie i)' },
     { b:'v',   a:'no',       ans:'í',       err_fam:'víno nie je vybrané slovo → po "v" píšeme í',  err_dlz:'víno má dĺžeň → píšeme í (nie i)' },
     { b:'b',   a:'č',        ans:'i',       err_fam:'bič nie je vybrané slovo → po "b" píšeme i',   err_dlz:'bič nemá dĺžeň → píšeme i (nie í)' },
     { b:'m',   a:'sa',       ans:'i',       err_fam:'misa nie je vybrané slovo → po "m" píšeme i',  err_dlz:'misa nemá dĺžeň → píšeme i (nie í)' },
@@ -977,10 +985,10 @@
     { b:'b',   a:'tosť',     ans:'y',       err_fam:'bytosť je vybrané slovo po "b" → píšeme y',      err_dlz:'bytosť nemá dĺžeň → píšeme y (nie ý)' },
     { b:'b',   a:'valý',     ans:'ý',       err_fam:'bývalý je vybrané slovo po "b" → píšeme ý',      err_dlz:'bývalý má dĺžeň → píšeme ý (nie y)' },
     { b:'ob',  a:'vať',      ans:'ý', hl:'"b"', err_fam:'obývať je vybrané slovo po "b" → píšeme ý',      err_dlz:'obývať má dĺžeň → píšeme ý (nie y)' },
-    { b:'ob',  a:'vateľ',    ans:'ý', hl:'"b"', err_fam:'obyvateľ je vybrané slovo po "b" → píšeme ý',    err_dlz:'obyvateľ má dĺžeň → píšeme ý (nie y)' },
+    { b:'ob',  a:'vateľ',    ans:'y', hl:'"b"', err_fam:'obyvateľ je vybrané slovo po "b" → píšeme y',    err_dlz:'obyvateľ nemá dĺžeň → píšeme y (nie ý)' },
     { b:'preb',a:'vať',      ans:'ý', hl:'"b"', err_fam:'prebývať je vybrané slovo po "b" → píšeme ý',    err_dlz:'prebývať má dĺžeň → píšeme ý (nie y)' },
     { b:'b',   a:'dlisko',   ans:'y',       err_fam:'bydlisko je vybrané slovo po "b" → píšeme y',    err_dlz:'bydlisko nemá dĺžeň → píšeme y (nie ý)' },
-    { b:'dob', a:'ť',        ans:'y', hl:'"b"', err_fam:'dobyť je vybrané slovo po "b" → píšeme y',       err_dlz:'dobyť nemá dĺžeň → píšeme y (nie ý)' },
+    { b:'dob', a:'ť',        ans:'y', hl:'"b"', ctx:'dob_ť hrad', err_fam:'dobyť je vybrané slovo po "b" → píšeme y',       err_dlz:'dobyť nemá dĺžeň → píšeme y (nie ý)' },
     { b:'vydob',a:'ť',       ans:'y', hl:'"b"', err_fam:'vydobyť je vybrané slovo po "b" → píšeme y',     err_dlz:'vydobyť nemá dĺžeň → píšeme y (nie ý)' },
     { b:'výdob',a:'tok',     ans:'y', hl:'"b"', err_fam:'výdobytok je vybrané slovo po "b" → píšeme y',   err_dlz:'výdobytok nemá dĺžeň → píšeme y (nie ý)' },
     { b:'dob', a:'vať',      ans:'ý', hl:'"b"', err_fam:'dobývať je vybrané slovo po "b" → píšeme ý',     err_dlz:'dobývať má dĺžeň → píšeme ý (nie y)' },
@@ -1083,12 +1091,12 @@
     { b:'v',   a:'',         ans:'y',       err_fam:'vy je vybrané slovo po "v" → píšeme y',          err_dlz:'vy nemá dĺžeň → píšeme y (nie ý)' },
     { b:'v',   a:'kať',      ans:'y',       err_fam:'vykať je vybrané slovo po "v" → píšeme y',       err_dlz:'vykať nemá dĺžeň → píšeme y (nie ý)' },
     { b:'v',   a:'hňa',      ans:'y',       err_fam:'vyhňa je vybrané slovo po "v" → píšeme y',       err_dlz:'vyhňa nemá dĺžeň → píšeme y (nie ý)' },
-    { b:'v',   a:'r',        ans:'ý',       err_fam:'výr je vybrané slovo po "v" → píšeme ý',         err_dlz:'výr má dĺžeň → píšeme ý (nie y)' },
+    { b:'v',   a:'r',        ans:'ý',       ctx:'v_r = sova', err_fam:'výr je vybrané slovo po "v" → píšeme ý',         err_dlz:'výr má dĺžeň → píšeme ý (nie y)' },
     { b:'v',   a:'skať',     ans:'ý',       err_fam:'výskať je vybrané slovo po "v" → píšeme ý',      err_dlz:'výskať má dĺžeň → píšeme ý (nie y)' },
     { b:'v',   a:'skot',     ans:'ý',       err_fam:'výskot je vybrané slovo po "v" → píšeme ý',      err_dlz:'výskot má dĺžeň → píšeme ý (nie y)' },
     { b:'v',   a:'šina',     ans:'ý',       err_fam:'výšina je vybrané slovo po "v" → píšeme ý',      err_dlz:'výšina má dĺžeň → píšeme ý (nie y)' },
     { b:'v',   a:'še',       ans:'y',       err_fam:'vyše je vybrané slovo po "v" → píšeme y',        err_dlz:'vyše nemá dĺžeň → píšeme y (nie ý)' },
-    { b:'v',   a:'ť',        ans:'y',       err_fam:'vyť je vybrané slovo po "v" → píšeme y',         err_dlz:'vyť nemá dĺžeň → píšeme y (nie ý)' },
+    { b:'v',   a:'ť',        ans:'y',       ctx:'pes v_je', err_fam:'vyť je vybrané slovo po "v" → píšeme y',         err_dlz:'vyť nemá dĺžeň → píšeme y (nie ý)' },
     { b:'zav', a:'jať',      ans:'ý', hl:'"v"', err_fam:'zavýjať je vybrané slovo po "v" → píšeme ý',     err_dlz:'zavýjať má dĺžeň → píšeme ý (nie y)' },
     { b:'v',   a:'žla',      ans:'y',       err_fam:'vyžla je vybrané slovo po "v" → píšeme y',       err_dlz:'vyžla nemá dĺžeň → píšeme y (nie ý)' },
     { b:'zv',  a:'šiť sa',   ans:'ý', hl:'"v"', err_fam:'zvýšiť sa je vybrané slovo po "v" → píšeme ý',   err_dlz:'zvýšiť sa má dĺžeň → píšeme ý (nie y)' },
@@ -1129,11 +1137,38 @@
     { b:'vzl', a:'kať',      ans:'y', hl:'"l"', err_fam:'vzlykať je výnimka po "l" → píšeme y',        err_dlz:'vzlykať nemá dĺžeň → píšeme y (nie ý)' },
     { b:'vzl', a:'k',        ans:'y', hl:'"l"', err_fam:'vzlyk je výnimka po "l" → píšeme y',          err_dlz:'vzlyk nemá dĺžeň → píšeme y (nie ý)' },
     { b:'zl',  a:'hať',      ans:'y', hl:'"l"', err_fam:'zlyhať je výnimka po "l" → píšeme y',         err_dlz:'zlyhať nemá dĺžeň → píšeme y (nie ý)' },
+    // ── Tvrdé spoluhlásky (ďalšie) ───────────────────────────────────
+    { b:'g',   a:'nekológ',  ans:'y',           err_fam:'g je tvrdá spoluhláska → píšeme y',              err_dlz:'gynekológ nemá dĺžeň → píšeme y (nie ý)' },
+    { b:'h',   a:'giena',    ans:'y',           err_fam:'h je tvrdá spoluhláska → píšeme y',              err_dlz:'hygiena nemá dĺžeň → píšeme y (nie ý)' },
+    { b:'t',   a:'p',        ans:'y',           err_fam:'t je tvrdá spoluhláska → píšeme y',              err_dlz:'typ nemá dĺžeň → píšeme y (nie ý)' },
+    // ── Vybrané slová po M (ďalšie 2) ────────────────────────────────
+    { b:'m',   a:'',         ans:'y',       ctx:'m_ sme tu', err_fam:'my je vybrané slovo po "m" → píšeme y',          err_dlz:'my nemá dĺžeň → píšeme y (nie ý)' },
+    { b:'m',   a:'tus',      ans:'ý',           err_fam:'mýtus je vybrané slovo po "m" → píšeme ý',       err_dlz:'mýtus má dĺžeň → píšeme ý (nie y)' },
+    // ── Výnimky po L (ďalšie 2) ──────────────────────────────────────
+    { b:'l',   a:'rika',     ans:'y',           err_fam:'lyrika je výnimka po "l" → píšeme y',            err_dlz:'lyrika nemá dĺžeň → píšeme y (nie ý)' },
+    // ── Nie vybrané slová (obojaké → i/í) (ďalšie) ───────────────────
+    { b:'b',   a:'cykel',    ans:'i',           err_fam:'bicykel nie je vybrané slovo → po "b" píšeme i', err_dlz:'bicykel nemá dĺžeň → píšeme i (nie í)' },
+    { b:'m',   a:'ňať',      ans:'í',           err_fam:'míňať nie je vybrané slovo → po "m" píšeme í',   err_dlz:'míňať má dĺžeň → píšeme í (nie i)' },
+    { b:'p',   a:'chať',     ans:'i',           err_fam:'pichať nie je vybrané slovo → po "p" píšeme i',  err_dlz:'pichať nemá dĺžeň → píšeme i (nie í)' },
+    { b:'r',   a:'ziko',     ans:'i',           err_fam:'riziko nie je vybrané slovo → po "r" píšeme i',  err_dlz:'riziko nemá dĺžeň → píšeme i (nie í)' },
+    { b:'v',   a:'dieť',     ans:'i',           err_fam:'vidieť nie je vybrané slovo → po "v" píšeme i',  err_dlz:'vidieť nemá dĺžeň → píšeme i (nie í)' },
+    { b:'v',   a:'ťaziť',    ans:'í',           err_fam:'víťaziť nie je vybrané slovo → po "v" píšeme í', err_dlz:'víťaziť má dĺžeň → píšeme í (nie i)' },
+    { b:'v',   a:'kend',     ans:'í',           err_fam:'víkend nie je vybrané slovo → po "v" píšeme í',  err_dlz:'víkend má dĺžeň → píšeme í (nie i)' },
+    { b:'v',   a:'sieť',     ans:'i',           err_fam:'visieť nie je vybrané slovo → po "v" píšeme i',  err_dlz:'visieť nemá dĺžeň → píšeme i (nie í)' },
+    { b:'v',   a:'sutý',     ans:'i',           err_fam:'visutý nie je vybrané slovo → po "v" píšeme i',  err_dlz:'visutý nemá dĺžeň → píšeme i (nie í)' },
+    // ── Kontrastné páry (obojaké) ─────────────────────────────────
+    { b:'b',   a:'ť',        ans:'i',       ctx:'b_ť do boxovacieho mecha', err_fam:'biť nie je vybrané slovo → po "b" píšeme i',  err_dlz:'biť nemá dĺžeň → píšeme i (nie í)' },
+    { b:'dob', a:'ť',        ans:'i', hl:'"b"', ctx:'dob_ť telefón', err_fam:'dobiť nie je vybrané slovo → po "b" píšeme i',  err_dlz:'dobiť nemá dĺžeň → píšeme i (nie í)' },
+    { b:'v',   a:'r',        ans:'í',       ctx:'v_r vody', err_fam:'vír nie je vybrané slovo → po "v" píšeme í',   err_dlz:'vír má dĺžeň → píšeme í (nie i)' },
+    { b:'v',   a:'la',       ans:'y',       ctx:'vlčica v_la', err_fam:'vyla (od vyť) je vybrané slovo po "v" → píšeme y', err_dlz:'vyla nemá dĺžeň → píšeme y (nie ý)' },
+    { b:'p',   a:'sk',       ans:'i',       ctx:'hlasný p_sk', err_fam:'pisk nie je vybrané slovo → po "p" píšeme i', err_dlz:'pisk nemá dĺžeň → píšeme i (nie í)' },
+    { b:'m',   a:'',         ans:'i',       ctx:'daj m_ to', err_fam:'mi nie je vybrané slovo → po "m" píšeme i',   err_dlz:'mi nemá dĺžeň → píšeme i (nie í)' },
+    { b:'v',   a:'ť',        ans:'i',       ctx:'v_ť veniec', err_fam:'viť nie je vybrané slovo → po "v" píšeme i', err_dlz:'viť nemá dĺžeň → píšeme i (nie í)' },
   ];
 
   // Difficulty levels: 1=easy, 2=medium, 3=hard
-  const _D1 = new Set([0,1,2,3,4,5,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,25,28,29,31,32,33,34,36,37,38,39,42,43,44,45,46,47,48,49,50,51,53,54,55,56,57,58,59,60,61,62,63,64,65,66,68,69,70,71,72,73,74,75,76,78,111,128,133,149,151,160,170,183,196]);
-  const _D3 = new Set([81,86,89,90,91,93,94,95,96,97,98,100,101,107,109,110,113,114,115,116,118,121,123,124,125,126,127,130,131,132,136,137,138,142,143,144,145,146,147,148,158,159,163,164,165,166,171,174,175,177,179,185,189,193,194,201,202,205,207,209,214,217,220,221,222,223,224,226,227,228]);
+  const _D1 = new Set([0,1,2,3,4,5,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,25,28,29,31,32,33,34,36,37,38,39,42,43,44,45,46,47,48,49,50,51,53,54,55,56,57,58,59,60,61,62,63,64,65,66,68,69,70,71,72,73,74,75,76,78,111,128,133,149,151,160,170,183,196,231,232,233,236,238,240,242,243,245,249,250,251]);
+  const _D3 = new Set([81,86,89,90,91,93,94,95,96,97,98,100,101,107,109,110,113,114,115,116,118,121,123,124,125,126,127,130,131,132,136,137,138,142,143,144,145,146,147,148,158,159,163,164,165,166,171,174,175,177,179,185,189,193,194,201,202,205,207,209,214,217,220,221,222,223,224,226,227,228,230,235]);
   QW.forEach((w,i) => { w.d = _D3.has(i) ? 3 : _D1.has(i) ? 1 : 2; });
 
   let qDeck = [], qIdx = 0, qFirst = true, qScore = 0;
@@ -1192,6 +1227,7 @@
       </div>
       <div class="quiz-prompt">Doplň správne písmeno:</div>
       <div class="quiz-word-display" id="quiz-word"></div>
+      <div class="quiz-ctx" id="quiz-ctx"></div>
       <div class="quiz-btns">
         <button class="qbtn" onclick="checkAnswer('i')">i</button>
         <button class="qbtn" onclick="checkAnswer('í')">í</button>
@@ -1207,6 +1243,8 @@
     document.getElementById('quiz-prog').textContent = (qIdx + 1) + ' / ' + qDeck.length;
     document.getElementById('quiz-word').innerHTML =
       q.b + '<span class="quiz-gap" id="quiz-gap"> </span>' + q.a;
+    const ctxEl = document.getElementById('quiz-ctx');
+    if (ctxEl) ctxEl.textContent = q.ctx || '';
     document.querySelectorAll('.qbtn').forEach(b => {
       b.classList.remove('q-correct', 'q-wrong');
       b.disabled = false;
