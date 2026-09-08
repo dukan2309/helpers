@@ -284,7 +284,7 @@ h1 {
   <div class="feedback" id="feedback"></div>
   <div class="btn-row">
     <button id="btn-check" onclick="checkAnswer()">Kontrola ✔ <small>Enter</small></button>
-    <button id="btn-hint"  onclick="showHint()">Pomoc 💡 <small>P</small></button>
+    <button id="btn-hint"  onclick="showHint()">Pomoc 💡 <small>H</small></button>
     <button id="btn-next"  onclick="nextProblem()">Ďalší ➡ <small>N</small></button>
     <button id="btn-finish" onclick="finishSession()">Koniec 🏁 <small>F</small></button>
   </div>
@@ -441,7 +441,7 @@ h1 {
   document.getElementById('answer-input').addEventListener('keydown', e => {
     if (e.key === 'Enter') checkAnswer();
     if (e.key === 'n' || e.key === 'N') nextProblem();
-    if (e.key === 'p' || e.key === 'P') showHint();
+    if (e.key === 'h' || e.key === 'H') showHint();
     if (e.key === 'f' || e.key === 'F') finishSession();
   });
 
@@ -449,7 +449,7 @@ h1 {
     if (e.target === document.getElementById('answer-input')) return;
     if (e.key === 'Enter') checkAnswer();
     if (e.key === 'n' || e.key === 'N') nextProblem();
-    if (e.key === 'p' || e.key === 'P') showHint();
+    if (e.key === 'h' || e.key === 'H') showHint();
     if (e.key === 'f' || e.key === 'F') finishSession();
   });
 

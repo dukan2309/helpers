@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Násobilka 🔢</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Quicksand', system-ui, sans-serif;
+  background:
+    radial-gradient(ellipse at 10% 0%, #fef3f7 0%, transparent 55%),
+    radial-gradient(ellipse at 95% 10%, #ecfeff 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 100%, #eef2ff 0%, transparent 60%),
+    #fafbff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+h1 {
+  font-size: clamp(26px, 4vw, 36px);
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  background: linear-gradient(90deg, #7c6cf2 0%, #ff7aa8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 10px;
+}
+
+.home-btn {
+  position: fixed;
+  top: 14px; left: 16px;
+  z-index: 200;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: white;
+  border: 2px solid #e7e9f4;
+  border-radius: 999px;
+  color: #7c6cf2;
+  font: 700 13px 'Quicksand', sans-serif;
+  text-decoration: none;
+  box-shadow: 0 2px 10px rgba(124,108,242,.12);
+  transition: border-color .15s, box-shadow .15s, transform .15s;
+}
+.home-btn:hover {
+  border-color: #7c6cf2;
+  box-shadow: 0 4px 14px rgba(124,108,242,.22);
+  transform: translateY(-1px);
+}
+
+.score-bar { display: flex; gap: 20px; margin-bottom: 20px; }
+.score-box {
+  background: white; border-radius: 16px; padding: 8px 20px;
+  font-size: 1.1rem; color: #555; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.score-box span { font-weight: bold; color: #7c6cf2; }
+
+.card {
+  background: white; border-radius: 24px; padding: 28px 36px;
+  width: 100%; max-width: 720px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.09); margin-bottom: 20px;
+}
+
+.section-title {
+  font-size: 1rem; color: #999; margin-bottom: 16px; text-align: center; font-weight: 600;
+}
+
+/* Table picker */
+.table-picker {
+  display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 4px;
+}
+.tbl-btn {
+  padding: 7px 16px; border-radius: 50px; border: 2.5px solid #e7e9f4;
+  font-size: 0.95rem; font-weight: 700; cursor: pointer; font-family: inherit;
+  background: #f8f8fe; color: #888; transition: all 0.15s;
+}
+.tbl-btn:hover { border-color: #c8c0f8; color: #7c6cf2; }
+.tbl-btn.active { border-color: #7c6cf2; background: #ece9ff; color: #7c6cf2; }
+
+/* Problem */
+.problem {
+  display: flex; align-items: center; justify-content: center;
+  gap: 16px; font-size: 3.2rem; font-weight: bold; color: #333; margin-bottom: 20px;
+}
+.problem .num1 { color: #4a90d9; }
+.problem .op   { color: #7c6cf2; }
+.problem .num2 { color: #ff7aa8; }
+.problem .eq   { color: #aaa; }
+
+#answer-input {
+  width: 120px; font-size: 2.8rem; font-family: inherit; text-align: center;
+  border: 4px solid #ddd; border-radius: 14px; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+}
+#answer-input:focus   { border-color: #7c6cf2; box-shadow: 0 0 0 4px #ece9ff; }
+#answer-input.correct { border-color: #4caf50; background: #f0fff4; }
+#answer-input.wrong   { border-color: #f44336; background: #fff0f0; }
+
+.feedback { text-align: center; font-size: 1.4rem; min-height: 2rem; margin-top: 10px; }
+.feedback.ok  { color: #4caf50; }
+.feedback.err { color: #f44336; }
+
+.btn-row { display: flex; gap: 12px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+button {
+  font-family: inherit; font-size: 1.05rem; padding: 11px 26px;
+  border: none; border-radius: 50px; cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+}
+button:active { transform: scale(0.95); box-shadow: 0 2px 5px rgba(0,0,0,0.12); }
+#btn-check  { background: linear-gradient(135deg, #7c6cf2, #ff7aa8); color: white; }
+#btn-hint   { background: linear-gradient(135deg, #ffb86b, #ff7aa8); color: white; }
+#btn-next   { background: linear-gradient(135deg, #4cc38a, #5bb6e0); color: white; }
+#btn-finish { background: #c0c0d0; color: white; }
+button small { opacity: 0.7; font-size: 0.7em; margin-left: 4px; }
+
+/* Násobilková mriežka */
+.mult-grid {
+  display: grid;
+  grid-template-columns: repeat(11, 1fr);
+  gap: 3px;
+  width: 100%;
+}
+.mg-cell {
+  aspect-ratio: 1;
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: clamp(0.55rem, 1.2vw, 0.8rem);
+  font-weight: 700;
+  background: #f5f5f5; color: #bbb;
+  transition: background 0.25s, color 0.25s;
+}
+.mg-cell.mg-header-row { background: #ffe0ef; color: #d63b78; }
+.mg-cell.mg-header-col { background: #ddeeff; color: #2c6fad; }
+.mg-cell.mg-corner     { background: #f0f0f0; color: #ccc; }
+.mg-cell.mg-row-hl     { background: #c8e6ff; color: #1a5fa0; }
+.mg-cell.mg-col-hl     { background: #ffd6e8; color: #a0215a; }
+.mg-cell.mg-both-hl    { background: #d5c8ff; color: #5040b0; }
+.mg-cell.mg-result     { background: #4cc38a; color: white; animation: pop 0.4s ease; box-shadow: 0 2px 8px rgba(76,195,138,0.5); }
+
+/* Opakované sčítanie */
+.rep-add-area {
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; justify-content: center;
+}
+.rep-unit { display: inline-flex; flex-direction: column; align-items: center; gap: 4px; }
+.rep-count {
+  font-size: 0.85rem; font-weight: 700; color: #4cc38a;
+  min-height: 1.1em; line-height: 1.1em;
+}
+.rep-chip {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 44px; height: 44px; border-radius: 12px;
+  font-size: 1.2rem; font-weight: bold; color: white; padding: 0 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+.rep-plus { font-size: 1.4rem; font-weight: bold; color: #aaa; height: 44px; display: inline-flex; align-items: center; }
+.rep-eq   { font-size: 1.5rem; font-weight: bold; color: #7c6cf2; height: 44px; display: inline-flex; align-items: center; }
+.rep-ans  {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 54px; height: 54px; border-radius: 50%;
+  font-size: 1.6rem; font-weight: bold; color: white;
+  background: linear-gradient(135deg, #4cc38a, #5bb6e0);
+  animation: pop 0.4s ease; box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+}
+
+/* Matica bodiek */
+.dot-matrix {
+  display: flex; flex-wrap: wrap; gap: 20px; align-items: center; justify-content: center;
+}
+.dot-block { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.dot-frame {
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-rows: auto auto;
+  align-items: center; justify-items: center;
+  column-gap: 8px; row-gap: 6px;
+}
+.dot-top  { grid-column: 2; grid-row: 1; font-weight: 700; color: #ff7aa8; font-size: 1.15rem; }
+.dot-left { grid-column: 1; grid-row: 2; font-weight: 700; color: #4a90d9; font-size: 1.15rem; }
+.dot-grid { grid-column: 2; grid-row: 2; display: flex; flex-direction: column; }
+.dot-row-wrap { display: flex; }
+.dot-circle {
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dot-res { font-weight: 700; color: #7c6cf2; font-size: 1.05rem; }
+.dot-eq  { font-size: 1.9rem; font-weight: 700; color: #bbb; align-self: center; }
+
+/* Theory: full table */
+.theory-grid {
+  display: grid;
+  grid-template-columns: 1fr 10px repeat(10, 1fr);
+  gap: 2px;
+  width: 100%;
+}
+.tg-cell {
+  aspect-ratio: 1;
+  border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: clamp(0.5rem, 1.1vw, 0.75rem);
+  font-weight: 700;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.tg-dim  { opacity: 0.2; }
+.tg-spacer { aspect-ratio: auto; background: transparent; border-radius: 0; }
+.tg-header { background: #f0eeff; color: #9080e0; }
+.tg-corner { background: #f5f5f5; color: #ddd; }
+.tg-body   { color: white; }
+.tg-pulse  { animation: pulse-ring 1.2s ease infinite; }
+
+/* Tips */
+.tips-list {
+  display: flex; flex-direction: column; gap: 12px;
+}
+.tip-row {
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border-left: 4px solid transparent;
+}
+.tip-badge {
+  flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 46px; height: 34px; padding: 0 8px; border-radius: 10px;
+  font-size: 0.95rem; font-weight: 700; color: white;
+}
+.tip-text { display: flex; flex-direction: column; gap: 3px; }
+.tip-rule { font-size: 0.95rem; color: #444; line-height: 1.45; }
+.tip-eg   { font-size: 0.9rem; color: #666; font-weight: 700; letter-spacing: 0.2px; }
+
+/* Summary overlay */
+#summary-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.45); z-index: 100;
+  align-items: center; justify-content: center;
+}
+#summary-overlay.visible { display: flex; }
+#summary-box {
+  background: white; border-radius: 24px; padding: 40px 48px;
+  max-width: 420px; width: 90%; text-align: center;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.22); animation: pop 0.35s ease;
+}
+#summary-box h2 {
+  font-size: 1.7rem;
+  background: linear-gradient(90deg, #7c6cf2, #ff7aa8);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  margin-bottom: 20px;
+}
+.sum-row {
+  display: flex; justify-content: space-between;
+  font-size: 1.1rem; color: #555; padding: 6px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+.sum-row:last-of-type { border-bottom: none; }
+.sum-row span { font-weight: bold; color: #7c6cf2; }
+#summary-box .sum-grade { font-size: 2.8rem; margin: 18px 0 6px; }
+#summary-box .sum-msg   { font-size: 1rem; color: #888; margin-bottom: 24px; }
+.btn-group { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+#btn-restart { background: linear-gradient(135deg, #7c6cf2, #ff7aa8); color: white; font-size: 1.05rem; padding: 12px 32px; border: none; border-radius: 50px; cursor: pointer; font-family: inherit; box-shadow: 0 4px 10px rgba(0,0,0,0.12); }
+#btn-retry   { background: linear-gradient(135deg, #ef5b6d, #ff7aa8); color: white; font-size: 1.05rem; padding: 12px 32px; border: none; border-radius: 50px; cursor: pointer; font-family: inherit; box-shadow: 0 4px 10px rgba(0,0,0,0.12); }
+
+#retry-banner {
+  background: #f44336; color: white; font-size: 1.15rem; font-weight: bold;
+  border-radius: 50px; padding: 10px 30px; margin-bottom: 16px;
+  box-shadow: 0 4px 14px rgba(244,67,54,0.35);
+  animation: pop 0.35s ease;
+}
+
+@keyframes pop {
+  0%   { transform: scale(0.8); }
+  60%  { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+@keyframes pulse-ring {
+  0%,100% { box-shadow: 0 0 0 0 rgba(124,108,242,0.5); }
+  50%      { box-shadow: 0 0 0 5px rgba(124,108,242,0); }
+}
+</style>
+</head>
+<body>
+<a class="home-btn" href="index.html">← Domov</a>
+<h1>🔢 Malá násobilka</h1>
+
+<div id="retry-banner" style="display:none">🔁 Opravujeme chyby — príklad <span id="retry-current">1</span> z <span id="retry-total">1</span></div>
+
+<div class="score-bar">
+  <div class="score-box">✅ Správne: <span id="score-ok">0</span></div>
+  <div class="score-box">❌ Pokusy: <span id="score-tries">0</span></div>
+</div>
+
+<!-- Problem card -->
+<div class="card">
+  <div class="table-picker" id="table-picker"></div>
+  <div class="problem" style="margin-top:20px">
+    <span class="num1" id="p-num1">7</span>
+    <span class="op">×</span>
+    <span class="num2" id="p-num2">8</span>
+    <span class="eq">=</span>
+    <input type="number" id="answer-input" min="1" max="100" placeholder="?" autocomplete="off">
+  </div>
+  <div class="feedback" id="feedback"></div>
+  <div class="btn-row">
+    <button id="btn-check"  onclick="checkAnswer()">Kontrola ✔ <small>Enter</small></button>
+    <button id="btn-hint"   onclick="showHint()">Pomoc 💡 <small>H</small></button>
+    <button id="btn-next"   onclick="nextProblem()">Ďalší ➡ <small>N</small></button>
+    <button id="btn-finish" onclick="finishSession()">Koniec 🏁 <small>F</small></button>
+  </div>
+</div>
+
+<!-- Násobilková mriežka -->
+<div class="card">
+  <div class="section-title">🔢 Násobilková mriežka</div>
+  <div class="mult-grid" id="mult-grid"></div>
+</div>
+
+<!-- Opakované sčítanie -->
+<div class="card">
+  <div class="section-title">➕ Opakované sčítanie</div>
+  <div class="rep-add-area" id="rep-add-area"></div>
+</div>
+
+<!-- Matica bodiek -->
+<div class="card">
+  <div class="section-title">⬛ Matica bodiek</div>
+  <div class="dot-matrix" id="dot-matrix"></div>
+</div>
+
+<!-- Theory: full table -->
+<div class="card">
+  <div class="section-title">📖 Tabuľka násobilky</div>
+  <div class="theory-grid" id="theory-grid"></div>
+</div>
+
+<!-- Tips -->
+<div class="card">
+  <div class="section-title">💡 Triky a pravidlá</div>
+  <div class="tips-list" id="tips-list"></div>
+</div>
+
+<!-- Summary overlay -->
+<div id="summary-overlay">
+  <div id="summary-box">
+    <h2 id="sum-title">Koniec relácie! 🏁</h2>
+    <div class="sum-row">Riešených príkladov <span id="sum-tries">0</span></div>
+    <div class="sum-row">Správnych odpovedí <span id="sum-ok">0</span></div>
+    <div class="sum-row">Chybných pokusov <span id="sum-wrong">0</span></div>
+    <div class="sum-row">Úspešnosť <span id="sum-pct">—</span></div>
+    <div class="sum-grade" id="sum-grade"></div>
+    <div class="sum-msg"   id="sum-msg"></div>
+    <div class="btn-group">
+      <button id="btn-restart" onclick="restartSession()">Hrať znova ▶</button>
+      <button id="btn-retry"   onclick="retryMistakes()" style="display:none">Precvičiť chyby 🔁</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── State ────────────────────────────────────────────────────────────────
+  let selectedTable = 1;   // 0 = mix
+  let num1, num2, correctAnswer;
+  let scoreOk = 0, scoreTries = 0;
+  let answered = false, wrongRecorded = false;
+  let wrongProblems = [], retryQueue = [], inRetry = false;
+
+  const CHIP_COLORS = ['#4a90d9','#7c6cf2','#ff7aa8','#4cc38a','#f9a825','#e0497a','#5bb6e0','#9c27b0','#00838f','#ff7043'];
+
+  // ── Table value colors for theory grid (rainbow diagonal) ───────────────
+  // Color based on r+c diagonal — pink top-left → blue bottom-right
+  function rainbowColor(t) {
+    const hue = (330 + t * 230) % 360;
+    return `hsl(${hue}, 70%, 74%)`;
+  }
+
+  // ── Table picker ─────────────────────────────────────────────────────────
+  function buildPicker() {
+    const picker = document.getElementById('table-picker');
+    picker.innerHTML = '';
+    for (let i = 1; i <= 10; i++) {
+      const b = document.createElement('button');
+      b.className = 'tbl-btn' + (i === selectedTable ? ' active' : '');
+      b.textContent = i + '×';
+      b.onclick = () => setTable(i);
+      picker.appendChild(b);
+    }
+    const mix = document.createElement('button');
+    mix.className = 'tbl-btn' + (selectedTable === 0 ? ' active' : '');
+    mix.textContent = '🎲 Mix';
+    mix.onclick = () => setTable(0);
+    picker.appendChild(mix);
+  }
+
+  function setTable(t) {
+    selectedTable = t;
+    document.querySelectorAll('.tbl-btn').forEach((b, i) => {
+      b.classList.toggle('active', i === (t === 0 ? 10 : t - 1));
+    });
+    if (!inRetry) { generate(); render(); }
+  }
+
+  // ── Generate / Render ─────────────────────────────────────────────────────
+  function generate() {
+    num1 = selectedTable === 0 ? Math.floor(Math.random() * 10) + 1 : selectedTable;
+    num2 = Math.floor(Math.random() * 10) + 1;
+    correctAnswer = num1 * num2;
+  }
+
+  function render() {
+    document.getElementById('p-num1').textContent = num1;
+    document.getElementById('p-num2').textContent = num2;
+    const inp = document.getElementById('answer-input');
+    inp.value = ''; inp.className = ''; inp.disabled = false;
+    document.getElementById('feedback').textContent = '';
+    document.getElementById('feedback').className = 'feedback';
+    answered = false; wrongRecorded = false;
+    renderMultGrid(false);
+    renderRepAdd(false);
+    renderDotMatrix(false);
+    renderTheoryGrid();
+    inp.focus();
+  }
+
+  // ── Answer logic ───────────────────────────────────────────────────────────
+  function checkAnswer() {
+    const inp = document.getElementById('answer-input');
+    const val = parseInt(inp.value);
+    const fb  = document.getElementById('feedback');
+    if (isNaN(val)) { fb.textContent = 'Najprv napíš číslo! 😊'; fb.className = 'feedback'; return; }
+    scoreTries++;
+    document.getElementById('score-tries').textContent = scoreTries;
+    if (val === correctAnswer) {
+      inp.className = 'correct';
+      fb.textContent = '🎉 Výborne! Správna odpoveď!';
+      fb.className = 'feedback ok';
+      if (!answered) { scoreOk++; document.getElementById('score-ok').textContent = scoreOk; }
+      answered = true; inp.disabled = true;
+      renderMultGrid(true); renderRepAdd(true); renderDotMatrix(true); renderTheoryGrid(true);
+      if (inRetry && retryQueue.length === 0) setTimeout(finishSession, 1500);
+    } else {
+      inp.className = 'wrong';
+      fb.textContent = '🙈 Nie je to tak, skús znova!';
+      fb.className = 'feedback err';
+      if (!wrongRecorded) { wrongProblems.push({num1, num2}); wrongRecorded = true; }
+      inp.select();
+    }
+  }
+
+  function showHint() {
+    renderMultGrid(true); renderRepAdd(true); renderDotMatrix(true); renderTheoryGrid(true);
+    document.getElementById('feedback').textContent = '💡 Pozri sa na zobrazenia nižšie!';
+    document.getElementById('feedback').className = 'feedback';
+  }
+
+  // ── Keyboard shortcuts ────────────────────────────────────────────────────
+  document.getElementById('answer-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') checkAnswer();
+    else if (e.key === 'n' || e.key === 'N') nextProblem();
+    else if (e.key === 'h' || e.key === 'H') showHint();
+    else if (e.key === 'f' || e.key === 'F') finishSession();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.target === document.getElementById('answer-input')) return;
+    if (e.key === 'Enter') checkAnswer();
+    else if (e.key === 'n' || e.key === 'N') nextProblem();
+    else if (e.key === 'h' || e.key === 'H') showHint();
+    else if (e.key === 'f' || e.key === 'F') finishSession();
+  });
+
+  // ── Visualization 1: Násobilková mriežka ──────────────────────────────────
+  function renderMultGrid(reveal) {
+    const grid = document.getElementById('mult-grid');
+    grid.innerHTML = '';
+
+    for (let r = 0; r <= 10; r++) {
+      for (let c = 0; c <= 10; c++) {
+        const cell = document.createElement('div');
+        cell.className = 'mg-cell';
+
+        if (r === 0 && c === 0) {
+          cell.classList.add('mg-corner');
+          cell.textContent = '×';
+        } else if (r === 0) {
+          cell.classList.add('mg-header-row');
+          cell.textContent = c;
+        } else if (c === 0) {
+          cell.classList.add('mg-header-col');
+          cell.textContent = r;
+        } else {
+          if (reveal && r === num1 && c === num2) {
+            cell.classList.add('mg-result');
+            cell.textContent = correctAnswer;
+          } else if (r === num1 && c === num2) {
+            cell.classList.add('mg-both-hl');
+            cell.textContent = '?';
+          } else if (r === num1) {
+            cell.classList.add('mg-row-hl');
+            cell.textContent = '';
+          } else if (c === num2) {
+            cell.classList.add('mg-col-hl');
+            cell.textContent = '';
+          } else {
+            cell.textContent = '';
+          }
+        }
+        grid.appendChild(cell);
+      }
+    }
+  }
+
+  // ── Visualization 2: Opakované sčítanie ───────────────────────────────────
+  function renderRepAdd(reveal) {
+    const area = document.getElementById('rep-add-area');
+    area.innerHTML = '';
+    const color = CHIP_COLORS[(num1 - 1) % CHIP_COLORS.length];
+
+    // wrap a child in a unit with a small counting number above it
+    function unit(countText, child) {
+      const u = document.createElement('span');
+      u.className = 'rep-unit';
+      const cnt = document.createElement('span');
+      cnt.className = 'rep-count';
+      cnt.textContent = countText;
+      u.appendChild(cnt);
+      u.appendChild(child);
+      return u;
+    }
+
+    for (let i = 0; i < num2; i++) {
+      if (i > 0) {
+        const plus = document.createElement('span');
+        plus.className = 'rep-plus'; plus.textContent = '+';
+        area.appendChild(unit('', plus));
+      }
+      const chip = document.createElement('span');
+      chip.className = 'rep-chip';
+      chip.style.background = color;
+      chip.textContent = num1;
+      const runningTotal = num1 * (i + 1);
+      area.appendChild(unit(reveal ? String(runningTotal) : '', chip));
+    }
+
+    if (reveal) {
+      const eq = document.createElement('span');
+      eq.className = 'rep-eq'; eq.textContent = '=';
+      area.appendChild(unit('', eq));
+      const ans = document.createElement('span');
+      ans.className = 'rep-ans';
+      ans.textContent = correctAnswer;
+      ans.style.background = rainbowColor((Math.max(num1, num2) - 1) / 9);
+      ans.style.color = '#2b2b3f';
+      ans.style.cursor = 'pointer';
+      ans.title = 'Ukáž v tabuľke násobilky';
+      ans.addEventListener('click', () => {
+        renderTheoryGrid(true);
+        document.getElementById('theory-grid').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+      area.appendChild(unit('', ans));
+    }
+  }
+
+  // ── Visualization 3: Matica bodiek ────────────────────────────────────────
+  function renderDotMatrix(reveal) {
+    const area = document.getElementById('dot-matrix');
+    area.innerHTML = '';
+    const compact = correctAnswer > 50;
+    const size    = compact ? 10 : 18;
+    const gap     = compact ? 4  : 6;
+
+    function buildBlock(rows, cols, label) {
+      const block = document.createElement('div');
+      block.className = 'dot-block';
+
+      const frame = document.createElement('div');
+      frame.className = 'dot-frame';
+
+      const top = document.createElement('div');
+      top.className = 'dot-top';
+      top.textContent = cols;
+      frame.appendChild(top);
+
+      const left = document.createElement('div');
+      left.className = 'dot-left';
+      left.textContent = rows;
+      frame.appendChild(left);
+
+      const grid = document.createElement('div');
+      grid.className = 'dot-grid';
+      grid.style.gap = gap + 'px';
+      for (let r = 0; r < rows; r++) {
+        const row = document.createElement('div');
+        row.className = 'dot-row-wrap';
+        row.style.gap = gap + 'px';
+        const col = r % 2 === 0 ? '#4a90d9' : '#ff7aa8';
+        for (let c = 0; c < cols; c++) {
+          const dot = document.createElement('div');
+          dot.className = 'dot-circle';
+          dot.style.cssText = `width:${size}px;height:${size}px;background:${reveal ? col : '#e0e0e0'};transition:background 0.3s;`;
+          row.appendChild(dot);
+        }
+        grid.appendChild(row);
+      }
+      frame.appendChild(grid);
+      block.appendChild(frame);
+
+      const res = document.createElement('div');
+      res.className = 'dot-res';
+      res.textContent = reveal ? (label + ' = ' + correctAnswer) : (label + ' = ?');
+      block.appendChild(res);
+      return block;
+    }
+
+    // First arrangement: num1 rows × num2 columns
+    area.appendChild(buildBlock(num1, num2, `${num1} × ${num2}`));
+
+    // If factors differ, show the swapped arrangement to make commutativity clear
+    if (num1 !== num2) {
+      const eq = document.createElement('div');
+      eq.className = 'dot-eq';
+      eq.textContent = '=';
+      area.appendChild(eq);
+      area.appendChild(buildBlock(num2, num1, `${num2} × ${num1}`));
+    }
+  }
+
+  // ── Theory: full 10×10 table ──────────────────────────────────────────────
+  function renderTheoryGrid(highlight) {
+    const grid = document.getElementById('theory-grid');
+    grid.innerHTML = '';
+    const cells = [];  // {el, r, c} for hover crosshair
+
+    const addSpacer = (h) => {
+      const sp = document.createElement('div');
+      sp.className = 'tg-cell tg-spacer';
+      if (h) sp.style.height = h + 'px';
+      grid.appendChild(sp);
+    };
+
+    for (let r = 0; r <= 10; r++) {
+      // gap row between header row and the body
+      if (r === 1) { for (let k = 0; k < 12; k++) addSpacer(10); }
+
+      for (let c = 0; c <= 10; c++) {
+        // gap column between header column and the body
+        if (c === 1) addSpacer();
+
+        const cell = document.createElement('div');
+        cell.className = 'tg-cell';
+
+        if (r === 0 && c === 0) {
+          cell.classList.add('tg-corner');
+          cell.textContent = '×';
+        } else if (r === 0) {
+          cell.classList.add('tg-header');
+          const bg = rainbowColor((c - 1) / 9);
+          cell.style.background = bg;
+          cell.style.color = '#2b2b3f';
+          cell.textContent = c;
+        } else if (c === 0) {
+          cell.classList.add('tg-header');
+          const bg = rainbowColor((r - 1) / 9);
+          cell.style.background = bg;
+          cell.style.color = '#2b2b3f';
+          cell.textContent = r;
+        } else {
+          const val = r * c;
+          cell.classList.add('tg-body');
+          cell.textContent = val;
+          cell.style.background = rainbowColor((Math.max(r, c) - 1) / 9);
+          cell.style.color = '#2b2b3f';
+          cell.style.textShadow = 'none';
+          cell.style.cursor = 'pointer';
+          const cr = r, cc = c;
+          cell.addEventListener('mouseenter', () => {
+            // L-shape: row from left header up to the cell, column from top header down to the cell
+            cells.forEach(o => {
+              const keep = (o.r === cr && o.c <= cc) || (o.c === cc && o.r <= cr);
+              if (!keep) o.el.classList.add('tg-dim');
+            });
+          });
+          cell.addEventListener('mouseleave', () => {
+            cells.forEach(o => o.el.classList.remove('tg-dim'));
+          });
+          if (highlight && r === num1 && c === num2) {
+            cell.classList.add('tg-pulse');
+            cell.style.outline = '3px solid #2b2b3f';
+            cell.style.outlineOffset = '1px';
+          }
+        }
+        cells.push({ el: cell, r, c });
+        grid.appendChild(cell);
+      }
+    }
+  }
+
+  // ── Theory: tips ──────────────────────────────────────────────────────────
+  function buildTips() {
+    const tips = [
+      { label: '×1',  color: '#4a90d9', rule: 'Výsledok je vždy to isté číslo.',                                                              eg: '7 × 1 = 7' },
+      { label: '×2',  color: '#7c6cf2', rule: 'Zdvojnásob číslo — prirátaj ho k sebe samému.',                                                eg: '6 × 2 = 6 + 6 = 12' },
+      { label: '×5',  color: '#f9a825', rule: 'Výsledok vždy končí na 0 alebo 5.',                                                            eg: '7 × 5 = 35   ·   4 × 5 = 20' },
+      { label: '×9',  color: '#e0497a', rule: 'Trik prstov: ohni n-tý prst — naľavo sú desiatky, napravo jednotky. Súčet číslic výsledku je vždy 9.', eg: '7 × 9 = 63 → 6 + 3 = 9' },
+      { label: '×10', color: '#4cc38a', rule: 'Len pripíš nulu.',                                                                             eg: '8 × 10 = 80' },
+    ];
+    const list = document.getElementById('tips-list');
+    list.innerHTML = '';
+    tips.forEach(t => {
+      const row = document.createElement('div');
+      row.className = 'tip-row';
+      row.style.background = t.color + '14';
+      row.style.borderLeftColor = t.color;
+
+      const badge = document.createElement('span');
+      badge.className = 'tip-badge';
+      badge.style.background = t.color;
+      badge.textContent = t.label;
+
+      const text = document.createElement('div');
+      text.className = 'tip-text';
+      const rule = document.createElement('span');
+      rule.className = 'tip-rule';
+      rule.textContent = t.rule;
+      const eg = document.createElement('span');
+      eg.className = 'tip-eg';
+      eg.textContent = t.eg;
+      text.appendChild(rule);
+      text.appendChild(eg);
+
+      row.appendChild(badge);
+      row.appendChild(text);
+      list.appendChild(row);
+    });
+  }
+
+  // ── Session management ────────────────────────────────────────────────────
+  function nextProblem() {
+    if (inRetry) { if (retryQueue.length > 0) nextRetry(); return; }
+    generate(); render();
+  }
+
+  function retryMistakes() {
+    retryQueue = wrongProblems.slice();
+    wrongProblems = [];
+    inRetry = true;
+    scoreOk = 0; scoreTries = 0;
+    document.getElementById('score-ok').textContent    = 0;
+    document.getElementById('score-tries').textContent = 0;
+    document.getElementById('summary-overlay').classList.remove('visible');
+    document.getElementById('retry-total').textContent   = retryQueue.length;
+    document.getElementById('retry-banner').style.display = '';
+    nextRetry();
+  }
+
+  function nextRetry() {
+    if (retryQueue.length === 0) { finishSession(); return; }
+    document.getElementById('retry-current').textContent =
+      parseInt(document.getElementById('retry-total').textContent) - retryQueue.length + 1;
+    const p = retryQueue.shift();
+    num1 = p.num1; num2 = p.num2; correctAnswer = num1 * num2;
+    render();
+  }
+
+  function finishSession() {
+    const wrong = scoreTries - scoreOk;
+    const pct   = scoreTries > 0 ? Math.round((scoreOk / scoreTries) * 100) : 0;
+    let grade, msg;
+    if (inRetry && wrong === 0 && scoreTries > 0) { grade = '🌟'; msg = 'Všetky chyby opravené — skvelá práca!'; }
+    else if (scoreTries === 0)  { grade = '🤔'; msg = 'Ešte si neskúsil žiadny príklad!'; }
+    else if (pct === 100)       { grade = '🏆'; msg = 'Perfektné skóre — úžasná práca!'; }
+    else if (pct >= 80)         { grade = '⭐'; msg = 'Skvelá práca — pokračuj takto!'; }
+    else if (pct >= 60)         { grade = '👍'; msg = 'Dobrá snaha — cvičenie robí majstra!'; }
+    else                        { grade = '💪'; msg = 'Nevzdávaj sa — zvládneš to!'; }
+    document.getElementById('sum-title').textContent   = inRetry ? 'Oprava chýb — hotovo! ✅' : 'Koniec relácie! 🏁';
+    inRetry = false;
+    document.getElementById('retry-banner').style.display = 'none';
+    document.getElementById('sum-tries').textContent = scoreTries;
+    document.getElementById('sum-ok').textContent    = scoreOk;
+    document.getElementById('sum-wrong').textContent = wrong;
+    document.getElementById('sum-pct').textContent   = scoreTries > 0 ? pct + '%' : '—';
+    document.getElementById('sum-grade').textContent = grade;
+    document.getElementById('sum-msg').textContent   = msg;
+    document.getElementById('btn-retry').style.display = wrongProblems.length > 0 ? '' : 'none';
+    document.getElementById('summary-overlay').classList.add('visible');
+  }
+
+  function restartSession() {
+    scoreOk = 0; scoreTries = 0; wrongProblems = []; retryQueue = []; inRetry = false;
+    document.getElementById('score-ok').textContent    = 0;
+    document.getElementById('score-tries').textContent = 0;
+    document.getElementById('retry-banner').style.display = 'none';
+    document.getElementById('summary-overlay').classList.remove('visible');
+    generate(); render();
+  }
+
+  // ── Init ──────────────────────────────────────────────────────────────────
+  buildPicker();
+  buildTips();
+  renderTheoryGrid();
+  generate();
+  render();
+</script>
+</body>
+</html>
