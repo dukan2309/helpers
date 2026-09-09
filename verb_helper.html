@@ -85,7 +85,7 @@
     margin-bottom: 6px;
     font-weight: 600; letter-spacing: 0.3px; text-transform: uppercase;
   }
-  .flag { font-size: 16px; }
+  .flag { font-size: 22px; vertical-align: middle; line-height: 1; }
   .field input {
     width: 100%;
     padding: 14px 16px;
@@ -253,7 +253,7 @@
 
   /* Quiz */
   .quiz { display: grid; gap: 14px; }
-  .quiz-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+  .quiz-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
   .quiz-head h2 { margin: 0; font-size: 22px; }
   .quiz-head .score {
     background: var(--primary-soft); color: var(--primary);
@@ -305,19 +305,72 @@
   }
   .quiz-answer .en-flag { font-size: 18px; }
   .quiz-q .pron { font-weight: 700; }
-  .quiz-q input {
+  .quiz-tense-input {
     width: 200px;
     padding: 8px 12px;
-    font: 600 22px 'Quicksand', sans-serif;
+    font: 600 20px 'Quicksand', sans-serif;
     border: 2px solid var(--line);
     border-radius: 10px;
     background: #fff;
     text-align: center;
     outline: none;
+    flex-shrink: 0;
   }
-  .quiz-q input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-soft); }
+  .quiz-tense-input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-soft); }
   .quiz-q .hint-base { color: var(--muted); font-size: 16px; font-style: italic; }
   .quiz-q .tail { color: var(--muted); }
+
+  /* Quiz tense selector */
+  .quiz-tense-select {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 10px 0 0;
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 600;
+  }  .tense-chk { display: flex; align-items: center; gap: 5px; cursor: pointer; user-select: none; }
+  .tense-chk input { cursor: pointer; accent-color: var(--primary); }
+
+  /* Multi-tense quiz answer area */
+  .quiz-answer-multi { display: flex; flex-direction: column; gap: 12px; font-size: 22px; }
+  .pron-row { display: flex; align-items: center; gap: 10px; }
+  .tense-inputs { display: flex; flex-direction: column; gap: 8px; margin-top: 2px; }
+  .tense-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .tense-lbl {
+    min-width: 130px;
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .pron-hint { font-size: 13px; color: var(--muted); font-style: italic; font-weight: 500; }
+
+  /* Quiz word-count selector */
+  .quiz-count-select {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 14px 0 0;
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .count-btn {
+    padding: 4px 14px;
+    border-radius: 999px;
+    border: 2px solid var(--line);
+    background: #fff;
+    color: var(--muted);
+    font: 700 13px 'Quicksand', sans-serif;
+    cursor: pointer;
+    transition: all .12s;
+  }
+  .count-btn:hover { border-color: var(--primary); color: var(--primary); }
+  .count-btn.active { background: var(--primary-soft); border-color: var(--primary); color: var(--primary); }
 
   .feedback { min-height: 24px; font-weight: 600; font-size: 16px; }
   .feedback.ok { color: var(--ok); }
@@ -529,7 +582,17 @@
     color: #8a5a1a;
   }
 
-  .footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 18px; }
+  .btn .key {
+    border-color: rgba(255,255,255,0.45);
+    background: rgba(255,255,255,0.2);
+    color: inherit;
+    margin-left: 6px;
+  }
+  .btn.ghost .key {
+    border-color: var(--line);
+    background: #f0f0fa;
+    color: var(--muted);
+  }
   .key {
     display: inline-block;
     padding: 1px 6px;
@@ -647,16 +710,30 @@
     <div class="quiz-toggle">
       <button class="btn ghost" id="quizStart">Spustiť kvíz</button>
       <button class="btn ghost" id="quizReset" disabled>Vynulovať skóre</button>
-      <span style="color:var(--muted); font-size:13px">Doplň správny tvar slovesa.</span>
+    </div>
+    <div class="quiz-tense-select">
+      <span>Precvičovať:</span>
+      <label class="tense-chk"><input type="checkbox" class="quiz-tc" value="pres" checked> Prítomný</label>
+      <label class="tense-chk"><input type="checkbox" class="quiz-tc" value="presc"> Prítomný priebehový</label>
+      <label class="tense-chk"><input type="checkbox" class="quiz-tc" value="past" checked> Minulý</label>
+      <label class="tense-chk"><input type="checkbox" class="quiz-tc" value="fut"> Budúci</label>
+    </div>
+    <div class="quiz-count-select" style="border-top: 1px dashed var(--line); margin-top: 10px; margin-bottom: 14px;">
+      <span>Počet otázok:</span>
+      <button class="count-btn" data-n="5">5</button>
+      <button class="count-btn active" data-n="10">10</button>
+      <button class="count-btn" data-n="20">20</button>
+      <button class="count-btn" data-n="0">∞</button>
     </div>
 
     <div class="quiz" id="quizArea" style="display:none">
       <div class="quiz-q" id="quizQ"></div>
       <div class="feedback" id="feedback"></div>
       <div class="actions">
-        <button class="btn primary" id="check">Skontrolovať</button>
-        <button class="btn ghost" id="next">Ďalšia ➜</button>
-        <button class="btn danger" id="finish">Koniec</button>
+        <button class="btn primary" id="check">Skontrolovať <span class="key">Enter</span></button>
+        <button class="btn ghost" id="dontKnow">Neviem <span class="key">H</span></button>
+        <button class="btn ghost" id="next">Ďalej <span class="key">N</span></button>
+        <button class="btn danger" id="finish">Koniec <span class="key">F</span></button>
       </div>
     </div>
   </section>
@@ -670,7 +747,7 @@
   </section>
 
   <div class="footer">
-    Skratky: <span class="key">Enter</span> skontrolovať · <span class="key">N</span> ďalšia · <span class="key">F</span> koniec · <span class="key">Esc</span> zrušiť kvíz
+    Skratky: <span class="key">Enter</span> skontrolovať · <span class="key">H</span> neviem · <span class="key">N</span> ďalej · <span class="key">F</span> koniec · <span class="key">Esc</span> zrušiť kvíz
   </div>
 </div>
 
@@ -793,7 +870,7 @@ const VERBS = [
   ['live','lived',['žiť','bývať']],
   ['stay','stayed',['zostať','ostať']],
   ['leave','left',['odísť','nechať']],
-  ['arrive','arrived',['prísť','dorazi']],
+  ['arrive','arrived',['prísť','doraziť']],
   ['return','returned',['vrátiť sa']],
   ['travel','travelled',['cestovať']],
 
@@ -828,8 +905,8 @@ const VERBS = [
   ['show','showed',['ukázať']],
 
   // weather / nature
-  ['rain','rained',['pršať']],
-  ['snow','snowed',['snežiť']],
+  ['rain','rained',['pršať'],{impersonal:true}],
+  ['snow','snowed',['snežiť'],{impersonal:true}],
   ['shine','shone',['svietiť']],
   ['grow','grew',['rásť','pestovať']],
   ['plant','planted',['zasadiť','sadiť']],
@@ -853,8 +930,8 @@ const norm = s => (s || '').trim().toLowerCase()
 
 const enMap = new Map();
 const skMap = new Map();
-for (const [en, past, skList] of VERBS) {
-  const entry = { en, past, sk: skList };
+for (const [en, past, skList, opts={}] of VERBS) {
+  const entry = { en, past, sk: skList, impersonal: !!opts.impersonal };
   enMap.set(norm(en), entry);
   for (const s of skList) {
     if (!skMap.has(norm(s))) skMap.set(norm(s), entry);
@@ -873,7 +950,11 @@ function isConsonantY(verb) {
 function endsInSibilant(verb) {
   return /(s|x|z|ch|sh|o)$/.test(verb);
 }
+// Polysyllabic verbs where final syllable is unstressed — no consonant doubling
+const NO_DOUBLE = new Set(['visit','listen','open','happen','enter','offer','cover','differ','cancel','budget','limit','finish','polish','punish','publish','flourish','answer']);
+
 function isCVC(verb) {
+  if (NO_DOUBLE.has(verb)) return false;
   if (verb.length < 3) return false;
   const a = verb[verb.length - 3], b = verb[verb.length - 2], c = verb[verb.length - 1];
   if (isVowel(a) || !isVowel(b) || isVowel(c)) return false;
@@ -1058,9 +1139,59 @@ const SK_PRES_IRREG = {
   'začať':  {i:'začnem',  ty:'začneš',   on:'začne',    ona:'začne',    ono:'začne',    my:'začneme',   vy:'začnete',   oni:'začnú'},
   'piecť':  {i:'pečiem',  ty:'pečieš',   on:'pečie',    ona:'pečie',    ono:'pečie',    my:'pečieme',   vy:'pečiete',   oni:'pečú'},
   'rásť':   {i:'rastiem', ty:'rastieš',  on:'rastie',   ona:'rastie',   ono:'rastie',   my:'rastieme',  vy:'rastiete',  oni:'rastú'},
-  'liezť':  {i:'leziem',  ty:'lezieš',   on:'lezie',    ona:'lezie',    ono:'lezie',    my:'leziem ',   vy:'leziete',   oni:'lezú'},
+  'liezť':   {i:'leziem',  ty:'lezieš',   on:'lezie',    ona:'lezie',    ono:'lezie',    my:'lezieme',   vy:'leziete',   oni:'lezú'},
   'zavrieť':{i:'zavriem', ty:'zavrieš',  on:'zavrie',   ona:'zavrie',   ono:'zavrie',   my:'zavrieme',  vy:'zavriete',  oni:'zavrú'},
   'stretnúť':{i:'stretnem',ty:'stretneš',on:'stretne',  ona:'stretne',  ono:'stretne',  my:'stretneme', vy:'stretnete', oni:'stretnú'},
+  // long-vowel -ať verbs (would get wrong short forms from the fallback)
+  'hrať':    {i:'hrám',    ty:'hráš',    on:'hrá',      ona:'hrá',      ono:'hrá',      my:'hráme',     vy:'hráte',     oni:'hrajú'},
+  'čakať':   {i:'čakám',   ty:'čakáš',   on:'čaká',     ona:'čaká',     ono:'čaká',     my:'čakáme',    vy:'čakáte',    oni:'čakajú'},
+  'volať':   {i:'volám',   ty:'voláš',   on:'volá',     ona:'volá',     ono:'volá',     my:'voláme',    vy:'voláte',    oni:'volajú'},
+  'štekať':  {i:'štekám',  ty:'štekáš',  on:'šteká',    ona:'šteká',    ono:'šteká',    my:'štekáme',   vy:'štekáte',   oni:'štekajú'},
+  'mňaukať': {i:'mňaukám', ty:'mňaukáš', on:'mňauká',   ona:'mňauká',   ono:'mňauká',   my:'mňaukáme',  vy:'mňaukáte',  oni:'mňaukajú'},
+  // consonant-change -ať verbs
+  'skákať':  {i:'skáčem',  ty:'skáčeš',  on:'skáče',    ona:'skáče',    ono:'skáče',    my:'skáčeme',   vy:'skáčete',   oni:'skáčú'},
+  'smiať':   {i:'smejem',  ty:'smeješ',  on:'smeje',    ona:'smeje',    ono:'smeje',    my:'smejeme',   vy:'smejete',   oni:'smejú'},
+  // complete coverage — every sk[0] verb from VERBS
+  'prísť':    {i:'prídem',   ty:'prídeš',   on:'príde',    ona:'príde',    ono:'príde',    my:'prídeme',   vy:'prídete',   oni:'prídu'    },
+  'dostať':   {i:'dostanem', ty:'dostaneš', on:'dostane',  ona:'dostane',  ono:'dostane',  my:'dostaneme', vy:'dostanete', oni:'dostanú'  },
+  'vziať':    {i:'vezmem',   ty:'vezmeš',   on:'vezme',    ona:'vezme',    ono:'vezme',    my:'vezmeme',   vy:'vezmete',   oni:'vezmú'    },
+  'dať':      {i:'dám',      ty:'dáš',      on:'dá',       ona:'dá',       ono:'dá',       my:'dáme',      vy:'dáte',      oni:'dajú'     },
+  'povedať':  {i:'poviem',   ty:'povieš',   on:'povie',    ona:'povie',    ono:'povie',    my:'povieme',   vy:'poviete',   oni:'povedia'  },
+  'odpovedať':{i:'odpovedám',ty:'odpovedáš',on:'odpovedá', ona:'odpovedá', ono:'odpovedá', my:'odpovedáme',vy:'odpovedáte',oni:'odpovedajú'},
+  'behať':    {i:'behám',    ty:'beháš',    on:'behá',     ona:'behá',     ono:'behá',     my:'beháme',    vy:'beháte',    oni:'behajú'   },
+  'letieť':   {i:'letím',    ty:'letíš',    on:'letí',     ona:'letí',     ono:'letí',     my:'letíme',    vy:'letíte',    oni:'letia'    },
+  'viezť':    {i:'veziem',   ty:'vezieš',   on:'vezie',    ona:'vezie',    ono:'vezie',    my:'vezieme',   vy:'veziete',   oni:'vezú'     },
+  'počuť':    {i:'počujem',  ty:'počuješ',  on:'počuje',   ona:'počuje',   ono:'počuje',   my:'počujeme',  vy:'počujete',  oni:'počujú'   },
+  'pozerať':  {i:'pozerám',  ty:'pozeráš',  on:'pozerá',   ona:'pozerá',   ono:'pozerá',   my:'pozeráme',  vy:'pozeráte',  oni:'pozerajú' },
+  'nájsť':    {i:'nájdem',   ty:'nájdeš',   on:'nájde',    ona:'nájde',    ono:'nájde',    my:'nájdeme',   vy:'nájdete',   oni:'nájdu'    },
+  'pomôcť':   {i:'pomôžem',  ty:'pomôžeš',  on:'pomôže',   ona:'pomôže',   ono:'pomôže',   my:'pomôžeme',  vy:'pomôžete',  oni:'pomôžu'   },
+  'žiť':      {i:'žijem',    ty:'žiješ',    on:'žije',     ona:'žije',     ono:'žije',     my:'žijeme',    vy:'žijete',    oni:'žijú'     },
+  'zostať':   {i:'zostanem', ty:'zostaneš', on:'zostane',  ona:'zostane',  ono:'zostane',  my:'zostaneme', vy:'zostanete', oni:'zostanú'  },
+  'odísť':    {i:'odídem',   ty:'odídeš',   on:'odíde',    ona:'odíde',    ono:'odíde',    my:'odídeme',   vy:'odídete',   oni:'odídu'    },
+  'nechať':   {i:'nechám',   ty:'necháš',   on:'nechá',    ona:'nechá',    ono:'nechá',    my:'necháme',   vy:'necháte',   oni:'nechajú'  },
+  'predať':   {i:'predám',   ty:'predáš',   on:'predá',    ona:'predá',    ono:'predá',    my:'predáme',   vy:'predáte',   oni:'predajú'  },
+  'stavať':   {i:'staviam',  ty:'staviaš',  on:'stavia',   ona:'stavia',   ono:'stavia',   my:'staviame',  vy:'staviate',  oni:'staviajú' },
+  'strihať':  {i:'strihám',  ty:'striháš',  on:'striha',   ona:'striha',   ono:'striha',   my:'striháme',  vy:'striháte',  oni:'strihajú' },
+  'obliecť':  {i:'oblečiem', ty:'oblečieš', on:'oblečie',  ona:'oblečie',  ono:'oblečie',  my:'oblečieme', vy:'oblečiete', oni:'oblečú'   },
+  'padať':    {i:'padám',    ty:'padáš',    on:'padá',     ona:'padá',     ono:'padá',     my:'padáme',    vy:'padáte',    oni:'padajú'   },
+  'pozvať':   {i:'pozvem',   ty:'pozveš',   on:'pozve',    ona:'pozve',    ono:'pozve',    my:'pozveme',   vy:'pozvete',   oni:'pozvu'    },
+  'ťahať':    {i:'ťahám',    ty:'ťaháš',    on:'ťahá',     ona:'ťahá',     ono:'ťahá',     my:'ťaháme',    vy:'ťaháte',    oni:'ťahajú'   },
+  'držať':    {i:'držím',    ty:'držíš',    on:'drží',     ona:'drží',     ono:'drží',     my:'držíme',    vy:'držíte',    oni:'držia'    },
+  'vybrať':   {i:'vyberiem', ty:'vyberieš', on:'vyberie',  ona:'vyberie',  ono:'vyberie',  my:'vyberieme', vy:'vyberiete', oni:'vyberú'   },
+  'prestať':  {i:'prestanem',ty:'prestaneš',on:'prestane', ona:'prestane', ono:'prestane', my:'prestaneme',vy:'prestanete',oni:'prestanú' },
+  'ukázať':   {i:'ukážem',   ty:'ukážeš',   on:'ukáže',    ona:'ukáže',    ono:'ukáže',    my:'ukážeme',   vy:'ukážete',   oni:'ukážu'    },
+  'pršať':    {i:'prší',     ty:'prší',     on:'prší',     ona:'prší',     ono:'prší',     my:'prší',      vy:'prší',      oni:'prší'     },
+  // Verbs with wrong fallback forms
+  'poslať':   {i:'pošlem',   ty:'pošleš',   on:'pošle',    ona:'pošle',    ono:'pošle',    my:'pošleme',   vy:'pošlete',   oni:'pošlú'    },
+  'rozbiť':   {i:'rozbijem', ty:'rozbiješ', on:'rozbije',  ona:'rozbije',  ono:'rozbije',  my:'rozbijeme', vy:'rozbijete', oni:'rozbijú'  },
+  'vyhrať':   {i:'vyhrám',   ty:'vyhráš',   on:'vyhrá',    ona:'vyhrá',    ono:'vyhrá',    my:'vyhráme',   vy:'vyhráte',   oni:'vyhrajú'  },
+  // Rhythmic-law -iť verbs (long root → short endings: ím→im, íš→iš, etc.)
+  'ľúbiť':    {i:'ľúbim',    ty:'ľúbiš',    on:'ľúbi',     ona:'ľúbi',     ono:'ľúbi',     my:'ľúbime',    vy:'ľúbite',    oni:'ľúbia'    },
+  'cítiť':    {i:'cítim',    ty:'cítiš',    on:'cíti',     ona:'cíti',     ono:'cíti',     my:'cítime',    vy:'cítite',    oni:'cítia'    },
+  'navštíviť':{i:'navštívim',ty:'navštíviš',on:'navštívi', ona:'navštívi', ono:'navštívi', my:'navštívime',vy:'navštívite',oni:'navštívia'},
+  'vrátiť':   {i:'vrátim',   ty:'vrátiš',   on:'vráti',    ona:'vráti',    ono:'vráti',    my:'vrátime',   vy:'vrátite',   oni:'vrátia'   },
+  'kúpiť':    {i:'kúpim',    ty:'kúpiš',    on:'kúpi',     ona:'kúpi',     ono:'kúpi',     my:'kúpime',    vy:'kúpite',    oni:'kúpia'    },
+  'skúsiť':   {i:'skúsim',   ty:'skúsiš',   on:'skúsi',    ona:'skúsi',    ono:'skúsi',    my:'skúsime',   vy:'skúsite',   oni:'skúsia'   },
 };
 
 /* Irregular past stems — forms keyed by ending (l/la/lo/li). */
@@ -1082,6 +1213,14 @@ const SK_PAST_IRREG = {
   'liezť':   { l:'liezol',  la:'liezla',   lo:'liezlo',   li:'liezli'   },
   'stretnúť':{ l:'stretol', la:'stretla',  lo:'stretlo',  li:'stretli'  },
   'začať':   { l:'začal',   la:'začala',   lo:'začalo',   li:'začali'   },
+  // additional past irregulars
+  'prísť':    { l:'prišiel',  la:'prišla',   lo:'prišlo',   li:'prišli'   },
+  'vziať':    { l:'vzal',     la:'vzala',    lo:'vzalo',    li:'vzali'    },
+  'viezť':    { l:'viezol',   la:'viezla',   lo:'viezlo',   li:'viezli'   },
+  'nájsť':    { l:'našiel',   la:'našla',    lo:'našlo',    li:'našli'    },
+  'pomôcť':   { l:'pomohol',  la:'pomohla',  lo:'pomohlo',  li:'pomohli'  },
+  'odísť':    { l:'odišiel',  la:'odišla',   lo:'odišlo',   li:'odišli'   },
+  'obliecť':  { l:'obliekol', la:'obliekla', lo:'oblieklo', li:'obliekli' },
 };
 
 function skPresent(inf, key) {
@@ -1106,10 +1245,10 @@ function skPresent(inf, key) {
     const stem = inf.slice(0, -3) + 'n';
     return stem + ({ i:'em', ty:'eš', on:'e', ona:'e', ono:'e', my:'eme', vy:'ete', oni:'ú' })[key];
   }
-  // -ať default → -ám pattern
+  // -ať default → short vowel -am pattern (long-vowel verbs are in SK_PRES_IRREG)
   if (inf.endsWith('ať')) {
     const stem = inf.slice(0, -2);
-    return stem + ({ i:'ám', ty:'áš', on:'á', ona:'á', ono:'á', my:'áme', vy:'áte', oni:'ajú' })[key];
+    return stem + ({ i:'am', ty:'aš', on:'a', ona:'a', ono:'a', my:'ame', vy:'ate', oni:'ajú' })[key];
   }
   // catch-all
   if (inf.endsWith('ť')) {
@@ -1139,18 +1278,30 @@ function skPastForm(inf, key) {
 
 function skConjugate(skBaseRaw, key, tense) {
   if (!skBaseRaw || !SK_PRONS[key]) return skBaseRaw || '';
-  const skBase = skBaseRaw.trim();
-  const refl = / sa$/.test(skBase) ? ' sa' : '';
-  const inf = skBase.replace(/ sa$/, '');
+  // Strip parenthetical annotations e.g. "stáť (cena)"
+  const skBase = skBaseRaw.trim().replace(/\s*\(.*?\)\s*$/, '');
+  // Detect reflexive clitic (sa or si) at end
+  const reflMatch = skBase.match(/ (sa|si)$/);
+  const refl = reflMatch ? ' ' + reflMatch[1] : '';
+  const full = reflMatch ? skBase.slice(0, -reflMatch[0].length) : skBase;
+  // For compound forms like "mať rád": conjugate first word only, keep rest
+  const words = full.split(' ');
+  const inf = words[0];
+  let extra = words.length > 1 ? ' ' + words.slice(1).join(' ') : '';
+  // "mať rád": rád agrees in gender/number with subject
+  if (extra === ' rád') {
+    const radMap = { i:'rád', ty:'rád', on:'rád', ona:'rada', ono:'rado', my:'radi', vy:'radi', oni:'radi' };
+    extra = ' ' + radMap[key];
+  }
   const pron = SK_PRONS[key];
 
-  if (tense === 'pres')  return pron.sk + ' ' + skPresent(inf, key) + refl;
-  if (tense === 'presc') return pron.sk + ' práve ' + skPresent(inf, key) + refl;
+  if (tense === 'pres')  return pron.sk + refl + ' ' + skPresent(inf, key) + extra;
+  if (tense === 'presc') return pron.sk + refl + ' práve ' + skPresent(inf, key) + extra;
   if (tense === 'past') {
     const aux = pron.pastAux ? ' ' + pron.pastAux : '';
-    return pron.sk + aux + ' ' + skPastForm(inf, key) + refl;
+    return pron.sk + aux + refl + ' ' + skPastForm(inf, key) + extra;
   }
-  if (tense === 'fut')   return pron.sk + ' ' + SK_FUT_AUX[key] + ' ' + inf + refl;
+  if (tense === 'fut')   return pron.sk + ' ' + SK_FUT_AUX[key] + refl + ' ' + inf + extra;
   return skBase;
 }
 
@@ -1466,7 +1617,19 @@ $('swap').addEventListener('click', () => {
   const a = skInput.value, b = enInput.value;
   skInput.value = b;
   enInput.value = a;
-  if (skInput.value.trim()) translateSlovakToEnglish(skInput.value);
+  clearTimeout(typingTimer);
+  const skVal = skInput.value.trim();
+  const enVal = enInput.value.trim();
+  const enHit = skVal ? enMap.get(norm(skVal)) : null;
+  if (enHit) {
+    skInput.value = enHit.sk[0];
+    enInput.value = enHit.en;
+    updateFromVerb(enHit, 'local');
+  } else if (skVal) {
+    translateSlovakToEnglish(skVal);
+  } else if (enVal) {
+    translateEnglishToSlovak(enVal);
+  }
 });
 
 /* ---------------------------------------------------------------- *
@@ -1478,8 +1641,6 @@ document.querySelectorAll('.tense').forEach(b => {
     b.classList.add('active');
     currentTense = b.dataset.t;
     renderConjugation();
-    // If the quiz is open, regenerate the question in the newly selected tense
-    if (quizActive) newQuizQuestion();
   });
 });
 
@@ -1491,6 +1652,7 @@ document.getElementById('showSk').addEventListener('change', renderConjugation);
  * ---------------------------------------------------------------- */
 let quizActive = false;
 let quizScore = 0, quizTries = 0;
+let quizWordLimit = 10, quizWordsAnswered = 0;
 let quizQuestion = null;
 
 const quizArea = $('quizArea'), quizQ = $('quizQ'), feedback = $('feedback'), score = $('score');
@@ -1507,14 +1669,14 @@ function pickQuizVerb() {
    Slovak keys:  i/ty/on/ona/ono/my/vy/oni (used by skConjugate)         */
 function pickPron() {
   const all = [
-    ['I',   'i',     'i'  ],
-    ['You', 'you',   'ty' ],
-    ['He',  'heshe', 'on' ],
-    ['She', 'heshe', 'ona'],
-    ['It',  'heshe', 'ono'],
-    ['We',  'we',    'my' ],
-    ['You', 'you',   'vy' ],
-    ['They','they',  'oni'],
+    ['I',    'i',     'i',   '1st person singular'],
+    ['You',  'you',   'ty',  '2nd person singular'],
+    ['He',   'heshe', 'on',  '3rd person singular (m.)'],
+    ['She',  'heshe', 'ona', '3rd person singular (f.)'],
+    ['It',   'heshe', 'ono', '3rd person singular (n.)'],
+    ['We',   'we',    'my',  '1st person plural'],
+    ['You',  'you',   'vy',  '2nd person plural'],
+    ['They', 'they',  'oni', '3rd person plural'],
   ];
   return all[Math.floor(Math.random() * all.length)];
 }
@@ -1544,71 +1706,166 @@ function expectedAnswer(entry, tense, pronKey) {
   }
 }
 
+function refreshTenseRows() {
+  if (!quizQuestion) { newQuizQuestion(); return; }
+  feedback.textContent = '';
+  feedback.className = 'feedback';
+  const tenses = getSelectedTenses();
+  const tLbl = { pres:'prítomný čas', presc:'priebehový čas', past:'minulý čas', fut:'budúci čas' };
+  const tenseInputsEl = quizQ.querySelector('.tense-inputs');
+  if (!tenseInputsEl) return;
+  if (!tenses.length) {
+    tenseInputsEl.innerHTML = '<div style="color:var(--bad);font-weight:600;padding:4px 0">Vyber aspoň jeden čas.</div>';
+    quizQuestion.forms = [];
+    quizQuestion.checked = false;
+    return;
+  }
+  const { entry, pronKey } = quizQuestion;
+  const forms = tenses.map(t => ({ tense: t, expected: expectedAnswer(entry, t, pronKey) }));
+  quizQuestion.forms = forms;
+  quizQuestion.checked = false;
+  tenseInputsEl.innerHTML = forms.map(({ tense }) => `
+    <div class="tense-row">
+      <span class="tense-lbl">${tLbl[tense]}</span>
+      <input class="quiz-tense-input" data-tense="${tense}" type="text" placeholder="…" autocomplete="off" spellcheck="false" />
+      <span class="tense-fb" data-tense="${tense}"></span>
+    </div>`).join('');
+  setTimeout(() => document.querySelector('.quiz-tense-input')?.focus(), 30);
+}
+
+
+function getSelectedTenses() {
+  return Array.from(document.querySelectorAll('.quiz-tc:checked')).map(b => b.value);
+}
+
 function newQuizQuestion() {
   feedback.textContent = '';
   feedback.className = 'feedback';
   const entry = pickQuizVerb();
-  const [label, pronKey, skKey] = pickPron();
-  // Quiz tense follows the upper-section tab selection
-  const tense = currentTense;
-  const expected = expectedAnswer(entry, tense, pronKey);
+  let [label, pronKey, , hint] = entry.impersonal ? ['It', 'heshe', 'ono', '3rd person singular (n.)'] : pickPron();
+  const skInf = entry.sk[0].replace(/\s*\(.*?\)\s*$/, '');
+  const tenses = getSelectedTenses();
+  if (!tenses.length) {
+    quizQ.innerHTML = '<div style="padding:14px;color:var(--bad);font-weight:600">Vyber aspoň jeden čas.</div>';
+    quizQuestion = null;
+    return;
+  }
+  const forms = tenses.map(t => ({ tense: t, expected: expectedAnswer(entry, t, pronKey) }));
+  quizQuestion = { entry, label, pronKey, hint, forms, checked: false };
 
-  const skPhrase = skConjugate(entry.sk[0], skKey, tense);
+  const tLbl = { pres:'prítomný čas', presc:'priebehový čas', past:'minulý čas', fut:'budúci čas' };
+  const rowsHtml = forms.map(({ tense }) => `
+    <div class="tense-row">
+      <span class="tense-lbl">${tLbl[tense]}</span>
+      <input class="quiz-tense-input" data-tense="${tense}" type="text" placeholder="…" autocomplete="off" spellcheck="false" />
+      <span class="tense-fb" data-tense="${tense}"></span>
+    </div>`).join('');
 
-  quizQuestion = { entry, label, pronKey, skKey, tense, expected, skPhrase };
-
-  const tenseLabel = ({pres:'prítomný', presc:'priebehový', past:'minulý', fut:'budúci'})[tense];
   quizQ.innerHTML = `
     <div class="quiz-prompt">
       <span class="sk-flag">🇸🇰</span>
-      <span class="sk-word">${skPhrase}</span>
-      <span class="sk-tense">${tenseLabel} čas</span>
+      <span class="sk-word">${skInf}</span>
     </div>
-    <div class="quiz-answer">
-      <span class="en-flag">🇬🇧</span>
-      <span class="pron">${label}</span>
-      <input id="quizInput" type="text" placeholder="…" autocomplete="off" spellcheck="false" />
-    </div>
-  `;
-  setTimeout(() => $('quizInput')?.focus(), 30);
+    <div class="quiz-answer-multi">
+      <div class="pron-row">
+        <span class="en-flag">🇬🇧</span>
+        <span class="pron">${label}</span>
+        <span class="pron-hint">${hint}</span>
+      </div>
+      <div class="tense-inputs">${rowsHtml}</div>
+    </div>`;
+  setTimeout(() => document.querySelector('.quiz-tense-input')?.focus(), 30);
 }
 
 function checkQuiz() {
-  if (!quizQuestion) return;
-  const inp = $('quizInput');
-  if (!inp) return;
-  const given = inp.value.trim().toLowerCase();
-  if (!given) return;
-  quizTries++;
-  const expected = quizQuestion.expected.toLowerCase();
-  if (given === expected) {
-    quizScore++;
-    feedback.textContent = '✅ Výborne! ' + quizQuestion.label + ' ' + quizQuestion.expected;
+  if (!quizQuestion || quizQuestion.checked) return;
+  const anyFilled = Array.from(document.querySelectorAll('.quiz-tense-input')).some(i => i.value.trim());
+  if (!anyFilled) return;
+  quizQuestion.checked = true;
+  let allCorrect = true;
+  quizQuestion.forms.forEach(({ tense, expected }) => {
+    const inp = document.querySelector(`.quiz-tense-input[data-tense="${tense}"]`);
+    const fb  = document.querySelector(`.tense-fb[data-tense="${tense}"]`);
+    quizTries++;
+    const given = inp ? inp.value.trim().toLowerCase() : '';
+    if (given === expected.toLowerCase()) {
+      quizScore++;
+      if (inp) { inp.style.borderColor = 'var(--ok)'; inp.disabled = true; }
+      if (fb)  fb.textContent = '✅';
+    } else {
+      allCorrect = false;
+      if (inp) { inp.style.borderColor = 'var(--bad)'; inp.disabled = true; }
+      if (fb)  fb.textContent = '→ ' + expected;
+    }
+  });
+  score.textContent = quizScore + ' / ' + quizTries;
+  if (allCorrect) {
+    feedback.textContent = '✅ Výborne!';
     feedback.className = 'feedback ok';
-    setTimeout(newQuizQuestion, 1100);
   } else {
-    feedback.textContent = '❌ Skús znova. Správne: ' + quizQuestion.label + ' ' + quizQuestion.expected
-                         + '  (' + quizQuestion.entry.en + ')';
+    feedback.textContent = '❌ Skontroluj správne tvary vyššie.';
     feedback.className = 'feedback bad';
   }
-  score.textContent = quizScore + ' / ' + quizTries;
 }
 
 $('quizStart').addEventListener('click', () => {
   quizActive = true;
+  quizWordsAnswered = 0;
   quizArea.style.display = 'grid';
   $('quizReset').disabled = false;
   $('quizStart').textContent = 'Pokračovať v kvíze';
   newQuizQuestion();
 });
 $('quizReset').addEventListener('click', () => {
-  quizScore = 0; quizTries = 0;
+  quizScore = 0; quizTries = 0; quizWordsAnswered = 0;
   score.textContent = '0 / 0';
   feedback.textContent = '';
 });
 $('check').addEventListener('click', checkQuiz);
-$('next').addEventListener('click', newQuizQuestion);
+$('dontKnow').addEventListener('click', () => {
+  if (!quizQuestion || quizQuestion.checked) return;
+  quizQuestion.checked = true;
+  quizQuestion.forms.forEach(({ tense, expected }) => {
+    const inp = document.querySelector(`.quiz-tense-input[data-tense="${tense}"]`);
+    const fb  = document.querySelector(`.tense-fb[data-tense="${tense}"]`);
+    quizTries++;
+    if (inp) { inp.style.borderColor = 'var(--bad)'; inp.disabled = true; }
+    if (fb)  fb.textContent = '→ ' + expected;
+  });
+  score.textContent = quizScore + ' / ' + quizTries;
+  feedback.textContent = '💡 Správne tvary sú vyššie.';
+  feedback.className = 'feedback bad';
+});
+$('next').addEventListener('click', () => {
+  if (!quizQuestion) { newQuizQuestion(); return; }
+  if (!quizQuestion.checked) {
+    checkQuiz();
+  } else {
+    quizWordsAnswered++;
+    if (quizWordLimit > 0 && quizWordsAnswered >= quizWordLimit) {
+      finishQuiz();
+    } else {
+      newQuizQuestion();
+    }
+  }
+});
 $('finish').addEventListener('click', finishQuiz);
+document.querySelectorAll('.count-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.count-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    quizWordLimit = parseInt(btn.dataset.n);
+    if (quizActive) {
+      quizScore = 0; quizTries = 0; quizWordsAnswered = 0;
+      score.textContent = '0 / 0';
+      feedback.textContent = '';
+      newQuizQuestion();
+    }
+  });
+});
+document.querySelectorAll('.quiz-tc').forEach(cb => {
+  cb.addEventListener('change', () => { if (quizActive) refreshTenseRows(); });
+});
 
 /* ---------------------------------------------------------------- *
  * Finish-quiz summary overlay                                      *
@@ -1641,7 +1898,7 @@ function finishQuiz() {
 }
 
 $('playAgain').addEventListener('click', () => {
-  quizScore = 0; quizTries = 0;
+  quizScore = 0; quizTries = 0; quizWordsAnswered = 0;
   score.textContent = '0 / 0';
   feedback.textContent = '';
   $('overlay').classList.remove('show');
@@ -1666,15 +1923,30 @@ document.addEventListener('keydown', e => {
     return;
   }
   const tag = e.target.tagName;
-  const isQuizInput = e.target.id === 'quizInput';
+  const isQuizInput = e.target.classList.contains('quiz-tense-input');
   if (tag === 'INPUT' && !isQuizInput) {
     if (e.key === 'Escape') e.target.blur();
     return;
   }
   if (e.key === 'Enter') {
-    if (quizActive) { e.preventDefault(); checkQuiz(); }
+    if (quizActive) {
+      e.preventDefault();
+      if (isQuizInput) {
+        const inputs = Array.from(document.querySelectorAll('.quiz-tense-input:not([disabled])'));
+        const idx = inputs.indexOf(e.target);
+        if (idx >= 0 && idx < inputs.length - 1) { inputs[idx + 1].focus(); return; }
+      }
+      checkQuiz();
+    }
+  } else if (e.key.toLowerCase() === 'h') {
+    if (quizActive && !isQuizInput) { e.preventDefault(); $('dontKnow').click(); }
   } else if (e.key.toLowerCase() === 'n') {
-    if (quizActive && !isQuizInput) { e.preventDefault(); newQuizQuestion(); }
+    if (quizActive && !isQuizInput) {
+      e.preventDefault();
+      if (!quizQuestion) { newQuizQuestion(); }
+      else if (!quizQuestion.checked) { checkQuiz(); }
+      else { newQuizQuestion(); }
+    }
   } else if (e.key.toLowerCase() === 'f') {
     if (quizActive && !isQuizInput) { e.preventDefault(); finishQuiz(); }
   } else if (e.key === 'Escape') {
