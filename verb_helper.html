@@ -255,10 +255,14 @@
   .quiz { display: grid; gap: 14px; }
   .quiz-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
   .quiz-head h2 { margin: 0; font-size: 22px; }
-  .quiz-head .score {
-    background: var(--primary-soft); color: var(--primary);
-    padding: 6px 12px; border-radius: 999px;
-    font-weight: 700; font-size: 14px;
+  .score {
+    display: inline-block;
+    padding: 11px 18px;
+    border-radius: 12px;
+    border: 2px solid var(--line);
+    background: #fff;
+    font: 700 15px 'Quicksand', sans-serif;
+    color: var(--muted);
   }
   .quiz-q {
     font-size: 22px;
@@ -278,7 +282,10 @@
     padding-bottom: 12px;
     border-bottom: 1px dashed var(--line);
   }
-  .quiz-prompt .sk-flag { font-size: 20px; }
+  .quiz-prompt .sk-flag { font-size: 28px; display: inline-block; min-width: 130px; }
+  .quiz-answer-multi .en-flag { display: inline-block; min-width: 130px; }
+  .flag-icon { border-radius: 4px; box-shadow: 0 0 0 1px rgba(0,0,0,.1); vertical-align: middle; }
+  .flag-title { font-weight: 700; color: var(--muted); font-size: 15px; letter-spacing: 0.5px; margin-right: 8px; vertical-align: middle; }
   .quiz-prompt .sk-word {
     font-size: 28px;
     font-weight: 700;
@@ -303,7 +310,7 @@
     gap: 10px;
     font-size: 22px;
   }
-  .quiz-answer .en-flag { font-size: 18px; }
+  .quiz-answer .en-flag, .quiz-answer-multi .en-flag { font-size: 28px; }
   .quiz-q .pron { font-weight: 700; }
   .quiz-tense-input {
     width: 200px;
@@ -346,7 +353,14 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
-  .pron-hint { font-size: 13px; color: var(--muted); font-style: italic; font-weight: 500; }
+  .pron-info-btn {
+    display: inline-flex; align-items: center;
+    padding: 8px 12px; border-radius: 10px;
+    border: 2px solid var(--line); background: #fff;
+    font: 600 20px 'Quicksand', sans-serif; color: var(--muted);
+    white-space: nowrap;
+  }
+  .tense-pron { font-weight: 700; color: var(--primary); min-width: 46px; }
 
   /* Quiz word-count selector */
   .quiz-count-select {
@@ -371,6 +385,29 @@
   }
   .count-btn:hover { border-color: var(--primary); color: var(--primary); }
   .count-btn.active { background: var(--primary-soft); border-color: var(--primary); color: var(--primary); }
+
+  .quiz-progress-wrap { display:none; margin-bottom: 10px; }
+  .quiz-progress-track {
+    height: 8px;
+    background: var(--line);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .quiz-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    border-radius: 999px;
+    transition: width 0.35s ease;
+  }
+  .quiz-progress-label {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 600;
+    margin-top: 4px;
+    display: block;
+    text-align: right;
+  }
 
   .feedback { min-height: 24px; font-weight: 600; font-size: 16px; }
   .feedback.ok { color: var(--ok); }
@@ -639,6 +676,10 @@
   box-shadow: 0 4px 14px rgba(124,108,242,.22);
   transform: translateY(-1px);
 }
+@media (max-width: 600px) {
+  .home-btn { top: 10px; left: 10px; padding: 7px 13px; font-size: 12px; }
+  body { padding-top: 60px; }
+}
 </style>
 </head>
 <body>
@@ -704,12 +745,12 @@
   <section class="card">
     <div class="quiz-head">
       <h2>🎯 Skúška</h2>
-      <div class="score" id="score">0 / 0</div>
     </div>
 
     <div class="quiz-toggle">
       <button class="btn ghost" id="quizStart">Spustiť kvíz</button>
       <button class="btn ghost" id="quizReset" disabled>Vynulovať skóre</button>
+      <span class="score" id="score">Skóre: 0 / 0</span>
     </div>
     <div class="quiz-tense-select">
       <span>Precvičovať:</span>
@@ -727,12 +768,19 @@
     </div>
 
     <div class="quiz" id="quizArea" style="display:none">
+      <div class="quiz-progress-wrap" id="quizProgressWrap">
+        <div class="quiz-progress-track"><div class="quiz-progress-fill" id="quizProgressFill"></div></div>
+        <span class="quiz-progress-label" id="quizProgressLabel"></span>
+      </div>
+      <div style="background:var(--primary-soft);border-left:4px solid var(--primary);border-radius:10px;padding:10px 14px;color:var(--ink);font-size:14px;line-height:1.6;font-weight:600;">
+        💡 Preložte sloveso do angličtiny a doplňte správny tvar pre zobrazenú osobu, číslo (jednotné alebo množné) a pre každý vybraný čas.
+      </div>
       <div class="quiz-q" id="quizQ"></div>
       <div class="feedback" id="feedback"></div>
       <div class="actions">
         <button class="btn primary" id="check">Skontrolovať <span class="key">Enter</span></button>
+        <button class="btn ghost" id="next" disabled>Ďalej <span class="key">N</span></button>
         <button class="btn ghost" id="dontKnow">Neviem <span class="key">H</span></button>
-        <button class="btn ghost" id="next">Ďalej <span class="key">N</span></button>
         <button class="btn danger" id="finish">Koniec <span class="key">F</span></button>
       </div>
     </div>
@@ -1706,10 +1754,22 @@ function expectedAnswer(entry, tense, pronKey) {
   }
 }
 
+function updateProgress() {
+  const wrap  = $('quizProgressWrap');
+  const fill  = $('quizProgressFill');
+  const label = $('quizProgressLabel');
+  if (quizWordLimit === 0) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  const pct = Math.min(100, Math.round(quizWordsAnswered / quizWordLimit * 100));
+  fill.style.width = pct + '%';
+  label.textContent = quizWordsAnswered + ' / ' + quizWordLimit;
+}
+
 function refreshTenseRows() {
   if (!quizQuestion) { newQuizQuestion(); return; }
   feedback.textContent = '';
   feedback.className = 'feedback';
+  $('next').disabled = true;
   const tenses = getSelectedTenses();
   const tLbl = { pres:'prítomný čas', presc:'priebehový čas', past:'minulý čas', fut:'budúci čas' };
   const tenseInputsEl = quizQ.querySelector('.tense-inputs');
@@ -1720,13 +1780,14 @@ function refreshTenseRows() {
     quizQuestion.checked = false;
     return;
   }
-  const { entry, pronKey } = quizQuestion;
+  const { entry, pronKey, label: pronLabel } = quizQuestion;
   const forms = tenses.map(t => ({ tense: t, expected: expectedAnswer(entry, t, pronKey) }));
   quizQuestion.forms = forms;
   quizQuestion.checked = false;
   tenseInputsEl.innerHTML = forms.map(({ tense }) => `
     <div class="tense-row">
       <span class="tense-lbl">${tLbl[tense]}</span>
+      <span class="tense-pron">${pronLabel}</span>
       <input class="quiz-tense-input" data-tense="${tense}" type="text" placeholder="…" autocomplete="off" spellcheck="false" />
       <span class="tense-fb" data-tense="${tense}"></span>
     </div>`).join('');
@@ -1738,9 +1799,14 @@ function getSelectedTenses() {
   return Array.from(document.querySelectorAll('.quiz-tc:checked')).map(b => b.value);
 }
 
+const SK_FLAG_SVG = `<svg class="flag-icon" width="40" height="27" viewBox="0 0 90 60" aria-label="Slovensko"><rect width="90" height="60" fill="#ee1c25"/><rect width="90" height="40" fill="#0b4ea2"/><rect width="90" height="20" fill="#fff"/><path d="M14 12 h30 v22 c0 11 -15 17 -15 17 S14 45 14 34 z" fill="#ee1c25" stroke="#fff" stroke-width="3"/><path d="M17 41 c4 -6 9 -6 12 -6 s8 0 12 6 v8 H17 z" fill="#0b4ea2"/><g stroke="#fff" stroke-width="3.4" stroke-linecap="round"><line x1="29" y1="16" x2="29" y2="41"/><line x1="22" y1="22" x2="36" y2="22"/><line x1="24.5" y1="29" x2="33.5" y2="29"/></g></svg>`;
+
+const GB_FLAG_SVG = `<svg class="flag-icon" width="40" height="27" viewBox="0 0 60 40" aria-label="United Kingdom"><clipPath id="ukflag"><rect width="60" height="40" rx="3"/></clipPath><g clip-path="url(#ukflag)"><rect width="60" height="40" fill="#012169"/><path d="M0 0 L60 40 M60 0 L0 40" stroke="#fff" stroke-width="8"/><path d="M0 0 L60 40 M60 0 L0 40" stroke="#C8102E" stroke-width="4"/><rect x="25" width="10" height="40" fill="#fff"/><rect y="15" width="60" height="10" fill="#fff"/><rect x="26.5" width="7" height="40" fill="#C8102E"/><rect y="16.5" width="60" height="7" fill="#C8102E"/></g></svg>`;
+
 function newQuizQuestion() {
   feedback.textContent = '';
   feedback.className = 'feedback';
+  $('next').disabled = true;
   const entry = pickQuizVerb();
   let [label, pronKey, , hint] = entry.impersonal ? ['It', 'heshe', 'ono', '3rd person singular (n.)'] : pickPron();
   const skInf = entry.sk[0].replace(/\s*\(.*?\)\s*$/, '');
@@ -1757,20 +1823,21 @@ function newQuizQuestion() {
   const rowsHtml = forms.map(({ tense }) => `
     <div class="tense-row">
       <span class="tense-lbl">${tLbl[tense]}</span>
+      <span class="tense-pron">${label}</span>
       <input class="quiz-tense-input" data-tense="${tense}" type="text" placeholder="…" autocomplete="off" spellcheck="false" />
       <span class="tense-fb" data-tense="${tense}"></span>
     </div>`).join('');
 
   quizQ.innerHTML = `
     <div class="quiz-prompt">
-      <span class="sk-flag">🇸🇰</span>
+      <span class="sk-flag"><span class="flag-title">SK</span>${SK_FLAG_SVG}</span>
       <span class="sk-word">${skInf}</span>
     </div>
     <div class="quiz-answer-multi">
       <div class="pron-row">
-        <span class="en-flag">🇬🇧</span>
-        <span class="pron">${label}</span>
-        <span class="pron-hint">${hint}</span>
+        <span class="en-flag"><span class="flag-title">EN</span>${GB_FLAG_SVG}</span>
+        <span class="tense-pron">${label}</span>
+        <span class="pron-info-btn">${hint.replace(/\s*\(.*?\)/, '').replace(/(person) (singular|plural)/, '$1 – $2')}</span>
       </div>
       <div class="tense-inputs">${rowsHtml}</div>
     </div>`;
@@ -1798,7 +1865,7 @@ function checkQuiz() {
       if (fb)  fb.textContent = '→ ' + expected;
     }
   });
-  score.textContent = quizScore + ' / ' + quizTries;
+  score.textContent = 'Skóre: ' + quizScore + ' / ' + quizTries;
   if (allCorrect) {
     feedback.textContent = '✅ Výborne!';
     feedback.className = 'feedback ok';
@@ -1814,14 +1881,16 @@ $('quizStart').addEventListener('click', () => {
   quizArea.style.display = 'grid';
   $('quizReset').disabled = false;
   $('quizStart').textContent = 'Pokračovať v kvíze';
+  updateProgress();
   newQuizQuestion();
 });
 $('quizReset').addEventListener('click', () => {
   quizScore = 0; quizTries = 0; quizWordsAnswered = 0;
-  score.textContent = '0 / 0';
+  score.textContent = 'Skóre: 0 / 0';
   feedback.textContent = '';
+  updateProgress();
 });
-$('check').addEventListener('click', checkQuiz);
+$('check').addEventListener('click', () => { checkQuiz(); if (quizQuestion?.checked) $('next').disabled = false; });
 $('dontKnow').addEventListener('click', () => {
   if (!quizQuestion || quizQuestion.checked) return;
   quizQuestion.checked = true;
@@ -1832,21 +1901,20 @@ $('dontKnow').addEventListener('click', () => {
     if (inp) { inp.style.borderColor = 'var(--bad)'; inp.disabled = true; }
     if (fb)  fb.textContent = '→ ' + expected;
   });
-  score.textContent = quizScore + ' / ' + quizTries;
+  score.textContent = 'Skóre: ' + quizScore + ' / ' + quizTries;
   feedback.textContent = '💡 Správne tvary sú vyššie.';
   feedback.className = 'feedback bad';
+  $('next').disabled = false;
 });
 $('next').addEventListener('click', () => {
   if (!quizQuestion) { newQuizQuestion(); return; }
-  if (!quizQuestion.checked) {
-    checkQuiz();
+  if (!quizQuestion.checked) return;
+  quizWordsAnswered++;
+  updateProgress();
+  if (quizWordLimit > 0 && quizWordsAnswered >= quizWordLimit) {
+    finishQuiz();
   } else {
-    quizWordsAnswered++;
-    if (quizWordLimit > 0 && quizWordsAnswered >= quizWordLimit) {
-      finishQuiz();
-    } else {
-      newQuizQuestion();
-    }
+    newQuizQuestion();
   }
 });
 $('finish').addEventListener('click', finishQuiz);
@@ -1857,8 +1925,9 @@ document.querySelectorAll('.count-btn').forEach(btn => {
     quizWordLimit = parseInt(btn.dataset.n);
     if (quizActive) {
       quizScore = 0; quizTries = 0; quizWordsAnswered = 0;
-      score.textContent = '0 / 0';
+      score.textContent = 'Skóre: 0 / 0';
       feedback.textContent = '';
+      updateProgress();
       newQuizQuestion();
     }
   });
@@ -1899,8 +1968,9 @@ function finishQuiz() {
 
 $('playAgain').addEventListener('click', () => {
   quizScore = 0; quizTries = 0; quizWordsAnswered = 0;
-  score.textContent = '0 / 0';
+  score.textContent = 'Skóre: 0 / 0';
   feedback.textContent = '';
+  updateProgress();
   $('overlay').classList.remove('show');
   quizActive = true;
   quizArea.style.display = 'grid';
@@ -1936,16 +2006,14 @@ document.addEventListener('keydown', e => {
         const idx = inputs.indexOf(e.target);
         if (idx >= 0 && idx < inputs.length - 1) { inputs[idx + 1].focus(); return; }
       }
-      checkQuiz();
+      $('check').click();
     }
   } else if (e.key.toLowerCase() === 'h') {
     if (quizActive && !isQuizInput) { e.preventDefault(); $('dontKnow').click(); }
   } else if (e.key.toLowerCase() === 'n') {
-    if (quizActive && !isQuizInput) {
+    if (quizActive && !isQuizInput && !$('next').disabled) {
       e.preventDefault();
-      if (!quizQuestion) { newQuizQuestion(); }
-      else if (!quizQuestion.checked) { checkQuiz(); }
-      else { newQuizQuestion(); }
+      $('next').click();
     }
   } else if (e.key.toLowerCase() === 'f') {
     if (quizActive && !isQuizInput) { e.preventDefault(); finishQuiz(); }

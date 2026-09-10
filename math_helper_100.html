@@ -256,6 +256,10 @@ h1 {
   box-shadow: 0 4px 14px rgba(124,108,242,.22);
   transform: translateY(-1px);
 }
+@media (max-width: 600px) {
+  .home-btn { top: 10px; left: 10px; padding: 7px 13px; font-size: 12px; }
+  body { padding-top: 60px; }
+}
 </style>
 </head>
 <body>
@@ -265,7 +269,7 @@ h1 {
 
 <div class="score-bar">
   <div class="score-box">✅ Správne: <span id="score-ok">0</span></div>
-  <div class="score-box">❌ Pokusy: <span id="score-tries">0</span></div>
+  <div class="score-box">🎯 Pokusy: <span id="score-tries">0</span></div>
 </div>
 
 <div class="card">

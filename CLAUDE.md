@@ -1,0 +1,78 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Running the app
+
+No build step. Open any `.html` file directly in a browser. All CSS and JS are inline in each file.
+
+```
+# open home page
+start index.html
+
+# or serve locally to avoid CORS on font fetches
+npx serve .
+```
+
+## Architecture
+
+Each helper is a **single self-contained HTML file** — no framework, no bundler, no shared JS modules. CSS and JS live inline inside `<style>` and `<script>` tags.
+
+| File | Purpose |
+|---|---|
+| `index.html` | Home page — tile grid linking to all helpers |
+| `math_helper.html` | Addition/subtraction up to 20 (older style) |
+| `math_helper_100.html` | Addition/subtraction up to 100 |
+| `nasobilka_helper.html` | Multiplication tables 1–10 |
+| `iy_helper.html` | Slovak i/y quiz (hard/soft/both consonants + selected words) |
+| `verb_helper.html` | English verb translator + conjugation grid + quiz |
+
+## Shared design system
+
+The newer files (`index.html`, `math_helper_100.html`, `nasobilka_helper.html`, `iy_helper.html`, `verb_helper.html`) share the same CSS custom properties:
+
+```css
+--primary: #7c6cf2;   /* lavender */
+--accent:  #ff7aa8;   /* pink */
+--green:   #4cc38a;
+--orange:  #ffb86b;
+--ink:     #2b2b3f;
+--muted:   #6c6e89;
+--line:    #e7e9f4;
+```
+
+Font: **Quicksand** (Google Fonts). Background: three-ellipse radial gradient on `#fafbff`. `math_helper.html` predates this system and uses Comic Sans + an orange gradient.
+
+## Quiz pattern
+
+All helpers share the same quiz structure:
+
+- **Score counters** `quizScore` / `quizTries` (or `score` / `tries`), displayed live.
+- **`newQuestion()` / `newQuizQuestion()`** — picks a random item, renders the prompt.
+- **`checkQuiz()` / `checkAnswer()`** — validates input, marks ✅/❌, disables inputs.
+- **Ďalej / Next** button checks first if unchecked, then advances.
+- **Summary overlay** (`finishQuiz()` / `finishSession()`) shown when word-count limit is reached or user presses Koniec.
+- **Keyboard shortcuts** consistent across all helpers: `Enter` = check, `H` = hint/Neviem, `N` = next, `F` = finish.
+
+## verb_helper.html specifics
+
+This is the most complex file. Key data structures and functions:
+
+- **`VERBS[]`** — master dictionary (~150 entries). Each entry: `{ en, sk[], forms, note?, impersonal? }`. `sk` is an array of Slovak infinitives.
+- **`SK_PRES_IRREG`** / **`SK_PAST_IRREG`** — lookup tables for Slovak conjugation by infinitive. Every verb in the dictionary has an explicit entry; do not rely on a conjugation engine for quiz answers.
+- **`skConjugate(entry, tense, pronKey)`** — returns the conjugated Slovak form. For the quiz the prompt uses `entry.sk[0]` (the infinitive) directly to avoid conjugation bugs.
+- **`expectedAnswer(entry, tense, pronKey)`** — returns the expected English answer for a given tense + pronoun.
+- **`pickPron()`** — returns `[label, pronKey, skKey, hint]` (4 elements). `pronKey` is one of `i / you / heshe / we / they`.
+- **`getSelectedTenses()`** — reads `.quiz-tc:checked` checkboxes → array of `'pres' | 'presc' | 'past' | 'fut'`.
+- **`refreshTenseRows()`** — re-renders tense input rows for the *current* verb/pronoun when checkboxes change (does **not** pick a new verb).
+- **`quizWordLimit`** (0 = unlimited) / **`quizWordsAnswered`** — enforce the count selector.
+
+## iy_helper.html specifics
+
+- Word list comes from `zoznam_slov.txt` (fetched at runtime) plus a hardcoded fallback array.
+- Quiz feedback messages must **not** contain `i/í` or `y/ý` letter pairs. The "nie X" suffix is appended dynamically from the clicked letter, not hardcoded.
+- Consonant categories: `TVRDE` (orange `#f07d3a`), `MAKKE` (blue `#4a90d9`), `OBOIAKE` (lavender `#7c6cf2`).
+
+## Images
+
+`albert.png`, `minions.png`, `avengers.jpg` live at the repo root and are referenced by `index.html`. Images with a white background use `mix-blend-mode: multiply` to blend into the page gradient.
