@@ -172,7 +172,7 @@
 <body>
   <div class="wrap">
     <header class="hero">
-      <img src="pomocnici_ucebna.jpg" alt="Pomocníci" onclick="document.getElementById('lb').classList.add('open')" style="height:200px;width:auto;display:block;margin:0 auto 10px;border-radius:16px;cursor:zoom-in;" />
+      <img id="hero-img" src="pomocnici_ucebna.jpg" alt="Pomocníci" onclick="document.getElementById('lb').classList.add('open')" style="height:200px;width:auto;display:block;margin:0 auto 10px;border-radius:16px;cursor:pointer;transition:transform .2s,box-shadow .2s;" onmouseover="this.style.transform='scale(1.04)';this.style.boxShadow='0 8px 32px rgba(124,108,242,.25)'" onmouseout="this.style.transform='';this.style.boxShadow=''" />
       <p>Vyber si, čo chceš dnes precvičovať.</p>
     </header>
 
