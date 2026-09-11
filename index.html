@@ -159,12 +159,20 @@
     margin-top: 32px;
   }
   footer .heart { color: var(--accent); }
+
+  .lightbox {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.75); z-index: 999;
+    align-items: center; justify-content: center; cursor: zoom-out;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox img { max-width: 90vw; max-height: 90vh; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.5); }
 </style>
 </head>
 <body>
   <div class="wrap">
     <header class="hero">
-      <img src="pomocnici_ucebna.jpg" alt="Pomocníci" style="height:200px;width:auto;display:block;margin:0 auto 10px;border-radius:16px;" />
+      <img src="pomocnici_ucebna.jpg" alt="Pomocníci" onclick="document.getElementById('lb').classList.add('open')" style="height:200px;width:auto;display:block;margin:0 auto 10px;border-radius:16px;cursor:zoom-in;" />
       <p>Vyber si, čo chceš dnes precvičovať.</p>
     </header>
 
@@ -236,5 +244,12 @@
       Spravil ocko s láskou <span class="heart">❤️</span>
     </footer>
   </div>
+
+  <div id="lb" class="lightbox" onclick="this.classList.remove('open')">
+    <img src="pomocnici_ucebna.jpg" alt="Pomocníci" />
+  </div>
+  <script>
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') document.getElementById('lb').classList.remove('open'); });
+  </script>
 </body>
 </html>
