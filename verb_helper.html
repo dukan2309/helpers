@@ -313,7 +313,8 @@
   .quiz-answer .en-flag, .quiz-answer-multi .en-flag { font-size: 28px; }
   .quiz-q .pron { font-weight: 700; }
   .quiz-tense-input {
-    width: 200px;
+    flex: none;
+    width: 238px;
     padding: 8px 12px;
     font: 600 20px 'Quicksand', sans-serif;
     border: 2px solid var(--line);
@@ -321,7 +322,6 @@
     background: #fff;
     text-align: center;
     outline: none;
-    flex-shrink: 0;
   }
   .quiz-tense-input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-soft); }
   .quiz-q .hint-base { color: var(--muted); font-size: 16px; font-style: italic; }
@@ -354,7 +354,8 @@
     letter-spacing: 0.5px;
   }
   .pron-info-btn {
-    display: inline-flex; align-items: center;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex: none; width: 238px;
     padding: 8px 12px; border-radius: 10px;
     border: 2px solid var(--line); background: #fff;
     font: 600 20px 'Quicksand', sans-serif; color: var(--muted);
@@ -679,6 +680,26 @@
 @media (max-width: 600px) {
   .home-btn { top: 10px; left: 10px; padding: 7px 13px; font-size: 12px; }
   body { padding-top: 60px; }
+  .card { padding: 14px 8px; }
+
+  .quiz-q { padding: 12px 8px; }
+  .quiz-prompt .sk-word { font-size: 22px; }
+  .quiz-prompt .sk-flag,
+  .quiz-answer-multi .en-flag { min-width: 50px; }
+  .tense-lbl { min-width: 50px; font-size: 11px; }
+
+  /* Fixed width sized to the longest hint: "2nd person – singular"
+     measured at 153px border-box (13px Quicksand 600) → 158px w/ buffer */
+  .pron-info-btn {
+    flex: none; width: 158px;
+    font-size: 13px; padding: 6px 8px;
+    white-space: nowrap; justify-content: center;
+    overflow: hidden;
+  }
+  .quiz-tense-input {
+    flex: none; width: 158px;
+    font-size: 16px; padding: 6px 8px;
+  }
 }
 </style>
 </head>
@@ -749,7 +770,6 @@
 
     <div class="quiz-toggle">
       <button class="btn ghost" id="quizStart">Spustiť kvíz</button>
-      <button class="btn ghost" id="quizReset" disabled>Vynulovať skóre</button>
       <span class="score" id="score">Skóre: 0 / 0</span>
     </div>
     <div class="quiz-tense-select">
@@ -778,10 +798,10 @@
       <div class="quiz-q" id="quizQ"></div>
       <div class="feedback" id="feedback"></div>
       <div class="actions">
-        <button class="btn primary" id="check">Skontrolovať <span class="key">Enter</span></button>
-        <button class="btn ghost" id="next" disabled>Ďalej <span class="key">N</span></button>
-        <button class="btn ghost" id="dontKnow">Neviem <span class="key">H</span></button>
-        <button class="btn danger" id="finish">Koniec <span class="key">F</span></button>
+        <button class="btn primary" id="check">Kontrola <span class="key">Enter</span></button>
+        <button class="btn ghost" id="next" disabled title="Najprv vyrieš úlohu">Ďalej <span class="key">Enter</span></button>
+        <button class="btn ghost" id="dontKnow">Pomoc</button>
+        <button class="btn danger" id="finish">Koniec <span class="key">End</span></button>
       </div>
     </div>
   </section>
@@ -795,7 +815,7 @@
   </section>
 
   <div class="footer">
-    Skratky: <span class="key">Enter</span> skontrolovať · <span class="key">H</span> neviem · <span class="key">N</span> ďalej · <span class="key">F</span> koniec · <span class="key">Esc</span> zrušiť kvíz
+    Skratky: <span class="key">Enter</span> skontrolovať / ďalej · <span class="key">Tab</span> ďalšie pole · <span class="key">End</span> koniec · <span class="key">Esc</span> zrušiť kvíz
   </div>
 </div>
 
@@ -1850,6 +1870,8 @@ function checkQuiz() {
   if (!anyFilled) return;
   quizQuestion.checked = true;
   let allCorrect = true;
+  let correctCount = 0;
+  const totalForms = quizQuestion.forms.length;
   quizQuestion.forms.forEach(({ tense, expected }) => {
     const inp = document.querySelector(`.quiz-tense-input[data-tense="${tense}"]`);
     const fb  = document.querySelector(`.tense-fb[data-tense="${tense}"]`);
@@ -1857,6 +1879,7 @@ function checkQuiz() {
     const given = inp ? inp.value.trim().toLowerCase() : '';
     if (given === expected.toLowerCase()) {
       quizScore++;
+      correctCount++;
       if (inp) { inp.style.borderColor = 'var(--ok)'; inp.disabled = true; }
       if (fb)  fb.textContent = '✅';
     } else {
@@ -1869,6 +1892,9 @@ function checkQuiz() {
   if (allCorrect) {
     feedback.textContent = '✅ Výborne!';
     feedback.className = 'feedback ok';
+  } else if (correctCount > 0) {
+    feedback.textContent = `✅ ${correctCount} z ${totalForms} správne — pozri opravené tvary vyššie.`;
+    feedback.className = 'feedback ok';
   } else {
     feedback.textContent = '❌ Skontroluj správne tvary vyššie.';
     feedback.className = 'feedback bad';
@@ -1877,22 +1903,26 @@ function checkQuiz() {
 
 $('quizStart').addEventListener('click', () => {
   quizActive = true;
-  quizWordsAnswered = 0;
-  quizArea.style.display = 'grid';
-  $('quizReset').disabled = false;
-  $('quizStart').textContent = 'Pokračovať v kvíze';
-  updateProgress();
-  newQuizQuestion();
-});
-$('quizReset').addEventListener('click', () => {
   quizScore = 0; quizTries = 0; quizWordsAnswered = 0;
   score.textContent = 'Skóre: 0 / 0';
   feedback.textContent = '';
+  quizArea.style.display = 'grid';
+  $('quizStart').textContent = 'Reštartovať kvíz';
   updateProgress();
+  newQuizQuestion();
 });
 $('check').addEventListener('click', () => { checkQuiz(); if (quizQuestion?.checked) $('next').disabled = false; });
 $('dontKnow').addEventListener('click', () => {
   if (!quizQuestion || quizQuestion.checked) return;
+  // 1st press: reveal only the English base verb as a small hint (no penalty)
+  if (!quizQuestion.hintUsed) {
+    quizQuestion.hintUsed = true;
+    feedback.innerHTML = '💡 Anglicky: <b>' + quizQuestion.entry.en + '</b> — teraz doplň správne tvary.';
+    feedback.className = 'feedback ok';
+    document.querySelector('.quiz-tense-input:not([disabled])')?.focus();
+    return;
+  }
+  // 2nd press: reveal all correct forms (give-up path)
   quizQuestion.checked = true;
   quizQuestion.forms.forEach(({ tense, expected }) => {
     const inp = document.querySelector(`.quiz-tense-input[data-tense="${tense}"]`);
@@ -1974,7 +2004,7 @@ $('playAgain').addEventListener('click', () => {
   $('overlay').classList.remove('show');
   quizActive = true;
   quizArea.style.display = 'grid';
-  $('quizStart').textContent = 'Pokračovať v kvíze';
+  $('quizStart').textContent = 'Reštartovať kvíz';
   newQuizQuestion();
 });
 $('closeSummary').addEventListener('click', () => {
@@ -1982,6 +2012,10 @@ $('closeSummary').addEventListener('click', () => {
   quizActive = false;
   quizArea.style.display = 'none';
   $('quizStart').textContent = 'Spustiť kvíz';
+  quizScore = 0; quizTries = 0; quizWordsAnswered = 0;
+  score.textContent = 'Skóre: 0 / 0';
+  feedback.textContent = '';
+  updateProgress();
 });
 
 /* Global keyboard shortcuts */
@@ -2001,6 +2035,12 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Enter') {
     if (quizActive) {
       e.preventDefault();
+      // If the question is already checked, Enter advances to the next one
+      if (quizQuestion && quizQuestion.checked) {
+        if (!$('next').disabled) $('next').click();
+        return;
+      }
+      // Otherwise move to the next blank field, or check on the last one
       if (isQuizInput) {
         const inputs = Array.from(document.querySelectorAll('.quiz-tense-input:not([disabled])'));
         const idx = inputs.indexOf(e.target);
@@ -2008,15 +2048,8 @@ document.addEventListener('keydown', e => {
       }
       $('check').click();
     }
-  } else if (e.key.toLowerCase() === 'h') {
-    if (quizActive && !isQuizInput) { e.preventDefault(); $('dontKnow').click(); }
-  } else if (e.key.toLowerCase() === 'n') {
-    if (quizActive && !isQuizInput && !$('next').disabled) {
-      e.preventDefault();
-      $('next').click();
-    }
-  } else if (e.key.toLowerCase() === 'f') {
-    if (quizActive && !isQuizInput) { e.preventDefault(); finishQuiz(); }
+  } else if (e.key === 'End') {
+    if (quizActive) { e.preventDefault(); finishQuiz(); }
   } else if (e.key === 'Escape') {
     quizActive = false;
     quizArea.style.display = 'none';

@@ -43,14 +43,24 @@ The newer files (`index.html`, `math_helper_100.html`, `nasobilka_helper.html`, 
 
 Font: **Quicksand** (Google Fonts). Background: three-ellipse radial gradient on `#fafbff`. `math_helper.html` predates this system and uses Comic Sans + an orange gradient.
 
+## Home button
+
+All helpers have a fixed lavender pill button `← Domov` linking to `index.html`:
+
+```html
+<a class="home-btn" href="index.html">← Domov</a>
+```
+
+It sits directly after `<body>`, outside any wrapper div, and uses `position: fixed; top: 14px; left: 16px`. Every file also has a `@media (max-width: 600px)` block that shrinks the button and adds `padding-top: 60px` to `body` so the button doesn't overlap the page title on phones.
+
 ## Quiz pattern
 
 All helpers share the same quiz structure:
 
-- **Score counters** `quizScore` / `quizTries` (or `score` / `tries`), displayed live.
+- **Score counters** `quizScore` / `quizTries` (or `score` / `tries`), displayed live. "Pokusy" uses 🎯, not ❌ (which reads as wrong answer).
 - **`newQuestion()` / `newQuizQuestion()`** — picks a random item, renders the prompt.
 - **`checkQuiz()` / `checkAnswer()`** — validates input, marks ✅/❌, disables inputs.
-- **Ďalej / Next** button checks first if unchecked, then advances.
+- **Ďalej** button is disabled until Skontrolovať or Neviem is triggered. Button order: Skontrolovať → Ďalej → Neviem → Koniec.
 - **Summary overlay** (`finishQuiz()` / `finishSession()`) shown when word-count limit is reached or user presses Koniec.
 - **Keyboard shortcuts** consistent across all helpers: `Enter` = check, `H` = hint/Neviem, `N` = next, `F` = finish.
 
@@ -66,6 +76,18 @@ This is the most complex file. Key data structures and functions:
 - **`getSelectedTenses()`** — reads `.quiz-tc:checked` checkboxes → array of `'pres' | 'presc' | 'past' | 'fut'`.
 - **`refreshTenseRows()`** — re-renders tense input rows for the *current* verb/pronoun when checkboxes change (does **not** pick a new verb).
 - **`quizWordLimit`** (0 = unlimited) / **`quizWordsAnswered`** — enforce the count selector.
+
+### Quiz card layout
+
+The quiz card has two rows followed by tense input rows:
+
+1. **SK row** (`.quiz-prompt`): `SK_FLAG_SVG` (inline SVG, `min-width: 130px`) + Slovak infinitive (`.sk-word`).
+2. **EN row** (`.pron-row`): `GB_FLAG_SVG` (inline SVG, `min-width: 130px`) + person label (`.tense-pron`) + ghost-button hint (`.pron-info-btn`) showing e.g. `3rd person – singular`.
+3. **Tense rows** (`.tense-row`): tense label (`.tense-lbl`, `min-width: 130px`) + person label (`.tense-pron`) + input + feedback span.
+
+The `min-width: 130px` on the flag spans, tense labels, and pron-lbl-col keeps the verb, person, and input boxes aligned in the same column across all rows.
+
+**Flag icons** use inline SVG constants `SK_FLAG_SVG` / `GB_FLAG_SVG` (defined just above `newQuizQuestion()`). Do not use emoji flags — they render as "SK"/"GB" text on Windows. Each flag span also includes a `<span class="flag-title">SK</span>` / `<span class="flag-title">EN</span>` text label.
 
 ## iy_helper.html specifics
 

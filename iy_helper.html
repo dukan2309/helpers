@@ -1288,23 +1288,22 @@
       fb.className = 'quiz-feedback fb-correct';
     } else {
       qFirst = false;
+      const correctLetter = Array.isArray(q.ans) ? q.ans[0] : q.ans;
+      gap.textContent = correctLetter;
+      gap.classList.add('correct');
       document.querySelectorAll('.qbtn').forEach(b => {
         if (b.textContent === letter) b.classList.add('q-wrong');
+        if (b.textContent === correctLetter) b.classList.add('q-correct');
+        b.disabled = true;
       });
       const isY = l => l === 'y' || l === 'ý';
-      const ref = Array.isArray(q.ans) ? q.ans[0] : q.ans;
-      const wrongFamily = isY(letter) !== isY(ref);
+      const wrongFamily = isY(letter) !== isY(correctLetter);
       const msg = wrongFamily
         ? q.err_fam.replace(hl, `<strong class="quiz-hl">${hl}</strong>`) + ` (nie ${letter})`
         : q.err_dlz;
-      fb.innerHTML = '✗ ' + msg +
+      fb.innerHTML = `✗ Správne je <strong class="quiz-hl">${correctLetter}</strong>. ` + msg +
         '<div><button class="quiz-next-btn" onclick="nextWord()">Ďalšie slovo →</button></div>';
       fb.className = 'quiz-feedback fb-wrong';
-      setTimeout(() => {
-        document.querySelectorAll('.qbtn').forEach(b => {
-          if (b.textContent === letter) b.classList.remove('q-wrong');
-        });
-      }, 1500);
     }
   }
 
