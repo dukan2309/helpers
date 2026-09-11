@@ -62,7 +62,7 @@ All helpers share the same quiz structure:
 - **`checkQuiz()` / `checkAnswer()`** — validates input, marks ✅/❌, disables inputs.
 - **Ďalej** button is disabled until Skontrolovať or Neviem is triggered. Button order: Skontrolovať → Ďalej → Neviem → Koniec.
 - **Summary overlay** (`finishQuiz()` / `finishSession()`) shown when word-count limit is reached or user presses Koniec.
-- **Keyboard shortcuts** consistent across all helpers: `Enter` = check, `H` = hint/Neviem, `N` = next, `F` = finish.
+- **Keyboard shortcuts** consistent across all helpers: `Enter` = check / next, `End` = finish, `Esc` = cancel quiz. Letter shortcuts (N/H/F) are not used — the user types answers, so letter keys must remain free.
 
 ## verb_helper.html specifics
 
@@ -76,6 +76,9 @@ This is the most complex file. Key data structures and functions:
 - **`getSelectedTenses()`** — reads `.quiz-tc:checked` checkboxes → array of `'pres' | 'presc' | 'past' | 'fut'`.
 - **`refreshTenseRows()`** — re-renders tense input rows for the *current* verb/pronoun when checkboxes change (does **not** pick a new verb).
 - **`quizWordLimit`** (0 = unlimited) / **`quizWordsAnswered`** — enforce the count selector.
+- **Scoring** — one point per tense form answered correctly (`quizScore / quizTries`). Partial credit: if 1 of 4 tenses correct, score += 1, tries += 4. Closing the summary resets the score.
+- **Two-stage Pomoc** — first press shows the English translation as a hint; second press reveals all correct forms and marks the question wrong. "Ďalej" button stays disabled until Skontrolovať or second Pomoc press; it shows a tooltip when disabled.
+- **`quizStart` button** — always labeled "Reštartovať kvíz" after first start; always does a full reset (no "Pokračovať" state).
 
 ### Quiz card layout
 
@@ -83,9 +86,9 @@ The quiz card has two rows followed by tense input rows:
 
 1. **SK row** (`.quiz-prompt`): `SK_FLAG_SVG` (inline SVG, `min-width: 130px`) + Slovak infinitive (`.sk-word`).
 2. **EN row** (`.pron-row`): `GB_FLAG_SVG` (inline SVG, `min-width: 130px`) + person label (`.tense-pron`) + ghost-button hint (`.pron-info-btn`) showing e.g. `3rd person – singular`.
-3. **Tense rows** (`.tense-row`): tense label (`.tense-lbl`, `min-width: 130px`) + person label (`.tense-pron`) + input + feedback span.
+3. **Tense rows** (`.tense-row`): tense label (`.tense-lbl`, desktop `min-width: 130px`, mobile `flex: none; width: 120px`) + person label (`.tense-pron`) + input + feedback span.
 
-The `min-width: 130px` on the flag spans, tense labels, and pron-lbl-col keeps the verb, person, and input boxes aligned in the same column across all rows.
+The fixed widths on flag spans, tense labels, and pron-lbl-col keep the verb, person, and input boxes aligned in the same column across all rows. Mobile widths were measured via headless Chrome to fit the longest label.
 
 **Flag icons** use inline SVG constants `SK_FLAG_SVG` / `GB_FLAG_SVG` (defined just above `newQuizQuestion()`). Do not use emoji flags — they render as "SK"/"GB" text on Windows. Each flag span also includes a `<span class="flag-title">SK</span>` / `<span class="flag-title">EN</span>` text label.
 
@@ -97,4 +100,8 @@ The `min-width: 130px` on the flag spans, tense labels, and pron-lbl-col keeps t
 
 ## Images
 
-`albert.png`, `minions.png`, `avengers.jpg` live at the repo root and are referenced by `index.html`. Images with a white background use `mix-blend-mode: multiply` to blend into the page gradient.
+`pomocnici_emblem.png` is the hero image on `index.html`. Images with a white/transparent background use `mix-blend-mode: multiply` to blend into the page gradient.
+
+When converting a JPEG with a plain background to a transparent PNG, use the flood-fill C# script embedded in PowerShell (`Add-Type -TypeDefinition`) with `LockBits` for performance. Seed the flood-fill from all four edges; tune brightness/saturation thresholds to match the actual background color (sample corners first).
+
+Other image assets at repo root: `pomocnici_stoja.jpg`, `pomocnici_stoja.png`, `pomocnici_stol.jpg`, `pomocnici_emblem.jpg`, `pomocnici_ucebna.jpg`.
