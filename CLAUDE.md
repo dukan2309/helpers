@@ -100,8 +100,8 @@ The fixed widths on flag spans, tense labels, and pron-lbl-col keep the verb, pe
 
 ## Images
 
-`pomocnici_emblem.png` is the hero image on `index.html`. Images with a white/transparent background use `mix-blend-mode: multiply` to blend into the page gradient.
+`pomocnici_ucebna.jpg` is the hero image on `index.html`. It has a colorful edge-to-edge illustration so it is used as a plain JPEG (no `mix-blend-mode`). It is clickable — a CSS lightbox overlay opens the image full-size (click or Esc to close). Images with a white/transparent background use `mix-blend-mode: multiply` to blend into the page gradient.
 
 When converting a JPEG with a plain background to a transparent PNG, use the flood-fill C# script embedded in PowerShell (`Add-Type -TypeDefinition`) with `LockBits` for performance. Seed the flood-fill from all four edges; tune brightness/saturation thresholds to match the actual background color (sample corners first).
 
-Other image assets at repo root: `pomocnici_stoja.jpg`, `pomocnici_stoja.png`, `pomocnici_stol.jpg`, `pomocnici_emblem.jpg`, `pomocnici_ucebna.jpg`.
+Other image assets at repo root: `pomocnici_stoja.jpg`, `pomocnici_stoja.png`, `pomocnici_stol.jpg`, `pomocnici_emblem.jpg`, `pomocnici_emblem.png`, `pomocnici_ucebna.jpg`.
