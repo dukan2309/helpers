@@ -28,11 +28,14 @@ h1 {
   font-size: clamp(26px, 4vw, 36px);
   font-weight: 700;
   letter-spacing: -0.5px;
+  color: #2b2b3f;
+  margin-bottom: 10px;
+}
+h1 .h1-grad {
   background: linear-gradient(90deg, #7c6cf2 0%, #ff7aa8 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  margin-bottom: 10px;
 }
 
 .home-btn {
@@ -130,30 +133,6 @@ button:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; transform
 #btn-finish { background: #c0c0d0; color: white; }
 button small { opacity: 0.7; font-size: 0.7em; margin-left: 4px; }
 
-/* Násobilková mriežka */
-.mult-grid {
-  display: grid;
-  grid-template-columns: repeat(11, 1fr);
-  gap: 3px;
-  width: 100%;
-}
-.mg-cell {
-  aspect-ratio: 1;
-  border-radius: 6px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: clamp(0.55rem, 1.2vw, 0.8rem);
-  font-weight: 700;
-  background: #f5f5f5; color: #bbb;
-  transition: background 0.25s, color 0.25s;
-}
-.mg-cell.mg-header-row { background: #ffe0ef; color: #d63b78; }
-.mg-cell.mg-header-col { background: #ddeeff; color: #2c6fad; }
-.mg-cell.mg-corner     { background: #f0f0f0; color: #ccc; }
-.mg-cell.mg-row-hl     { background: #c8e6ff; color: #1a5fa0; }
-.mg-cell.mg-col-hl     { background: #ffd6e8; color: #a0215a; }
-.mg-cell.mg-both-hl    { background: #d5c8ff; color: #5040b0; }
-.mg-cell.mg-result     { background: #4cc38a; color: white; animation: pop 0.4s ease; box-shadow: 0 2px 8px rgba(76,195,138,0.5); }
-
 /* Opakované sčítanie */
 .rep-add-area {
   display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; justify-content: center;
@@ -165,7 +144,7 @@ button small { opacity: 0.7; font-size: 0.7em; margin-left: 4px; }
 }
 .rep-chip {
   display: inline-flex; align-items: center; justify-content: center;
-  min-width: 44px; height: 44px; border-radius: 12px;
+  min-width: 44px; height: 44px; border-radius: 8px;
   font-size: 1.2rem; font-weight: bold; color: white; padding: 0 8px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.12);
 }
@@ -173,8 +152,8 @@ button small { opacity: 0.7; font-size: 0.7em; margin-left: 4px; }
 .rep-eq   { font-size: 1.5rem; font-weight: bold; color: #7c6cf2; height: 44px; display: inline-flex; align-items: center; }
 .rep-ans  {
   display: inline-flex; align-items: center; justify-content: center;
-  min-width: 54px; height: 54px; border-radius: 50%;
-  font-size: 1.6rem; font-weight: bold; color: white;
+  min-width: 44px; height: 44px; border-radius: 8px;
+  font-size: 1.2rem; font-weight: bold; color: white;
   background: linear-gradient(135deg, #4cc38a, #5bb6e0);
   animation: pop 0.4s ease; box-shadow: 0 3px 10px rgba(0,0,0,0.15);
 }
@@ -203,11 +182,19 @@ button small { opacity: 0.7; font-size: 0.7em; margin-left: 4px; }
 .dot-eq  { font-size: 1.9rem; font-weight: 700; color: #bbb; align-self: center; }
 
 /* Theory: full table */
+.tg-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .theory-grid {
   display: grid;
   grid-template-columns: 1fr 10px repeat(10, 1fr);
   gap: 2px;
   width: 100%;
+}
+@media (max-width: 600px) {
+  .theory-grid {
+    grid-template-columns: 30px 6px repeat(10, 30px);
+    width: max-content;
+  }
+  .tg-cell { font-size: 0.7rem; }
 }
 .tg-cell {
   aspect-ratio: 1;
@@ -299,8 +286,8 @@ button small { opacity: 0.7; font-size: 0.7em; margin-left: 4px; }
 </head>
 <body>
 <div class="page-header">
-<a class="home-btn" href="index.html">🏠 Domov</a>
-<h1>🔢 Malá násobilka</h1>
+<a class="home-btn" href="index.html">⌂ Domov</a>
+<h1><span class="h1-icon">🔢</span> <span class="h1-grad">Malá násobilka</span></h1>
 </div>
 
 <div id="retry-banner" style="display:none">🔁 Opravujeme chyby — príklad <span id="retry-current">1</span> z <span id="retry-total">1</span></div>
@@ -331,12 +318,6 @@ button small { opacity: 0.7; font-size: 0.7em; margin-left: 4px; }
   </div>
 </div>
 
-<!-- Násobilková mriežka -->
-<div class="card">
-  <div class="section-title">🔢 Násobilková mriežka</div>
-  <div class="mult-grid" id="mult-grid"></div>
-</div>
-
 <!-- Opakované sčítanie -->
 <div class="card">
   <div class="section-title">➕ Opakované sčítanie</div>
@@ -352,7 +333,7 @@ button small { opacity: 0.7; font-size: 0.7em; margin-left: 4px; }
 <!-- Theory: full table -->
 <div class="card">
   <div class="section-title">📖 Tabuľka násobilky</div>
-  <div class="theory-grid" id="theory-grid"></div>
+  <div class="tg-scroll"><div class="theory-grid" id="theory-grid"></div></div>
 </div>
 
 <!-- Tips -->
@@ -440,7 +421,6 @@ button small { opacity: 0.7; font-size: 0.7em; margin-left: 4px; }
     document.getElementById('feedback').className = 'feedback';
     answered = false; hintUsed = false;
     document.getElementById('btn-next').disabled = true;
-    renderMultGrid(false);
     renderRepAdd(false);
     renderDotMatrix(false);
     renderTheoryGrid();
@@ -458,7 +438,7 @@ button small { opacity: 0.7; font-size: 0.7em; margin-left: 4px; }
     scoreTries++;
     inp.disabled = true;
     document.getElementById('btn-next').disabled = false;
-    renderMultGrid(true); renderRepAdd(true); renderDotMatrix(true); renderTheoryGrid(true);
+    renderRepAdd(true); renderDotMatrix(true); renderTheoryGrid(true);
     if (val === correctAnswer) {
       inp.className = 'correct';
       if (hintUsed) { scoreOkWithHelp++; fb.textContent = '🎉 Správne! (s pomocou)'; }
@@ -488,7 +468,7 @@ button small { opacity: 0.7; font-size: 0.7em; margin-left: 4px; }
   function showHint() {
     if (answered) return;
     hintUsed = true;
-    renderMultGrid(true); renderRepAdd(true); renderDotMatrix(true); renderTheoryGrid(true);
+    renderRepAdd(true); renderDotMatrix(true); renderTheoryGrid(true);
     document.getElementById('feedback').textContent = '💡 Pozri sa na zobrazenia nižšie!';
     document.getElementById('feedback').className = 'feedback';
     document.getElementById('answer-input').focus();
@@ -509,54 +489,12 @@ button small { opacity: 0.7; font-size: 0.7em; margin-left: 4px; }
     else if (e.key === 'f' || e.key === 'F') finishSession();
   });
 
-  // ── Visualization 1: Násobilková mriežka ──────────────────────────────────
-  function renderMultGrid(reveal) {
-    const grid = document.getElementById('mult-grid');
-    grid.innerHTML = '';
-
-    for (let r = 0; r <= 10; r++) {
-      for (let c = 0; c <= 10; c++) {
-        const cell = document.createElement('div');
-        cell.className = 'mg-cell';
-
-        if (r === 0 && c === 0) {
-          cell.classList.add('mg-corner');
-          cell.textContent = '×';
-        } else if (r === 0) {
-          cell.classList.add('mg-header-row');
-          cell.textContent = c;
-        } else if (c === 0) {
-          cell.classList.add('mg-header-col');
-          cell.textContent = r;
-        } else {
-          if (reveal && r === num1 && c === num2) {
-            cell.classList.add('mg-result');
-            cell.textContent = correctAnswer;
-          } else if (r === num1 && c === num2) {
-            cell.classList.add('mg-both-hl');
-            cell.textContent = '?';
-          } else if (r === num1) {
-            cell.classList.add('mg-row-hl');
-            cell.textContent = '';
-          } else if (c === num2) {
-            cell.classList.add('mg-col-hl');
-            cell.textContent = '';
-          } else {
-            cell.textContent = '';
-          }
-        }
-        grid.appendChild(cell);
-      }
-    }
-  }
-
   // ── Visualization 2: Opakované sčítanie ───────────────────────────────────
   function renderRepAdd(reveal) {
     const area = document.getElementById('rep-add-area');
     area.innerHTML = '';
-    const color = CHIP_COLORS[(num1 - 1) % CHIP_COLORS.length];
+    const color = CHIP_COLORS[(num2 - 1) % CHIP_COLORS.length];
 
-    // wrap a child in a unit with a small counting number above it
     function unit(countText, child) {
       const u = document.createElement('span');
       u.className = 'rep-unit';
@@ -568,7 +506,7 @@ button small { opacity: 0.7; font-size: 0.7em; margin-left: 4px; }
       return u;
     }
 
-    for (let i = 0; i < num2; i++) {
+    for (let i = 0; i < num1; i++) {
       if (i > 0) {
         const plus = document.createElement('span');
         plus.className = 'rep-plus'; plus.textContent = '+';
@@ -577,8 +515,8 @@ button small { opacity: 0.7; font-size: 0.7em; margin-left: 4px; }
       const chip = document.createElement('span');
       chip.className = 'rep-chip';
       chip.style.background = color;
-      chip.textContent = num1;
-      const runningTotal = num1 * (i + 1);
+      chip.textContent = num2;
+      const runningTotal = num2 * (i + 1);
       area.appendChild(unit(reveal ? String(runningTotal) : '', chip));
     }
 
@@ -595,7 +533,11 @@ button small { opacity: 0.7; font-size: 0.7em; margin-left: 4px; }
       ans.title = 'Ukáž v tabuľke násobilky';
       ans.addEventListener('click', () => {
         renderTheoryGrid(true);
-        document.getElementById('theory-grid').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const cell = document.querySelector('.tg-pulse');
+        if (cell) cell.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const grid = document.getElementById('theory-grid');
+        grid.style.pointerEvents = 'none';
+        setTimeout(() => { grid.style.pointerEvents = ''; }, 700);
       });
       area.appendChild(unit('', ans));
     }
@@ -670,6 +612,8 @@ button small { opacity: 0.7; font-size: 0.7em; margin-left: 4px; }
     const grid = document.getElementById('theory-grid');
     grid.innerHTML = '';
     const cells = [];  // {el, r, c} for hover crosshair
+    const lockedR = highlight ? num1 : 0;
+    const lockedC = highlight ? num2 : 0;
 
     const addSpacer = (h) => {
       const sp = document.createElement('div');
@@ -714,7 +658,7 @@ button small { opacity: 0.7; font-size: 0.7em; margin-left: 4px; }
           cell.style.cursor = 'pointer';
           const cr = r, cc = c;
           cell.addEventListener('mouseenter', () => {
-            // L-shape: row from left header up to the cell, column from top header down to the cell
+            cells.forEach(o => o.el.classList.remove('tg-dim'));
             cells.forEach(o => {
               const keep = (o.r === cr && o.c <= cc) || (o.c === cc && o.r <= cr);
               if (!keep) o.el.classList.add('tg-dim');
@@ -722,6 +666,12 @@ button small { opacity: 0.7; font-size: 0.7em; margin-left: 4px; }
           });
           cell.addEventListener('mouseleave', () => {
             cells.forEach(o => o.el.classList.remove('tg-dim'));
+            if (highlight) {
+              cells.forEach(o => {
+                const keep = (o.r === lockedR && o.c <= lockedC) || (o.c === lockedC && o.r <= lockedR);
+                if (!keep) o.el.classList.add('tg-dim');
+              });
+            }
           });
           if (highlight && r === num1 && c === num2) {
             cell.classList.add('tg-pulse');
@@ -732,6 +682,13 @@ button small { opacity: 0.7; font-size: 0.7em; margin-left: 4px; }
         cells.push({ el: cell, r, c });
         grid.appendChild(cell);
       }
+    }
+
+    if (highlight) {
+      cells.forEach(o => {
+        const keep = (o.r === num1 && o.c <= num2) || (o.c === num2 && o.r <= num1);
+        if (!keep) o.el.classList.add('tg-dim');
+      });
     }
   }
 

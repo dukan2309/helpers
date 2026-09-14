@@ -76,11 +76,15 @@
     font-weight: 700;
     font-size: clamp(28px, 5vw, 44px);
     letter-spacing: -0.5px;
+    color: var(--ink);
+  }
+  header.hero h1 .h1-grad {
     background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }
+  header.hero h1 .h1-icon { -webkit-text-fill-color: initial; background: none; -webkit-background-clip: initial; background-clip: initial; }
   header.hero p {
     margin: 8px 0 0;
     color: var(--muted);
@@ -469,8 +473,8 @@
 <div class="wrap">
 
   <header class="hero">
-    <a class="home-btn" href="index.html">🏠 Domov</a>
-    <h1>📝 I a Y v slovenčine</h1>
+    <a class="home-btn" href="index.html">⌂ Domov</a>
+    <h1><span class="h1-icon">📝</span> <span class="h1-grad">I a Y v slovenčine</span></h1>
     <p>Kedy píšeme mäkké <strong>i/í</strong> a kedy tvrdé <strong>y/ý</strong>?</p>
   </header>
 

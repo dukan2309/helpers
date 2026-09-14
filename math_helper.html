@@ -579,14 +579,20 @@ h1 {
   font-size: clamp(28px, 4vw, 38px);
   font-weight: 700;
   letter-spacing: -0.5px;
+  color: #2b2b3f;
+  text-shadow: none;
+}
+h1 .h1-grad {
   background: linear-gradient(90deg, #7c6cf2 0%, #ff7aa8 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  text-shadow: none;
 }
+h1 .h1-icon { -webkit-text-fill-color: initial; background: none; -webkit-background-clip: initial; background-clip: initial; }
 .score-box span     { color: #7c6cf2; }
 .mode-btn.active    { border-color: #7c6cf2; background: #ece9ff; color: #7c6cf2; }
+.cross-lbl { display: flex; align-items: center; gap: 8px; justify-content: center; font-size: 14px; color: #6c6e89; cursor: pointer; margin: 4px 0 12px; font-family: 'Quicksand', sans-serif; font-weight: 600; }
+.cross-lbl input[type="checkbox"] { accent-color: #7c6cf2; width: 16px; height: 16px; cursor: pointer; }
 #answer-input:focus { border-color: #7c6cf2; box-shadow: 0 0 0 4px #ece9ff; }
 #btn-check  { background: linear-gradient(135deg, #7c6cf2, #ff7aa8); }
 #btn-hint   { background: linear-gradient(135deg, #ffb86b, #ff7aa8); }
@@ -642,8 +648,8 @@ h1 {
 </head>
 <body>
 <div class="page-header">
-<a class="home-btn" href="index.html">🏠 Domov</a>
-<h1>🌟 Pomocník s matematikou — do 20! 🌟</h1>
+<a class="home-btn" href="index.html">⌂ Domov</a>
+<h1><span class="h1-icon">🌟</span> <span class="h1-grad">Pomocník s matematikou — do 20!</span> <span class="h1-icon">🌟</span></h1>
 </div>
 
 <div class="score-bar">
@@ -659,6 +665,7 @@ h1 {
     <button class="mode-btn" id="mode-sub" onclick="setMode('sub')">➖ Odčítanie</button>
     <button class="mode-btn" id="mode-mix" onclick="setMode('mix')">🎲 Mix</button>
   </div>
+  <label class="cross-lbl"><input type="checkbox" id="only-cross" onchange="onlyCrossChanged()"> Len premostenie cez 10</label>
   <div class="problem">
     <span class="num1" id="p-num1">7</span>
     <span class="op"   id="p-op">+</span>
@@ -740,27 +747,31 @@ h1 {
   let scoreOkFull = 0, scoreOkWithHelp = 0, scoreTries = 0;
   let hintShown = false;
   let answered = false;
+  let onlyCross = false;
+  function onlyCrossChanged() { onlyCross = document.getElementById('only-cross').checked; generate(); render(); }
 
   function setMode(m) {
     mode = m;
     document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('mode-' + m).classList.add('active');
-    nextProblem();
+    generate(); render();
   }
 
   function generate() {
-    const useAdd = mode === 'add' || (mode === 'mix' && Math.random() < 0.5);
-    op = useAdd ? '+' : '-';
+    do {
+      const useAdd = mode === 'add' || (mode === 'mix' && Math.random() < 0.5);
+      op = useAdd ? '+' : '-';
 
-    if (op === '+') {
-      num1 = Math.floor(Math.random() * 11);        // 0-10
-      num2 = Math.floor(Math.random() * (20 - num1 + 1));
-      num2 = Math.min(num2, 20 - num1);
-    } else {
-      num1 = Math.floor(Math.random() * 11) + 5;    // 5-15
-      num2 = Math.floor(Math.random() * (num1 + 1));
-    }
-    correctAnswer = op === '+' ? num1 + num2 : num1 - num2;
+      if (op === '+') {
+        num1 = Math.floor(Math.random() * 11);        // 0-10
+        num2 = Math.floor(Math.random() * (20 - num1 + 1));
+        num2 = Math.min(num2, 20 - num1);
+      } else {
+        num1 = Math.floor(Math.random() * 11) + 5;    // 5-15
+        num2 = Math.floor(Math.random() * (num1 + 1));
+      }
+      correctAnswer = op === '+' ? num1 + num2 : num1 - num2;
+    } while (onlyCross && !(op === '+' ? num2 < 10 && (num1 % 10) + num2 > 10 : num2 < 10 && (num1 % 10) < num2));
   }
 
   function render() {
