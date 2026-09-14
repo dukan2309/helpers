@@ -63,8 +63,11 @@
     transform: translateY(-1px);
   }
   @media (max-width: 600px) {
-    .home-btn { top: 10px; left: 10px; padding: 7px 13px; font-size: 12px; }
-    body { padding-top: 60px; }
+    .home-btn { position: static; padding: 6px 12px; font-size: 13px; flex-shrink: 0; }
+    header.hero { display: flex; align-items: center; gap: 12px; text-align: left; }
+    header.hero h1 { margin: 0; font-size: 22px; }
+    header.hero p { display: none; }
+    body { padding-top: 16px; }
   }
 
   header.hero { text-align: center; margin-bottom: 36px; }
@@ -463,10 +466,10 @@
 </style>
 </head>
 <body>
-<a class="home-btn" href="index.html">← Domov</a>
 <div class="wrap">
 
   <header class="hero">
+    <a class="home-btn" href="index.html">🏠 Domov</a>
     <h1>📝 I a Y v slovenčine</h1>
     <p>Kedy píšeme mäkké <strong>i/í</strong> a kedy tvrdé <strong>y/ý</strong>?</p>
   </header>

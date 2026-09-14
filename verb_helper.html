@@ -678,8 +678,11 @@
   transform: translateY(-1px);
 }
 @media (max-width: 600px) {
-  .home-btn { top: 10px; left: 10px; padding: 7px 13px; font-size: 12px; }
-  body { padding-top: 60px; }
+  .home-btn { position: static; padding: 6px 12px; font-size: 13px; flex-shrink: 0; }
+  header.title { display: flex; align-items: center; gap: 12px; text-align: left; margin-bottom: 16px; }
+  header.title h1 { margin: 0; font-size: 22px; }
+  header.title p { display: none; }
+  body { padding-top: 16px; }
   .card { padding: 14px 8px; }
 
   .quiz-q { padding: 12px 8px; }
@@ -704,10 +707,10 @@
 </style>
 </head>
 <body>
-<a class="home-btn" href="index.html">← Domov</a>
 <div class="wrap">
 
   <header class="title">
+    <a class="home-btn" href="index.html">🏠 Domov</a>
     <h1>🌈 Slovesník</h1>
     <p>Anglické slovesá — preklad, časovanie, precvičovanie</p>
   </header>
