@@ -1183,10 +1183,53 @@
     { b:'m',   a:'',         ans:'i',       ctx:'daj m_ to', err_fam:'mi nie je vybrané slovo → po "m" píšeme i',   err_dlz:'mi nemá dĺžeň → píšeme i (nie í)' },
     { b:'v',   a:'ť',        ans:'i',       ctx:'v_ť veniec', err_fam:'viť nie je vybrané slovo → po "v" píšeme i', err_dlz:'viť nemá dĺžeň → píšeme i (nie í)' },
     { b:'t',   a:'p',        ans:'i',       ctx:'dobrý t_p', err_fam:'tip nie je vybrané slovo → po "t" píšeme i', err_dlz:'tip nemá dĺžeň → píšeme i (nie í)' },
+    // ── Mäkké spoluhlásky (ďalšie 2) ─────────────────────────────────
+    { b:'č',   a:'tať',      ans:'í',           err_fam:'č je mäkká spoluhláska → píšeme í',              err_dlz:'čítať má dĺžeň → píšeme í (nie i)' },
+    { b:'š',   a:'ška',      ans:'i',           err_fam:'š je mäkká spoluhláska → píšeme i',              err_dlz:'šiška nemá dĺžeň → píšeme i (nie í)' },
+    { b:'š',   a:'ť',        ans:'i',           err_fam:'š je mäkká spoluhláska → píšeme i',              err_dlz:'šiť nemá dĺžeň → píšeme i (nie í)' },
+    { b:'ž',   a:'la',       ans:'i',           err_fam:'ž je mäkká spoluhláska → píšeme i',              err_dlz:'žila nemá dĺžeň → píšeme i (nie í)' },
+    { b:'ž',   a:'ť',        ans:'i',           err_fam:'ž je mäkká spoluhláska → píšeme i',              err_dlz:'žiť nemá dĺžeň → píšeme i (nie í)' },
+    { b:'čiž', a:'ma',       ans:'i', hl:'"ž"', err_fam:'ž je mäkká spoluhláska → píšeme i',              err_dlz:'čižma nemá dĺžeň → píšeme i (nie í)' },
+    // ── Nie vybrané slová (obojaké → i/í) (ďalšie 2) ─────────────────
+    { b:'s',   a:'la',       ans:'i',           err_fam:'sila nie je vybrané slovo → po "s" píšeme i',    err_dlz:'sila nemá dĺžeň → píšeme i (nie í)' },
+    { b:'s',   a:'lný',      ans:'i',           err_fam:'silný nie je vybrané slovo → po "s" píšeme i',   err_dlz:'silný nemá dĺžeň → píšeme i (nie í)' },
+    { b:'s',   a:'rup',      ans:'i',           err_fam:'sirup nie je vybrané slovo → po "s" píšeme i',   err_dlz:'sirup nemá dĺžeň → píšeme i (nie í)' },
+    { b:'z',   a:'ma',       ans:'i',           err_fam:'zima nie je vybrané slovo → po "z" píšeme i',    err_dlz:'zima nemá dĺžeň → píšeme i (nie í)' },
+    { b:'z',   a:'sk',       ans:'i',           err_fam:'zisk nie je vybrané slovo → po "z" píšeme i',    err_dlz:'zisk nemá dĺžeň → píšeme i (nie í)' },
+    { b:'p',   a:'vo',       ans:'i',           err_fam:'pivo nie je vybrané slovo → po "p" píšeme i',    err_dlz:'pivo nemá dĺžeň → píšeme i (nie í)' },
+    { b:'p',   a:'lník',     ans:'i',           err_fam:'pilník nie je vybrané slovo → po "p" píšeme i',  err_dlz:'pilník nemá dĺžeň → píšeme i (nie í)' },
+    { b:'m',   a:'lý',       ans:'i',           err_fam:'milý nie je vybrané slovo → po "m" píšeme i',    err_dlz:'milý nemá dĺžeň → píšeme i (nie í)' },
+    { b:'m',   a:'ska',      ans:'i',           err_fam:'miska nie je vybrané slovo → po "m" píšeme i',   err_dlz:'miska nemá dĺžeň → píšeme i (nie í)' },
+    { b:'v',   a:'no',       ans:'í',           err_fam:'víno nie je vybrané slovo → po "v" píšeme í',    err_dlz:'víno má dĺžeň → píšeme í (nie i)' },
+    { b:'v',   a:'la',       ans:'í',           ctx:'lesná v_la', err_fam:'víla nie je vybrané slovo → po "v" píšeme í', err_dlz:'víla má dĺžeň → píšeme í (nie i)' },
+    { b:'v',   a:'dlička',   ans:'i',           err_fam:'vidlička nie je vybrané slovo → po "v" píšeme i',err_dlz:'vidlička nemá dĺžeň → píšeme i (nie í)' },
+    { b:'r',   a:'adok',     ans:'i',           err_fam:'riadok nie je vybrané slovo → po "r" píšeme i',  err_dlz:'riadok nemá dĺžeň → píšeme i (nie í)' },
+    { b:'b',   a:'blia',     ans:'i',           err_fam:'biblia nie je vybrané slovo → po "b" píšeme i',  err_dlz:'biblia nemá dĺžeň → píšeme i (nie í)' },
+    // ── Mäkké spoluhlásky (ďalšie 3) ─────────────────────────────────
+    { b:'č',   a:'apka',     ans:'i',           err_fam:'č je mäkká spoluhláska → píšeme i',              err_dlz:'čiapka nemá dĺžeň → píšeme i (nie í)' },
+    { b:'č',   a:'ara',      ans:'i',           err_fam:'č je mäkká spoluhláska → píšeme i',              err_dlz:'čiara nemá dĺžeň → píšeme i (nie í)' },
+    { b:'ž',   a:'vot',      ans:'i',           err_fam:'ž je mäkká spoluhláska → píšeme i',              err_dlz:'život nemá dĺžeň → píšeme i (nie í)' },
+    { b:'ž',   a:'arovka',   ans:'i',           err_fam:'ž je mäkká spoluhláska → píšeme i',              err_dlz:'žiarovka nemá dĺžeň → píšeme i (nie í)' },
+    { b:'ž',   a:'ačka',     ans:'i',           err_fam:'ž je mäkká spoluhláska → píšeme i',              err_dlz:'žiačka nemá dĺžeň → píšeme i (nie í)' },
+    { b:'c',   a:'rkus',     ans:'i',           err_fam:'c je mäkká spoluhláska → píšeme i',              err_dlz:'cirkus nemá dĺžeň → píšeme i (nie í)' },
+    { b:'c',   a:'trón',     ans:'i',           err_fam:'c je mäkká spoluhláska → píšeme i',              err_dlz:'citrón nemá dĺžeň → píšeme i (nie í)' },
+    // ── Nie vybrané slová (obojaké → i/í) (ďalšie 3) ─────────────────
+    { b:'m',   a:'núta',     ans:'i',           err_fam:'minúta nie je vybrané slovo → po "m" píšeme i',  err_dlz:'minúta nemá dĺžeň → píšeme i (nie í)' },
+    { b:'m',   a:'nce',      ans:'i',           err_fam:'mince nie je vybrané slovo → po "m" píšeme i',   err_dlz:'mince nemá dĺžeň → píšeme i (nie í)' },
+    { b:'m',   a:'hať',      ans:'i',           err_fam:'mihať nie je vybrané slovo → po "m" píšeme i',   err_dlz:'mihať nemá dĺžeň → píšeme i (nie í)' },
+    { b:'p',   a:'lot',      ans:'i',           err_fam:'pilot nie je vybrané slovo → po "p" píšeme i',   err_dlz:'pilot nemá dĺžeň → píšeme i (nie í)' },
+    { b:'p',   a:'sať',      ans:'í',           err_fam:'písať nie je vybrané slovo → po "p" píšeme í',   err_dlz:'písať má dĺžeň → píšeme í (nie i)' },
+    { b:'p',   a:'vnica',    ans:'i',           err_fam:'pivnica nie je vybrané slovo → po "p" píšeme i', err_dlz:'pivnica nemá dĺžeň → píšeme i (nie í)' },
+    { b:'s',   a:'to',       ans:'i',           err_fam:'sito nie je vybrané slovo → po "s" píšeme i',    err_dlz:'sito nemá dĺžeň → píšeme i (nie í)' },
+    { b:'s',   a:'vý',       ans:'i',           err_fam:'sivý nie je vybrané slovo → po "s" píšeme i',    err_dlz:'sivý nemá dĺžeň → píšeme i (nie í)' },
+    { b:'z',   a:'ps',       ans:'i',           err_fam:'zips nie je vybrané slovo → po "z" píšeme i',    err_dlz:'zips nemá dĺžeň → píšeme i (nie í)' },
+    { b:'b',   a:'č',        ans:'i',           err_fam:'bič nie je vybrané slovo → po "b" píšeme i',     err_dlz:'bič nemá dĺžeň → píšeme i (nie í)' },
+    { b:'v',   a:'la',       ans:'i',           ctx:'veľká v_la', err_fam:'vila nie je vybrané slovo → po "v" píšeme i', err_dlz:'vila nemá dĺžeň → píšeme i (nie í)' },
+    { b:'v',   a:'ťaz',      ans:'í',           err_fam:'víťaz nie je vybrané slovo → po "v" píšeme í',   err_dlz:'víťaz má dĺžeň → píšeme í (nie i)' },
   ];
 
   // Difficulty levels: 1=easy, 2=medium, 3=hard
-  const _D1 = new Set([0,1,2,3,4,5,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,25,28,29,31,32,33,34,36,37,38,39,42,43,44,45,46,47,48,49,50,51,53,54,55,56,57,58,59,60,61,62,63,64,65,66,68,69,70,71,72,73,74,75,76,78,110,127,132,148,150,159,168,181,194,229,230,231,234,236,238,240,241,243,247,248,249,250]);
+  const _D1 = new Set([0,1,2,3,4,5,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,25,28,29,31,32,33,34,36,37,38,39,42,43,44,45,46,47,48,49,50,51,53,54,55,56,57,58,59,60,61,62,63,64,65,66,68,69,70,71,72,73,74,75,76,78,110,127,132,148,150,159,168,181,194,229,230,231,234,236,238,240,241,243,247,248,249,250,251,252,253,254,255,256,271,272,273,274,275,276,277]);
   const _D3 = new Set([81,86,89,90,91,93,94,95,96,97,99,100,106,108,109,112,113,114,115,117,120,122,123,124,125,126,129,130,131,135,136,137,141,142,143,144,145,146,147,157,158,162,163,164,169,172,173,175,177,183,187,191,192,199,200,203,205,207,212,215,218,219,220,221,222,224,225,226,228,233]);
   QW.forEach((w,i) => { w.d = _D3.has(i) ? 3 : _D1.has(i) ? 1 : 2; });
 
