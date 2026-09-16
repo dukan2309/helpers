@@ -695,6 +695,10 @@
   .quiz-answer-multi .en-flag { min-width: 50px; }
   .tense-lbl { flex: none; width: 120px; font-size: 11px; }
 
+  /* Pronoun is identical for every tense row and already shown in the EN row above,
+     so hide the per-row repeat on mobile — keeps each row a clean label + input. */
+  .tense-row .tense-pron { display: none; }
+
   /* Fixed width sized to the longest hint: "2nd person – singular"
      measured at 153px border-box (13px Quicksand 600) → 158px w/ buffer */
   .pron-info-btn {
