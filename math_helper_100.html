@@ -813,7 +813,9 @@ h1 .h1-icon { -webkit-text-fill-color: initial; background: none; -webkit-backgr
     }
 
     // extra ticks + labels for key values not already on the grid
-    keyVals.forEach(v => {
+    // (before reveal, only the start number is shown — never the answer/bridge)
+    const shownKeyVals = reveal ? keyVals : [num1];
+    shownKeyVals.forEach(v => {
       if (v % step !== 0) {
         const tick = document.createElement('div');
         tick.className = 'nl-tick'; tick.style.left = xOf(v) + 'px';
