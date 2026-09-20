@@ -43,6 +43,25 @@ The newer files (`index.html`, `math_helper_100.html`, `nasobilka_helper.html`, 
 
 Font: **Quicksand** (Google Fonts). Background: three-ellipse radial gradient on `#fafbff`. `math_helper.html` predates this system and uses Comic Sans + an orange gradient.
 
+### h1 gradient + emoji pattern
+
+Applying a CSS gradient to `h1` text via `background-clip:text; color:transparent` also clips child emoji, turning them solid purple. Always split the heading into two spans:
+
+```html
+<h1><span class="h1-icon">🔢</span> <span class="h1-grad">Title text</span></h1>
+```
+
+```css
+h1 { color: var(--ink); }          /* emoji inherit this — visible */
+h1 .h1-grad {
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+/* h1-icon gets no gradient — just inherits color: var(--ink) */
+```
+
 ## Home button
 
 All helpers have a fixed lavender pill button `← Domov` linking to `index.html`:
@@ -97,6 +116,33 @@ The fixed widths on flag spans, tense labels, and pron-lbl-col keep the verb, pe
 - Word list comes from `zoznam_slov.txt` (fetched at runtime) plus a hardcoded fallback array.
 - Quiz feedback messages must **not** contain `i/í` or `y/ý` letter pairs. The "nie X" suffix is appended dynamically from the clicked letter, not hardcoded.
 - Consonant categories: `TVRDE` (orange `#f07d3a`), `MAKKE` (blue `#4a90d9`), `OBOIAKE` (lavender `#7c6cf2`).
+
+### QW word array
+
+Each entry in the `QW` array:
+
+```js
+{ b:'b', a:'cykel', ans:'i',
+  err_fam:'bicykel nie je vybrané slovo → po "b" píšeme i',
+  err_dlz:'bicykel nemá dĺžeň → píšeme i (nie í)',
+  ctx:'dobrý b_cykel',   // optional — sentence shown in place of "b_cykel"
+  hl:'"b"'               // optional — substring to highlight in the rule
+}
+```
+
+- `b` + gap + `a` assembles the word display (e.g. `b` + `_` + `cykel`).
+- `ans` is `'i' | 'í' | 'y' | 'ý'`, or an array of accepted answers.
+
+**Difficulty** is assigned by array index via two Sets at the bottom of the script:
+
+```js
+const _D1 = new Set([0,1,…]);  // easy   🐣
+const _D3 = new Set([81,86,…]); // hard   🐲
+// everything else → medium 🦊
+QW.forEach((w,i) => { w.d = _D3.has(i) ? 3 : _D1.has(i) ? 1 : 2; });
+```
+
+**Critical:** indices are positional. **Appending** to the end of `QW` is safe — just add the new indices to `_D1` or `_D3` as needed. **Removing or inserting** anywhere else requires decrementing/incrementing every higher index in both Sets (use a script; manual edits miss entries).
 
 ## Images
 
