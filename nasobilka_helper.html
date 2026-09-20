@@ -364,7 +364,8 @@ button small { opacity: 0.7; font-size: 0.7em; margin-left: 4px; }
 
 <script>
   // ── State ────────────────────────────────────────────────────────────────
-  let selectedTable = 1;   // 0 = mix
+  let selectedTables = new Set([1]);   // which tables (num1) are being practiced
+  let mixMode = false;                 // when on, picks from all 1–10; individual buttons disabled
   let num1, num2, correctAnswer;
   let scoreOkFull = 0, scoreOkWithHelp = 0, scoreTries = 0;
   let answered = false, hintUsed = false;
@@ -385,29 +386,57 @@ button small { opacity: 0.7; font-size: 0.7em; margin-left: 4px; }
     picker.innerHTML = '';
     for (let i = 1; i <= 10; i++) {
       const b = document.createElement('button');
-      b.className = 'tbl-btn' + (i === selectedTable ? ' active' : '');
+      b.className = 'tbl-btn';
+      b.dataset.table = i;
       b.textContent = i + '×';
-      b.onclick = () => setTable(i);
+      b.onclick = () => toggleTable(i);
       picker.appendChild(b);
     }
     const mix = document.createElement('button');
-    mix.className = 'tbl-btn' + (selectedTable === 0 ? ' active' : '');
+    mix.className = 'tbl-btn';
+    mix.id = 'mix-btn';
     mix.textContent = '🎲 Mix';
-    mix.onclick = () => setTable(0);
+    mix.onclick = toggleMix;
     picker.appendChild(mix);
+    updatePickerUI();
   }
 
-  function setTable(t) {
-    selectedTable = t;
-    document.querySelectorAll('.tbl-btn').forEach((b, i) => {
-      b.classList.toggle('active', i === (t === 0 ? 10 : t - 1));
+  // Reflect current selection / mix mode on the buttons
+  function updatePickerUI() {
+    document.querySelectorAll('.tbl-btn[data-table]').forEach(b => {
+      const i = parseInt(b.dataset.table);
+      b.disabled = mixMode;                                    // Mix disables individual choices
+      b.classList.toggle('active', !mixMode && selectedTables.has(i));
     });
+    document.getElementById('mix-btn').classList.toggle('active', mixMode);
+  }
+
+  function toggleTable(i) {
+    if (mixMode) return;                          // ignored while Mix is active
+    if (selectedTables.has(i)) {
+      if (selectedTables.size === 1) return;      // keep at least one selected
+      selectedTables.delete(i);
+    } else {
+      selectedTables.add(i);
+    }
+    updatePickerUI();
+    if (!inRetry) { generate(); render(); }
+  }
+
+  function toggleMix() {
+    mixMode = !mixMode;
+    updatePickerUI();
     if (!inRetry) { generate(); render(); }
   }
 
   // ── Generate / Render ─────────────────────────────────────────────────────
   function generate() {
-    num1 = selectedTable === 0 ? Math.floor(Math.random() * 10) + 1 : selectedTable;
+    if (mixMode) {
+      num1 = Math.floor(Math.random() * 10) + 1;
+    } else {
+      const arr = [...selectedTables];
+      num1 = arr[Math.floor(Math.random() * arr.length)];
+    }
     num2 = Math.floor(Math.random() * 10) + 1;
     correctAnswer = num1 * num2;
   }
