@@ -24,12 +24,13 @@ Each helper is a **single self-contained HTML file** — no framework, no bundle
 | `math_helper.html` | Addition/subtraction up to 20 (older style) |
 | `math_helper_100.html` | Addition/subtraction up to 100 |
 | `nasobilka_helper.html` | Multiplication tables 1–10 |
+| `delenie_helper.html` | Division tied to the times tables 1–10 (inverse of `nasobilka_helper.html`, exact/no remainders) |
 | `iy_helper.html` | Slovak i/y quiz (hard/soft/both consonants + selected words) |
 | `verb_helper.html` | English verb translator + conjugation grid + quiz |
 
 ## Shared design system
 
-The newer files (`index.html`, `math_helper_100.html`, `nasobilka_helper.html`, `iy_helper.html`, `verb_helper.html`) share the same CSS custom properties:
+The newer files (`index.html`, `math_helper_100.html`, `nasobilka_helper.html`, `delenie_helper.html`, `iy_helper.html`, `verb_helper.html`) share the same CSS custom properties:
 
 ```css
 --primary: #7c6cf2;   /* lavender */
