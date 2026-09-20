@@ -544,9 +544,9 @@ button small { opacity: 0.7; font-size: 0.7em; margin-left: 4px; }
   });
 
   // ── Visualization 2: Rozdeľovanie do skupín ───────────────────────────────
-  // Split `dividend` dots into equal groups of `divisor`; the number of groups
-  // (rows) is the answer. Before reveal the dots are an unsorted grey pile so the
-  // answer isn't given away.
+  // Share `dividend` dots equally into `divisor` groups (rows); how many land in
+  // each group is the answer (`quotient`). Before reveal the dots are an unsorted
+  // grey pile so the answer isn't given away.
   function renderShareGroups(reveal) {
     const area = document.getElementById('share-area');
     area.innerHTML = '';
@@ -565,19 +565,19 @@ button small { opacity: 0.7; font-size: 0.7em; margin-left: 4px; }
     grid.style.gap = gap + 'px';
 
     if (reveal) {
-      // `quotient` groups (rows), each with `divisor` dots; alternate row colors
+      // `divisor` groups (rows), each with `quotient` dots; alternate row colors
       const top = document.createElement('div');
-      top.className = 'dot-top'; top.textContent = divisor;      // koľko v skupine
+      top.className = 'dot-top'; top.textContent = quotient;     // koľko v skupine
       frame.appendChild(top);
       const left = document.createElement('div');
-      left.className = 'dot-left'; left.textContent = quotient;  // koľko skupín
+      left.className = 'dot-left'; left.textContent = divisor;   // koľko skupín
       frame.appendChild(left);
 
-      for (let r = 0; r < quotient; r++) {
+      for (let r = 0; r < divisor; r++) {
         const row = document.createElement('div');
         row.className = 'dot-row-wrap'; row.style.gap = gap + 'px';
         const col = r % 2 === 0 ? '#4a90d9' : '#ff7aa8';
-        for (let c = 0; c < divisor; c++) {
+        for (let c = 0; c < quotient; c++) {
           const dot = document.createElement('div');
           dot.className = 'dot-circle';
           dot.style.cssText = `width:${size}px;height:${size}px;background:${col};transition:background 0.3s;`;
@@ -615,7 +615,7 @@ button small { opacity: 0.7; font-size: 0.7em; margin-left: 4px; }
       const cap = document.createElement('div');
       cap.className = 'dot-res';
       cap.style.color = '#666'; cap.style.fontWeight = '600';
-      cap.textContent = `${quotient} ${skPlural(quotient, 'skupina', 'skupiny', 'skupín')} po ${divisor}`;
+      cap.textContent = `${divisor} ${skPlural(divisor, 'skupina', 'skupiny', 'skupín')} po ${quotient}`;
       block.appendChild(cap);
     }
 
