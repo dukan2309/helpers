@@ -771,7 +771,9 @@ h1 .h1-icon { -webkit-text-fill-color: initial; background: none; -webkit-backgr
         num2 = Math.floor(Math.random() * (num1 + 1));
       }
       correctAnswer = op === '+' ? num1 + num2 : num1 - num2;
-    } while (onlyCross && !(op === '+' ? num2 < 10 && (num1 % 10) + num2 > 10 : num2 < 10 && (num1 % 10) < num2));
+    } while (onlyCross && !(op === '+'
+      ? num2 < 10 && (num1 % 10) + num2 > 10
+      : num2 < 10 && num1 % 10 !== 0 && (num1 % 10) < num2));
   }
 
   function render() {

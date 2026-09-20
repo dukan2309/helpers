@@ -154,11 +154,11 @@ button small { opacity: 0.7; font-size: 0.72em; margin-left: 4px; }
   min-width: 48px; height: 44px; border-radius: 12px;
   font-size: 1.2rem; font-weight: bold; color: white; padding: 0 10px;
 }
-.pv-blue         { background: #4a90d9; }
+.pv-blue         { background: #7c6cf2; }
 .pv-tens         { background: #4a90d9; }
-.pv-ones         { background: #00838f; }
-.pv-result-tens  { background: #f9a825; }
-.pv-result-ones  { background: #ff5722; }
+.pv-ones         { background: #e0497a; }
+.pv-result-tens  { background: #4a90d9; }
+.pv-result-ones  { background: #e0497a; }
 .pv-final {
   display: inline-flex; align-items: center; justify-content: center;
   min-width: 60px; height: 60px; border-radius: 50%;
@@ -390,7 +390,7 @@ h1 .h1-icon { -webkit-text-fill-color: initial; background: none; -webkit-backgr
         num2 = Math.floor(Math.random() * (num1 - 1)) + 2;   // 2 to num1-1
       }
       correctAnswer = op === '+' ? num1 + num2 : num1 - num2;
-    } while (onlyCross && !(op === '+' ? num2 < 10 && (num1 % 10) + num2 > 10 : num2 < 10 && (num1 % 10) < num2));
+    } while (onlyCross && Math.floor(num1 / 10) === Math.floor(correctAnswer / 10));
   }
 
   function render() {
@@ -578,7 +578,6 @@ h1 .h1-icon { -webkit-text-fill-color: initial; background: none; -webkit-backgr
 
 
   function getBridge() {
-    if (num2 >= 10) return null;
     if (op === '+') {
       const next10 = Math.ceil((num1 + 1) / 10) * 10;
       return next10 < num1 + num2 ? next10 : null;
@@ -663,7 +662,6 @@ h1 .h1-icon { -webkit-text-fill-color: initial; background: none; -webkit-backgr
 
     const t1 = Math.floor(num1 / 10) * 10, o1 = num1 % 10;
     const t2 = Math.floor(num2 / 10) * 10, o2 = num2 % 10;
-    const opSym = op === '+' ? '+' : '−';
 
     function pnum(n, cls) {
       const w = document.createElement('div'); w.className = 'pv-num-cell';
@@ -691,60 +689,80 @@ h1 .h1-icon { -webkit-text-fill-color: initial; background: none; -webkit-backgr
     table.appendChild(psym('+'));
     table.appendChild(psym('jednotky'));
 
-    // row 1: num1
-    table.appendChild(popCell(''));
-    table.appendChild(pnum(num1,  'pv-blue'));
-    table.appendChild(psym('='));
-    table.appendChild(pnum(t1,   'pv-tens'));
-    table.appendChild(psym('+'));
-    table.appendChild(pnum(o1,   'pv-ones'));
+    // For subtraction with too-few ones, regroup num1 on reveal: borrow 10
+    // from its tens so each column subtracts cleanly (no negative ones).
+    const borrow = op === '-' && reveal && o1 < o2;
+    const d1 = borrow ? t1 - 10 : t1;   // num1 tens as shown
+    const u1 = borrow ? o1 + 10 : o1;   // num1 ones as shown
 
-    // row 2: operator floats between the rows, then num2
-    table.appendChild(popCell(opSym));
-    table.appendChild(pnum(num2,  'pv-blue'));
+    // row 1: num1 (regrouped on reveal when borrowing)
+    table.appendChild(popCell(''));
+    table.appendChild(pnum(num1, 'pv-blue'));
     table.appendChild(psym('='));
-    table.appendChild(pnum(t2,   'pv-tens'));
+    table.appendChild(pnum(d1, 'pv-tens'));
     table.appendChild(psym('+'));
-    table.appendChild(pnum(o2,   'pv-ones'));
+    table.appendChild(pnum(u1, 'pv-ones'));
+
+    // row 2: num2 — operator floats between the rows
+    if (op === '+') {
+      table.appendChild(popCell('+'));
+      table.appendChild(pnum(num2, 'pv-blue'));
+      table.appendChild(psym('='));
+      table.appendChild(pnum(t2, 'pv-tens'));
+      table.appendChild(psym('+'));
+      table.appendChild(pnum(o2, 'pv-ones'));
+    } else {
+      // The whole subtrahend is taken away, so show it distributed across the
+      // columns as "− tens − ones" (the number itself is in the problem above).
+      // A "= tens + ones" decomposition here would read like adding the ones.
+      table.appendChild(popCell(''));
+      table.appendChild(pnum('', 'pv-blue'));
+      table.appendChild(psym('−'));
+      table.appendChild(pnum(t2, 'pv-tens'));
+      table.appendChild(psym('−'));
+      table.appendChild(pnum(o2, 'pv-ones'));
+    }
 
     area.appendChild(table);
 
     if (!reveal) return;
 
-    // divider
-    const divEl = document.createElement('div'); divEl.className = 'pv-divider'; area.appendChild(divEl);
-
-    const table2 = document.createElement('div');
-    table2.className = 'pv-table';
+    // Divider, result and notes go into the SAME grid so their columns line up
+    // with the rows above (a separate table would size its 1fr tracks on its own
+    // content and drift out of alignment).
+    const addDivider = () => {
+      const d = document.createElement('div'); d.className = 'pv-divider pv-span-row';
+      table.appendChild(d);
+    };
+    const addNote = (txt) => {
+      const n = document.createElement('div'); n.className = 'pv-note pv-span-row';
+      n.textContent = txt; table.appendChild(n);
+    };
 
     if (op === '+') {
+      addDivider();
       const tensSum = t1 + t2, onesSum = o1 + o2;
-      table2.appendChild(popCell('='));
-      table2.appendChild(pnum(correctAnswer, 'pv-tens'));  // blank placeholder
-      table2.appendChild(psym('='));
-      table2.appendChild(pnum(tensSum, 'pv-result-tens'));
-      table2.appendChild(psym('+'));
-      table2.appendChild(pnum(onesSum, 'pv-result-ones'));
-      area.appendChild(table2);
+      table.appendChild(popCell(''));
+      table.appendChild(pnum(correctAnswer, 'pv-blue'));
+      table.appendChild(psym('='));
+      table.appendChild(pnum(tensSum, 'pv-result-tens'));
+      table.appendChild(psym('+'));
+      table.appendChild(pnum(onesSum, 'pv-result-ones'));
       if (onesSum >= 10) {
-        const note = document.createElement('div'); note.className = 'pv-note';
-        note.textContent = `(${onesSum} jednotiek = 10 + ${onesSum - 10} — prenesieme 10!)`;
-        area.appendChild(note);
+        addNote(`(${onesSum} jednotiek = 10 + ${onesSum - 10} — prenesieme 10!)`);
       }
     } else {
-      const tensRes = Math.floor(correctAnswer / 10) * 10, onesRes = correctAnswer % 10;
-      table2.appendChild(popCell('='));
-      table2.appendChild(pnum(correctAnswer, 'pv-tens'));
-      table2.appendChild(psym('='));
-      table2.appendChild(pnum(tensRes, 'pv-result-tens'));
-      table2.appendChild(psym('+'));
-      table2.appendChild(pnum(onesRes, 'pv-result-ones'));
-      area.appendChild(table2);
-      if (o1 < o2) {
-        const note = document.createElement('div'); note.className = 'pv-note';
-        note.textContent = `(požičaj 10 z desiatok: ${t1}→${t1-10}, jednotky: 10+${o1}−${o2}=${10+o1-o2})`;
-        area.appendChild(note);
+      if (borrow) {
+        addNote(`(jednotiek je málo → požičali sme 10 z desiatok: ${t1} → ${d1}, jednotky ${o1} → ${u1})`);
       }
+      addDivider();
+      // each column subtracts on its own: (d1 − t2) tens, (u1 − o2) ones
+      table.appendChild(popCell(''));
+      table.appendChild(pnum(correctAnswer, 'pv-blue'));
+      table.appendChild(psym('='));
+      table.appendChild(pnum(d1 - t2, 'pv-result-tens'));
+      table.appendChild(psym('+'));
+      table.appendChild(pnum(u1 - o2, 'pv-result-ones'));
     }
   }
 
