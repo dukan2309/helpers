@@ -80,7 +80,7 @@ The site is served from the custom domain **pomocnici.com** (see `CNAME`). Every
 - `<meta name="description">` — unique Slovak description per page (the Google snippet).
 - `<link rel="canonical">` — absolute `https://pomocnici.com/<file>.html` (home page uses `https://pomocnici.com/`).
 - Favicon: `<link rel="icon" type="image/png" href="pomocnici_emblem.png">` (+ `apple-touch-icon`).
-- Open Graph + Twitter card tags. **OG image is always the absolute URL `https://pomocnici.com/pomocnici_ucebna.jpg`** (the classroom hero); `og:title`/`og:description` mirror the page title/description; `og:locale` is `sk_SK`.
+- Open Graph + Twitter card tags. **OG image is always the absolute URL `https://pomocnici.com/og_image.jpg`** — a 1200×630 (1.905:1) social-sized center-crop of the classroom hero `pomocnici_ucebna.jpg`, sized to fit Facebook/Twitter cards without letterboxing. `og:title`/`og:description` mirror the page title/description; `og:locale` is `sk_SK`.
 - `index.html` also has a `WebSite` **JSON-LD** block (`application/ld+json`) — validate it parses as JSON after editing.
 
 Rules:
