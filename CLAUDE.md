@@ -23,7 +23,7 @@ Each helper is a **single self-contained HTML file** — no framework, no bundle
 | `index.html` | Home page — tile grid linking to all helpers |
 | `math_helper.html` | Addition/subtraction up to 20 (older style) |
 | `math_helper_100.html` | Addition/subtraction up to 100 |
-| `nasobilka_helper.html` | Multiplication tables 1–10 |
+| `nasobilka_helper.html` | Multiplication tables 1–10 (multi-select + Mix) |
 | `delenie_helper.html` | Division tied to the times tables 1–10 (inverse of `nasobilka_helper.html`, exact/no remainders) |
 | `iy_helper.html` | Slovak i/y quiz (hard/soft/both consonants + selected words) |
 | `verb_helper.html` | English verb translator + conjugation grid + quiz |
@@ -73,6 +73,22 @@ All helpers have a fixed lavender pill button `← Domov` linking to `index.html
 
 It sits directly after `<body>`, outside any wrapper div, and uses `position: fixed; top: 14px; left: 16px`. Every file also has a `@media (max-width: 600px)` block that shrinks the button and adds `padding-top: 60px` to `body` so the button doesn't overlap the page title on phones.
 
+## SEO / social meta
+
+The site is served from the custom domain **pomocnici.com** (see `CNAME`). Every page's `<head>` carries, right after `<title>`:
+
+- `<meta name="description">` — unique Slovak description per page (the Google snippet).
+- `<link rel="canonical">` — absolute `https://pomocnici.com/<file>.html` (home page uses `https://pomocnici.com/`).
+- Favicon: `<link rel="icon" type="image/png" href="pomocnici_emblem.png">` (+ `apple-touch-icon`).
+- Open Graph + Twitter card tags. **OG image is always the absolute URL `https://pomocnici.com/pomocnici_ucebna.jpg`** (the classroom hero); `og:title`/`og:description` mirror the page title/description; `og:locale` is `sk_SK`.
+- `index.html` also has a `WebSite` **JSON-LD** block (`application/ld+json`) — validate it parses as JSON after editing.
+
+Rules:
+- Canonical, `og:url`, `og:image`, and sitemap entries use **absolute** `pomocnici.com` URLs; everything else (internal links, favicon, images) stays **relative** so the pages also work at `dukan2309.github.io/helpers/` and when opened locally.
+- Page language: all content is Slovak → `<html lang="sk">` on every file (the two math helpers were `lang="en"` by mistake — fixed).
+- `robots.txt` and `sitemap.xml` live at the repo root. **When adding a new page, add a matching `<url>` entry to `sitemap.xml`.**
+- Google Search Console: domain verified via a DNS TXT record at websupport.sk; sitemap submitted at `https://pomocnici.com/sitemap.xml`.
+
 ## Quiz pattern
 
 All helpers share the same quiz structure:
@@ -112,7 +128,91 @@ The fixed widths on flag spans, tense labels, and pron-lbl-col keep the verb, pe
 
 **Flag icons** use inline SVG constants `SK_FLAG_SVG` / `GB_FLAG_SVG` (defined just above `newQuizQuestion()`). Do not use emoji flags — they render as "SK"/"GB" text on Windows. Each flag span also includes a `<span class="flag-title">SK</span>` / `<span class="flag-title">EN</span>` text label.
 
-## iy_helper.html specifics
+## JS syntax check
+
+After any edit to a helper's `<script>` block, validate with:
+
+```bash
+node -e '
+const fs=require("fs");
+const html=fs.readFileSync("FILE.html","utf8");
+const m=html.match(/<script>([\s\S]*)<\/script>/);
+new Function(m[1]);
+console.log("Syntax OK");
+'
+```
+
+## Multi-select table/divisor picker pattern
+
+`nasobilka_helper.html` and `delenie_helper.html` share the same picker pattern:
+
+```js
+let selectedTables = new Set([1]);  // or selectedDivisors
+let mixMode = false;
+
+function updatePickerUI() {
+  document.querySelectorAll('.tbl-btn[data-table]').forEach(b => {
+    b.disabled = mixMode;
+    b.classList.toggle('active', !mixMode && selectedTables.has(+b.dataset.table));
+  });
+  document.getElementById('mix-btn').classList.toggle('active', mixMode);
+}
+function toggleTable(i) {
+  if (mixMode) return;
+  if (selectedTables.has(i)) { if (selectedTables.size === 1) return; selectedTables.delete(i); }
+  else { selectedTables.add(i); }
+  updatePickerUI(); generate(); render();
+}
+function toggleMix() { mixMode = !mixMode; updatePickerUI(); generate(); render(); }
+```
+
+- **Mix** disables all individual buttons via native `disabled` + global `button:disabled` CSS.
+- At least one table/divisor always stays selected (last one cannot be deselected).
+
+## delenie_helper.html specifics
+
+Key variables: `dividend`, `divisor`, `quotient`. `correctAnswer = quotient`. `generate()` sets `divisor` from `selectedDivisors` (or random 1–10 in Mix), then `quotient = rand(1,10)`, `dividend = divisor * quotient` — always exact, no remainder.
+
+### Two deliberate division models — do not unify
+
+The two main visualizations intentionally show *different* meanings of ÷:
+
+| Section | Model | Example 20 ÷ 4 |
+|---|---|---|
+| 📏 Číselná os | **Quotitive** — "how many jumps of 4 fit?" → count the arcs | 5 arcs of −4 → answer = 5 |
+| ⬛ Rozdeľovanie do skupín | **Partitive** — "share into 4 groups, how many each?" → answer is per-group size | 4 rows × 5 dots → answer = 5 |
+
+The grid draws `divisor` rows of `quotient` dots. The caption reads `"N skupín po M"` where N = divisor, M = quotient.
+
+### Number line CSS classes
+
+| Class | Purpose |
+|---|---|
+| `.nl-line` | The horizontal axis bar |
+| `.nl-tick` | Faint scale tick (no label) |
+| `.nl-pt` | Coloured dot at each landing point (start blue, end green, intermediate lavender) |
+| `.nl-ptlabel` | Running value shown below each landing dot |
+| `.nl-arc` | Dashed semicircle for each backward jump |
+| `.nl-jump-num` | Circular lavender badge with jump counter (1, 2, 3…) above each arc |
+| `.nl-sub` | "−divisor" pill tag inside each arc |
+
+Before reveal: only start and 0 dots shown, with a hint prompt. On reveal: all landing points + numbered arcs.
+
+### `skPlural` helper
+
+```js
+function skPlural(n, one, few, many) {
+  return n === 1 ? one : (n >= 2 && n <= 4) ? few : many;
+}
+// e.g. skPlural(quotient, 'skok', 'skoky', 'skokov')
+//      skPlural(divisor,  'skupina', 'skupiny', 'skupín')
+```
+
+### Fact family (`#fact-family`)
+
+Shows four linked facts: `divisor × quotient = dividend`, `quotient × divisor = dividend`, `dividend ÷ divisor = quotient`, `dividend ÷ quotient = divisor`. Quotient cells show `?` until reveal. CSS classes: `.ff-dividend` (blue), `.ff-divisor` (pink), `.ff-quotient` (green).
+
+
 
 - Word list comes from `zoznam_slov.txt` (fetched at runtime) plus a hardcoded fallback array.
 - Quiz feedback messages must **not** contain `i/í` or `y/ý` letter pairs. The "nie X" suffix is appended dynamically from the clicked letter, not hardcoded.
