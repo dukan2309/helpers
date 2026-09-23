@@ -1,0 +1,15 @@
+{
+  "name": "Pomocníci",
+  "short_name": "Pomocníci",
+  "description": "Zábavné cvičenia pre deti: počítanie, násobilka, delenie, i/y a anglické slovesá.",
+  "lang": "sk",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#171d3a",
+  "theme_color": "#7c6cf2",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

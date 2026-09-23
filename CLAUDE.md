@@ -80,6 +80,7 @@ The site is served from the custom domain **pomocnici.com** (see `CNAME`). Every
 - `<meta name="description">` — unique Slovak description per page (the Google snippet).
 - `<link rel="canonical">` — absolute `https://pomocnici.com/<file>.html` (home page uses `https://pomocnici.com/`).
 - Favicon: `<link rel="icon" type="image/png" href="favicon.png">` (96×96) + `<link rel="apple-touch-icon" href="apple-touch-icon.png">` (180×180). Both are square center-crops of `pomocnici_emblem.png` (which is 1408×768 — using it directly makes the browser squash the favicon into a distorted oval, so a square crop is required). Built with the PowerShell System.Drawing technique (see Images section).
+- **PWA / Android home-screen icon**: `<link rel="manifest" href="manifest.webmanifest">` (relative, on **every** page). `manifest.webmanifest` (repo root) declares `name`/`short_name` "Pomocníci", `display: standalone`, `background_color: #171d3a` (deep indigo), `theme_color: #7c6cf2`, and three icons: `icon-192.png` + `icon-512.png` (`purpose: "any"`) and `icon-maskable-512.png` (`purpose: "maskable"`). **Why maskable + opaque background:** Android masks home-screen icons to a circle/squircle and fills any transparency white, then shrinks non-maskable icons into a small safe circle — that's what made the icon "a small picture in a white circle." The maskable icon keeps its content inside the inner 80% safe zone on a full-bleed opaque indigo background, so Android's mask crops the background, not the medallion. All four icon PNGs are center-crops of `pomocnici_emblem.png` on a `#171d3a` background (crop x=321, y=0, size=768): `icon-192.png`/`icon-512.png` at 90%, `icon-maskable-512.png` at 80% (safe zone), `apple-touch-icon.png` at 92%. Built with the PowerShell System.Drawing technique (`g.Clear($bg)` then `DrawImage` the crop into a centered square; see Images section).
 - Open Graph + Twitter card tags. **OG image is always the absolute URL `https://pomocnici.com/og_image.jpg`** — a 1200×630 (1.905:1) social-sized center-crop of the classroom hero `pomocnici_ucebna.jpg`, sized to fit Facebook/Twitter cards without letterboxing. `og:title`/`og:description` mirror the page title/description; `og:locale` is `sk_SK`.
 - `index.html` also has a `WebSite` **JSON-LD** block (`application/ld+json`) — validate it parses as JSON after editing.
 
@@ -99,6 +100,32 @@ All helpers share the same quiz structure:
 - **Ďalej** button is disabled until Skontrolovať or Neviem is triggered. Button order: Skontrolovať → Ďalej → Neviem → Koniec.
 - **Summary overlay** (`finishQuiz()` / `finishSession()`) shown when word-count limit is reached or user presses Koniec.
 - **Keyboard shortcuts** consistent across all helpers: `Enter` = check / next, `End` = finish, `Esc` = cancel quiz. Letter shortcuts (N/H/F) are not used — the user types answers, so letter keys must remain free.
+
+## math_helper_100.html specifics
+
+Two **display modes**, chosen by a **toggle switch** (`.method-toggle` at the top of the quiz card) with two clickable labels: **riadkové počítanie** (left) ↔ **písomné počítanie** (right). The switch is a checkbox `#col-mode` (`onColModeChanged()`); clicking either label calls `setColMode(bool)` which flips the checkbox. `applyDisplayMode()` toggles the `.active` class on `#mt-classic`/`#mt-column`.
+
+- **Horizontal mode** (default): the main quiz card with the horizontal `num1 op num2 = [#answer-input]` line (`#h-problem`), plus all five visualization cards (`sbs-card`, `bridge-card`, `pv-card`, `grid-card`, `nl-card`).
+- **Column mode** (written method, Slovak "písomný postup / stĺpcová metóda"): the five viz cards are hidden and `#h-problem` is swapped for the stacked column layout rendered into `#col-method-area` (inside the **same** quiz card — there is no separate card). The student types the answer directly into digit input boxes. Column mode is constrained to **two-digit values (≤ 99)** — `generate()`'s while-loop rejects any problem where `num1`, `num2`, or `correctAnswer` exceeds 99, so the layout only ever needs tens + ones. `onColModeChanged()` regenerates if the current problem is out of range when switching into column mode.
+
+`applyDisplayMode()` owns all show/hide: the four viz cards by id, `bridge-card` force-hidden (re-shown by `renderBridge()` in horizontal mode only), and `#h-problem` ↔ `#col-method-area`. It runs once at init (before `nextProblem()`), on every toggle, **and at the top of `render()`** (so the post-check classic-viz cards re-hide on each new problem). Toggling mid-problem preserves reveal state via `renderAll(answered || hintUsed)`.
+
+All visualization rendering fans out through **`renderAll(reveal)`**, which branches on `columnMode` — `render()` calls `renderAll(false)`; `checkAnswer()` calls `renderAll(true)`. Do **not** call individual `renderX()` functions from those sites.
+
+**`renderColumnMethod(reveal)`** — stacked place-value layout on a 3-column grid (`op | T | O`, classes `.cm-op/.cm-t/.cm-o`; the redundant hundreds column was removed). num1 row, operator+num2 row, `.cm-line` rule, then the result row:
+- **before reveal:** two editable answer boxes (`inputBox()` → `.cm-input`, tens + ones) — always exactly 2 regardless of operation, since column mode never exceeds 99. The ones box gets focus; typing a digit auto-advances **right→left** (ones→tens, the column-addition order), and Backspace on an empty box moves back left→right (`colSibling(inp, ±1)`).
+- **after reveal:** the correct answer digits, colored, with `.cm-ans` (pop animation).
+
+**Carry / borrow school notation (reveal only).** On reveal `renderColumnMethod` annotates the **num1 row** with the marks a child writes on paper, via a small `mark(cls, txt)` → `.cm-regroup` span (orange `#f07d3a`) positioned absolutely inside the tens/ones cells (which are `position: relative`):
+- **Carry** (addition, `o1 + o2 ≥ 10`): a little `1` above the tens (`.cm-carry`).
+- **Borrow** (subtraction, `o1 < o2`): the tens digit gets a diagonal strike (`.cm-struck` with a rotated `::after` bar), the reduced tens value is written above it (`.cm-newtens`), and a little `1` sits on the ones (`.cm-borrowone`) so they read as `1o`.
+A one-line caption (`.cm-note`, below the grid) ties the marks to words — e.g. `2 − 8 sa nedá → požičiame si 1 desiatku…` / `7 + 5 = 12 → 1 desiatku prenesieme vyššie.`. `.col-method-area` is `flex-direction: column` so the note stacks under the grid; `.col-method` has `padding-top` for the marks above the top row.
+
+**`readColumnValue()`** assembles the entered number from the `.cm-input` boxes by place class (blank = 0); returns `NaN` if all blank. `checkAnswer()` reads it in column mode (vs `#answer-input` in horizontal). The global keydown handler skips letter shortcuts when focus is a `.cm-input` (Enter still checks).
+
+**Post-check classic-viz reveal:** in column mode, after a correct/wrong check `checkAnswer()` calls **`showClassicVizReveal()`**, which renders **only the place-value card** (`renderPlaceValue(true)` + un-hides `pv-card`) solved for the same problem — place value is the single visualization that maps onto the written method (and its own text already narrates the carry/borrow: *"prenesieme 10!"* / *"požičali sme 10 z desiatok"*). It re-hides on the next `render()` (via `applyDisplayMode()` at its top).
+
+**Pomoc in column mode** fills **only the ones box** with the correct ones digit (still editable) and focuses the tens box so the student works out the tens themselves; sets `hintUsed`; the student confirms with Kontrola (scores "with help"). In horizontal mode Pomoc still reveals the side visualizations.
 
 ## verb_helper.html specifics
 
@@ -212,7 +239,7 @@ function skPlural(n, one, few, many) {
 
 Shows four linked facts: `divisor × quotient = dividend`, `quotient × divisor = dividend`, `dividend ÷ divisor = quotient`, `dividend ÷ quotient = divisor`. Quotient cells show `?` until reveal. CSS classes: `.ff-dividend` (blue), `.ff-divisor` (pink), `.ff-quotient` (green).
 
-
+## iy_helper.html specifics
 
 - Word list comes from `zoznam_slov.txt` (fetched at runtime) plus a hardcoded fallback array.
 - Quiz feedback messages must **not** contain `i/í` or `y/ý` letter pairs. The "nie X" suffix is appended dynamically from the clicked letter, not hardcoded.

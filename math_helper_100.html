@@ -12,6 +12,7 @@
 <meta name="theme-color" content="#7c6cf2" />
 <link rel="icon" type="image/png" href="favicon.png" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<link rel="manifest" href="manifest.webmanifest" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Pomocníci" />
 <meta property="og:locale" content="sk_SK" />
@@ -222,6 +223,51 @@ button small { opacity: 0.7; font-size: 0.72em; margin-left: 4px; }
 .nl-marker.result { background: #4caf50; bottom: 38px; }
 .nl-arc { position: absolute; bottom: 48px; border-top: 3px dashed; border-radius: 50%; pointer-events: none; }
 
+/* Column method (písomný postup) */
+.col-method-area { display: flex; flex-direction: column; align-items: center; padding: 14px 0 20px; }
+.col-method {
+  display: grid;
+  grid-template-columns: 2.2rem 3.2rem 3.2rem; /* operátor | desiatky | jednotky */
+  column-gap: 6px; row-gap: 10px;
+  padding-top: 0.7rem;  /* room for carry/borrow marks above the top row */
+  font-size: 3rem; font-weight: bold; text-align: center; align-items: center;
+}
+.col-method .cm-t, .col-method .cm-o { position: relative; }
+.cm-op   { color: #00838f; }   /* operator — teal (matches horizontal) */
+.cm-h    { color: #4cc38a; }   /* hundreds — green  */
+.cm-t    { color: #4a90d9; }   /* tens — blue       */
+.cm-o    { color: #e0497a; }   /* ones — pink       */
+.cm-line { grid-column: 1 / -1; height: 4px; background: #333; border-radius: 2px; }
+.cm-ans  { animation: pop 0.4s ease; }
+/* carry / borrow school-notation marks (reveal only) — all share one position rule
+   so the little numbers align on a single row, each centred above its digit column */
+.cm-regroup { position: absolute; top: -1rem; left: 50%; transform: translateX(-50%); font-size: 1.2rem; font-weight: 700; color: #f07d3a; line-height: 1; pointer-events: none; }
+.cm-struck { position: relative; }
+.cm-struck::after { content: ''; position: absolute; left: 6%; right: 6%; top: 46%; height: 0.22rem; background: #f07d3a; border-radius: 2px; transform: rotate(-16deg); }
+.cm-note { margin-top: 14px; font-size: 0.95rem; font-weight: 600; color: #6c6e89; max-width: 22rem; text-align: center; line-height: 1.4; }
+/* answer digit input boxes */
+.cm-input {
+  width: 100%; box-sizing: border-box; height: 3.4rem;
+  font-size: 2.6rem; font-weight: bold; font-family: inherit; text-align: center;
+  padding: 0; border: 3px solid #ddd; border-radius: 12px; outline: none;
+  background: #fff; transition: border-color 0.2s, box-shadow 0.2s;
+}
+.cm-input.cm-h { color: #4cc38a; }
+.cm-input.cm-t { color: #4a90d9; }
+.cm-input.cm-o { color: #e0497a; }
+.cm-input:focus { border-color: #7c6cf2; box-shadow: 0 0 0 3px rgba(124,108,242,.18); }
+
+/* Method toggle switch (riadkové počítanie / písomné počítanie) */
+.method-toggle { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 16px; }
+.mt-label { font-weight: 700; color: #9a9cb3; font-size: 1rem; transition: color 0.15s; cursor: pointer; user-select: none; }
+.mt-label.active { color: #7c6cf2; }
+.switch { position: relative; display: inline-block; width: 54px; height: 30px; flex: none; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.switch .slider { position: absolute; cursor: pointer; inset: 0; background: #cfd2e6; border-radius: 30px; transition: 0.2s; }
+.switch .slider::before { content: ''; position: absolute; height: 24px; width: 24px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,.25); }
+.switch input:checked + .slider { background: #7c6cf2; }
+.switch input:checked + .slider::before { transform: translateX(24px); }
+
 /* ── modern redesign ── */
 body {
   font-family: 'Quicksand', system-ui, sans-serif;
@@ -307,19 +353,28 @@ h1 .h1-icon { -webkit-text-fill-color: initial; background: none; -webkit-backgr
 </div>
 
 <div class="card">
+  <div class="method-toggle">
+    <span class="mt-label active" id="mt-classic" onclick="setColMode(false)">riadkové počítanie</span>
+    <label class="switch" title="Prepni spôsob zápisu">
+      <input type="checkbox" id="col-mode" onchange="onColModeChanged()">
+      <span class="slider"></span>
+    </label>
+    <span class="mt-label" id="mt-column" onclick="setColMode(true)">písomné počítanie</span>
+  </div>
   <div class="mode-row">
     <button class="mode-btn active" id="mode-add" onclick="setMode('add')">➕ Sčítanie</button>
     <button class="mode-btn" id="mode-sub" onclick="setMode('sub')">➖ Odčítanie</button>
     <button class="mode-btn" id="mode-mix" onclick="setMode('mix')">🎲 Mix</button>
   </div>
-  <label class="cross-lbl"><input type="checkbox" id="only-cross" onchange="onlyCrossChanged()"> Len premostenie cez 10</label>
-  <div class="problem">
+  <label class="cross-lbl"><input type="checkbox" id="only-cross" onchange="onlyCrossChanged()"> Len príklady s prechodom cez 10</label>
+  <div class="problem" id="h-problem">
     <span class="num1" id="p-num1">47</span>
     <span class="op"   id="p-op">+</span>
     <span class="num2" id="p-num2">35</span>
     <span class="eq">=</span>
     <input type="number" id="answer-input" min="0" max="100" placeholder="?" autocomplete="off">
   </div>
+  <div class="col-method-area" id="col-method-area" style="display:none"></div>
   <div class="feedback" id="feedback"></div>
   <div class="btn-row">
     <button id="btn-check" onclick="checkAnswer()">Kontrola ✔ <small>Enter</small></button>
@@ -329,7 +384,7 @@ h1 .h1-icon { -webkit-text-fill-color: initial; background: none; -webkit-backgr
   </div>
 </div>
 
-<div class="card">
+<div class="card" id="sbs-card">
   <div class="section-title" id="sbs-title">➕ Najprv desiatky, potom jednotky</div>
   <div class="bridge-area" id="sbs-area"></div>
 </div>
@@ -339,17 +394,17 @@ h1 .h1-icon { -webkit-text-fill-color: initial; background: none; -webkit-backgr
   <div class="bridge-area" id="bridge-area"></div>
 </div>
 
-<div class="card">
+<div class="card" id="pv-card">
   <div class="section-title">🔢 Rozklad na desiatky a jednotky</div>
   <div class="pv-area" id="pv-area"></div>
 </div>
 
-<div class="card">
+<div class="card" id="grid-card">
   <div class="section-title">🟦 Stočtverček</div>
   <div class="hundred-grid" id="hundred-grid"></div>
 </div>
 
-<div class="card">
+<div class="card" id="nl-card">
   <div class="section-title">📏 Číselná os</div>
   <div class="numberline-wrap">
     <div class="numberline" id="numberline"></div>
@@ -382,6 +437,42 @@ h1 .h1-icon { -webkit-text-fill-color: initial; background: none; -webkit-backgr
   let answered = false;
   let onlyCross = false;
   function onlyCrossChanged() { onlyCross = document.getElementById('only-cross').checked; generate(); render(); }
+  let columnMode = false;
+  function onColModeChanged() {
+    columnMode = document.getElementById('col-mode').checked;
+    applyDisplayMode();
+    // column mode is 2-digit only — swap in a fresh problem if the current one is 100
+    if (columnMode && (num1 > 99 || correctAnswer > 99)) { generate(); render(); return; }
+    renderAll(answered || hintUsed);   // keep current reveal state on toggle
+  }
+  function setColMode(on) {                 // clicking a text label flips the switch
+    document.getElementById('col-mode').checked = on;
+    onColModeChanged();
+  }
+  function applyDisplayMode() {
+    const hidden = columnMode ? 'none' : '';
+    ['sbs-card','pv-card','grid-card','nl-card'].forEach(id =>
+      document.getElementById(id).style.display = hidden);
+    // bridge card is conditional in horizontal mode — renderBridge re-shows it
+    document.getElementById('bridge-card').style.display = 'none';
+    // main card: swap horizontal problem ↔ column layout
+    document.getElementById('h-problem').style.display   = columnMode ? 'none' : '';
+    document.getElementById('col-method-area').style.display = columnMode ? '' : 'none';
+    // toggle label emphasis
+    document.getElementById('mt-classic').classList.toggle('active', !columnMode);
+    document.getElementById('mt-column').classList.toggle('active', columnMode);
+  }
+  function renderAll(reveal) {
+    if (columnMode) {
+      renderColumnMethod(reveal);
+    } else {
+      renderStepByStep(reveal);
+      renderBridge(reveal);
+      renderPlaceValue(reveal);
+      renderHundredGrid(reveal);
+      renderNumberLine(reveal);
+    }
+  }
   let hintUsed = false;
   let wrongProblems = [];   // {num1, num2, op, correctAnswer}
   let retryQueue = [];      // retry mode: problems still to practice
@@ -406,10 +497,12 @@ h1 .h1-icon { -webkit-text-fill-color: initial; background: none; -webkit-backgr
         num2 = Math.floor(Math.random() * (num1 - 1)) + 2;   // 2 to num1-1
       }
       correctAnswer = op === '+' ? num1 + num2 : num1 - num2;
-    } while (onlyCross && Math.floor(num1 / 10) === Math.floor(correctAnswer / 10));
+    } while ((onlyCross && Math.floor(num1 / 10) === Math.floor(correctAnswer / 10))
+             || (columnMode && (num1 > 99 || num2 > 99 || correctAnswer > 99)));
   }
 
   function render() {
+    applyDisplayMode();   // resets card visibility (hides classic-viz cards again in column mode)
     document.getElementById('p-num1').textContent = num1;
     document.getElementById('p-op').textContent = op;
     document.getElementById('p-num2').textContent = num2;
@@ -419,12 +512,8 @@ h1 .h1-icon { -webkit-text-fill-color: initial; background: none; -webkit-backgr
     document.getElementById('feedback').className = 'feedback';
     answered = false; hintUsed = false;
     document.getElementById('btn-next').disabled = true;
-    renderStepByStep(false);
-    renderBridge(false);
-    renderPlaceValue(false);
-    renderHundredGrid(false);
-    renderNumberLine(false);
-    inp.focus();
+    renderAll(false);
+    if (!columnMode) inp.focus();   // column mode focuses the ones box in renderColumnMethod
   }
 
   function retryMistakes() {
@@ -457,21 +546,26 @@ h1 .h1-icon { -webkit-text-fill-color: initial; background: none; -webkit-backgr
   function checkAnswer() {
     if (answered) return;
     const inp = document.getElementById('answer-input');
-    const val = parseInt(inp.value);
+    const val = columnMode ? readColumnValue() : parseInt(inp.value);
     const fb = document.getElementById('feedback');
     if (isNaN(val)) { fb.textContent = 'Najprv napíš číslo! 😊'; fb.className = 'feedback'; return; }
     answered = true;
     scoreTries++;
-    inp.disabled = true;
+    if (columnMode) {
+      document.querySelectorAll('#col-method-area .cm-input').forEach(b => b.disabled = true);
+    } else {
+      inp.disabled = true;
+    }
     document.getElementById('btn-next').disabled = false;
-    renderStepByStep(true); renderBridge(true); renderPlaceValue(true); renderHundredGrid(true); renderNumberLine(true);
+    renderAll(true);
+    if (columnMode) showClassicVizReveal();   // reward: show the classic visualisations solved
     if (val === correctAnswer) {
-      inp.className = 'correct';
+      if (!columnMode) inp.className = 'correct';
       if (hintUsed) { scoreOkWithHelp++; fb.textContent = '🎉 Správne! (s pomocou)'; }
       else          { scoreOkFull++;     fb.textContent = '🎉 Výborne! Správna odpoveď!'; }
       fb.className = 'feedback ok';
     } else {
-      inp.className = 'wrong';
+      if (!columnMode) inp.className = 'wrong';
       fb.innerHTML = `🙈 Nesprávne. Správna odpoveď je <b>${correctAnswer}</b>. ${num1} ${op} ${num2} = ${correctAnswer}.`;
       fb.className = 'feedback err';
       wrongProblems.push({num1, num2, op, correctAnswer});
@@ -480,6 +574,20 @@ h1 .h1-icon { -webkit-text-fill-color: initial; background: none; -webkit-backgr
     document.getElementById('score-tries').textContent = scoreTries;
     updateHud();
     if (inRetry && retryQueue.length === 0) setTimeout(finishSession, 1500);
+  }
+
+  // assemble the number the student entered across the column boxes (blank = 0)
+  function readColumnValue() {
+    const boxes = [...document.querySelectorAll('#col-method-area .cm-input')];
+    if (boxes.length === 0 || boxes.every(b => b.value === '')) return NaN;
+    let h = 0, t = 0, o = 0;
+    boxes.forEach(b => {
+      const v = b.value === '' ? 0 : parseInt(b.value);
+      if (b.classList.contains('cm-h')) h = v;
+      else if (b.classList.contains('cm-t')) t = v;
+      else o = v;
+    });
+    return h * 100 + t * 10 + o;
   }
 
   function updateHud() {
@@ -494,10 +602,23 @@ h1 .h1-icon { -webkit-text-fill-color: initial; background: none; -webkit-backgr
   function showHint() {
     if (answered) return;
     hintUsed = true;
-    renderStepByStep(true); renderBridge(true); renderPlaceValue(true); renderHundredGrid(true); renderNumberLine(true);
-    document.getElementById('feedback').textContent = '💡 Pozri sa na všetky zobrazenia nižšie!';
-    document.getElementById('feedback').className = 'feedback';
-    document.getElementById('answer-input').focus();
+    const fb = document.getElementById('feedback');
+    if (columnMode) {
+      // help = fill only the ones digit; the student still works out the tens
+      const o = correctAnswer % 10;
+      let tensBox = null;
+      document.querySelectorAll('#col-method-area .cm-input').forEach(b => {
+        if (b.classList.contains('cm-o'))      b.value = o;
+        else if (b.classList.contains('cm-t')) tensBox = b;
+      });
+      fb.textContent = '💡 Doplnili sme jednotky — desiatky dorátaj a stlač Kontrola.';
+      if (tensBox) tensBox.focus();
+    } else {
+      renderAll(true);
+      fb.textContent = '💡 Pozri sa na všetky zobrazenia nižšie!';
+      document.getElementById('answer-input').focus();
+    }
+    fb.className = 'feedback';
   }
 
   document.getElementById('answer-input').addEventListener('keydown', e => {
@@ -509,6 +630,10 @@ h1 .h1-icon { -webkit-text-fill-color: initial; background: none; -webkit-backgr
 
   document.addEventListener('keydown', e => {
     if (e.target === document.getElementById('answer-input')) return;
+    if (e.target.classList && e.target.classList.contains('cm-input')) {
+      if (e.key === 'Enter') checkAnswer();
+      return;   // let digit keys type; don't fire letter shortcuts
+    }
     if (e.key === 'Enter') checkAnswer();
     if (e.key === 'n' || e.key === 'N') nextProblem();
     if (e.key === 'h' || e.key === 'H') showHint();
@@ -921,6 +1046,131 @@ h1 .h1-icon { -webkit-text-fill-color: initial; background: none; -webkit-backgr
     }
   }
 
+  // ---- Column method (písomný postup / stĺpcová metóda) ----
+  function renderColumnMethod(reveal) {
+    const area = document.getElementById('col-method-area');
+    area.innerHTML = '';
+
+    const grid = document.createElement('div');
+    grid.className = 'col-method';
+
+    function cell(text, cls) {
+      const e = document.createElement('div');
+      if (cls) e.className = cls;
+      e.textContent = text;
+      return e;
+    }
+
+    // two place-value cells [T, O] for a number; blank tens keeps 1- and 2-digit
+    // numbers aligned to the right. (Column mode stays within 2 digits, ≤ 99.)
+    function digitRow(opCell, n, extraCls) {
+      const t = Math.floor((n % 100) / 10);
+      const o = n % 10;
+      const suffix = extraCls ? ' ' + extraCls : '';
+      grid.appendChild(opCell);
+      grid.appendChild(cell(n >= 10 ? t : '', 'cm-t' + suffix));
+      grid.appendChild(cell(o, 'cm-o' + suffix));
+    }
+
+    // small carry/borrow annotation mark
+    function mark(cls, txt) {
+      const s = document.createElement('span');
+      s.className = 'cm-regroup ' + cls;
+      s.textContent = txt;
+      return s;
+    }
+
+    const o1 = num1 % 10, o2 = num2 % 10;
+    const t1 = Math.floor((num1 % 100) / 10);
+    const carry  = reveal && op === '+' && (o1 + o2) >= 10;   // ones overflow → carry a ten up
+    const borrow = reveal && op === '-' && o1 < o2;           // too few ones → borrow a ten
+
+    // row 1: num1 — with carry/borrow school-notation marks on reveal
+    grid.appendChild(cell('', 'cm-op'));
+    const t1Cell = cell('', 'cm-t');
+    const o1Cell = cell('', 'cm-o');
+    if (borrow) {
+      const struck = document.createElement('span');
+      struck.className = 'cm-struck'; struck.textContent = t1;
+      t1Cell.appendChild(struck);
+      t1Cell.appendChild(mark('cm-newtens', t1 - 1));  // reduced tens written above
+      o1Cell.textContent = o1;
+      o1Cell.appendChild(mark('cm-borrowone', '1'));   // little 1 → ones become 1o
+    } else {
+      t1Cell.textContent = num1 >= 10 ? t1 : '';
+      o1Cell.textContent = o1;
+      if (carry) t1Cell.appendChild(mark('cm-carry', '1'));  // carried ten above the tens
+    }
+    grid.appendChild(t1Cell);
+    grid.appendChild(o1Cell);
+
+    // row 2: operator + num2
+    digitRow(cell(op === '+' ? '+' : '−', 'cm-op'), num2);
+    // rule
+    grid.appendChild(cell('', 'cm-line'));
+
+    // row 3: result
+    if (reveal) {
+      digitRow(cell('', 'cm-op'), correctAnswer, 'cm-ans');
+    } else {
+      grid.appendChild(cell('', 'cm-op'));
+      grid.appendChild(inputBox('cm-t'));
+      grid.appendChild(inputBox('cm-o'));
+    }
+
+    area.appendChild(grid);
+
+    // caption tying the marks to words
+    if (borrow) {
+      const n = document.createElement('div'); n.className = 'cm-note';
+      n.textContent = `${o1} − ${o2} sa nedá → požičiame si 1 desiatku (10) k jednotkám.`;
+      area.appendChild(n);
+    } else if (carry) {
+      const n = document.createElement('div'); n.className = 'cm-note';
+      n.textContent = `${o1} + ${o2} = ${o1 + o2} → 1 desiatku prenesieme vyššie.`;
+      area.appendChild(n);
+    }
+
+    if (!reveal) {
+      const boxes = area.querySelectorAll('.cm-input');
+      if (boxes.length) boxes[boxes.length - 1].focus();   // start at the ones box
+    }
+  }
+
+  // one answer digit box; typing advances right→left (ones→tens→hundreds) — the column order
+  function inputBox(placeCls) {
+    const inp = document.createElement('input');
+    inp.type = 'text';
+    inp.inputMode = 'numeric';
+    inp.maxLength = 1;
+    inp.autocomplete = 'off';
+    inp.className = 'cm-input ' + placeCls;
+    inp.addEventListener('input', () => {
+      inp.value = inp.value.replace(/[^0-9]/g, '').slice(0, 1);
+      if (inp.value) { const prev = colSibling(inp, -1); if (prev) prev.focus(); }
+    });
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && inp.value === '') {
+        const next = colSibling(inp, 1);
+        if (next) { next.focus(); e.preventDefault(); }
+      }
+    });
+    return inp;
+  }
+  function colSibling(inp, dir) {
+    const boxes = [...document.querySelectorAll('#col-method-area .cm-input')];
+    return boxes[boxes.indexOf(inp) + dir];
+  }
+
+  // after a column-mode answer is checked, reveal the classic-method visualisations
+  // (number line, hundred grid, place value, …) solved for the same problem.
+  function showClassicVizReveal() {
+    // In column mode, place value is the single visualisation that maps onto the
+    // written method (tens/ones aligned by place). Show only it, solved.
+    renderPlaceValue(true);
+    document.getElementById('pv-card').style.display = '';
+  }
+
   function finishSession() {
     const correct = scoreOkFull + scoreOkWithHelp;
     const wrong = scoreTries - correct;
@@ -960,6 +1210,7 @@ h1 .h1-icon { -webkit-text-fill-color: initial; background: none; -webkit-backgr
     nextProblem();
   }
 
+  applyDisplayMode();
   nextProblem();
 </script>
 </body>
