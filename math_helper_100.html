@@ -257,7 +257,7 @@ button small { opacity: 0.7; font-size: 0.72em; margin-left: 4px; }
 .cm-input.cm-o { color: #e0497a; }
 .cm-input:focus { border-color: #7c6cf2; box-shadow: 0 0 0 3px rgba(124,108,242,.18); }
 
-/* Method toggle switch (riadkové počítanie / písomné počítanie) */
+/* Method toggle switch (riadkové počítanie / počítanie pod seba) */
 .method-toggle { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 16px; }
 .mt-label { font-weight: 700; color: #9a9cb3; font-size: 1rem; transition: color 0.15s; cursor: pointer; user-select: none; }
 .mt-label.active { color: #7c6cf2; }
@@ -359,7 +359,7 @@ h1 .h1-icon { -webkit-text-fill-color: initial; background: none; -webkit-backgr
       <input type="checkbox" id="col-mode" onchange="onColModeChanged()">
       <span class="slider"></span>
     </label>
-    <span class="mt-label" id="mt-column" onclick="setColMode(true)">písomné počítanie</span>
+    <span class="mt-label" id="mt-column" onclick="setColMode(true)">počítanie pod seba</span>
   </div>
   <div class="mode-row">
     <button class="mode-btn active" id="mode-add" onclick="setMode('add')">➕ Sčítanie</button>

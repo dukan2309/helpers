@@ -195,12 +195,57 @@
   }
   .lightbox.open { display: flex; }
   .lightbox img { max-width: 90vw; max-height: 90vh; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.5); }
+
+  /* Hero image — person tooltip zones */
+  .hero-img-wrap {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+  .hero-img-wrap:hover #hero-img {
+    transform: scale(1.04);
+    box-shadow: 0 8px 32px rgba(124,108,242,.25);
+  }
+  .person-zone {
+    position: absolute;
+    top: 0; bottom: 0;
+  }
+  .person-zone::after {
+    content: attr(data-name);
+    position: absolute;
+    top: 12%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-4px);
+    background: rgba(23,29,58,0.82);
+    color: #fff;
+    font-family: 'Quicksand', system-ui, sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .15s, transform .15s;
+    letter-spacing: 0.2px;
+  }
+  .person-zone:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 </style>
 </head>
 <body>
   <div class="wrap">
     <header class="hero">
-      <img id="hero-img" src="pomocnici_ucebna.jpg" alt="Pomocníci" onclick="document.getElementById('lb').classList.add('open')" style="height:200px;width:auto;display:block;margin:0 auto 10px;border-radius:16px;cursor:pointer;transition:transform .2s,box-shadow .2s;" onmouseover="this.style.transform='scale(1.04)';this.style.boxShadow='0 8px 32px rgba(124,108,242,.25)'" onmouseout="this.style.transform='';this.style.boxShadow=''" />
+      <div class="hero-img-wrap" onclick="document.getElementById('lb').classList.add('open')">
+        <img id="hero-img" src="pomocnici_ucebna.jpg" alt="Pomocníci" style="height:200px;width:auto;display:block;border-radius:16px;transition:transform .2s,box-shadow .2s;" />
+        <div class="person-zone" style="left:0;width:22%;"  data-name="Ľudovít Štúr"></div>
+        <div class="person-zone" style="left:22%;width:24%;" data-name="Albert Einstein"></div>
+        <div class="person-zone" style="left:46%;width:18%;" data-name="Mária Curie-Sklodowska"></div>
+        <div class="person-zone" style="left:64%;width:36%;" data-name="Ada Lovelace"></div>
+      </div>
       <p>Vyber si, čo chceš dnes precvičovať.</p>
     </header>
 

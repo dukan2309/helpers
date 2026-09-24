@@ -90,6 +90,31 @@ Rules:
 - `robots.txt` and `sitemap.xml` live at the repo root. **When adding a new page, add a matching `<url>` entry to `sitemap.xml`.**
 - Google Search Console: domain verified via a DNS TXT record at websupport.sk; sitemap submitted at `https://pomocnici.com/sitemap.xml`.
 
+### New-page checklist
+
+When adding a helper, copy the `<head>` block from an existing newer page and update:
+- [ ] `<title>` — unique, concise
+- [ ] `<meta name="description">` — unique Slovak description
+- [ ] `<link rel="canonical" href="https://pomocnici.com/NEW.html">`
+- [ ] `og:title`, `og:description`, `og:url` — mirror title/description/canonical
+- [ ] `<html lang="sk">` on the `<html>` element
+- [ ] Add `<url>` entry to `sitemap.xml`
+- [ ] Add tile to `index.html` grid
+- [ ] `<a class="home-btn" href="index.html">← Domov</a>` directly after `<body>`
+- [ ] `@media (max-width: 600px)` block with shrunken home button + `padding-top: 60px` on `body`
+
+## Slovak typography
+
+All UI text (captions, feedback messages, button labels, quiz prompts) follows standard Slovak typographic rules:
+
+- **Non-breaking spaces after one-letter words.** Single-letter prepositions and conjunctions (`k`, `v`, `s`, `z`, `o`, `a`, `i`, `u`) must not be left stranded at a line end. Bind them to the following word with a non-breaking space (U+00A0). In JS template literals use a literal NBSP character; in HTML use `&nbsp;`.
+  ```js
+  // ✓  wraps as "si 1 desiatku (10)\nk jednotkám."
+  n.textContent = `…požičiame si 1 desiatku (10) k jednotkám.`;
+  //                                               ^ NBSP here
+  ```
+- **i/y quiz messages** must never contain the letter pairs `i/í` or `y/ý` (the student is looking for one; seeing the other in feedback is confusing). The "nie X" suffix is appended dynamically from the clicked letter, not hardcoded.
+
 ## Quiz pattern
 
 All helpers share the same quiz structure:
@@ -103,7 +128,7 @@ All helpers share the same quiz structure:
 
 ## math_helper_100.html specifics
 
-Two **display modes**, chosen by a **toggle switch** (`.method-toggle` at the top of the quiz card) with two clickable labels: **riadkové počítanie** (left) ↔ **písomné počítanie** (right). The switch is a checkbox `#col-mode` (`onColModeChanged()`); clicking either label calls `setColMode(bool)` which flips the checkbox. `applyDisplayMode()` toggles the `.active` class on `#mt-classic`/`#mt-column`.
+Two **display modes**, chosen by a **toggle switch** (`.method-toggle` at the top of the quiz card) with two clickable labels: **riadkové počítanie** (left) ↔ **počítanie pod seba** (right). The switch is a checkbox `#col-mode` (`onColModeChanged()`); clicking either label calls `setColMode(bool)` which flips the checkbox. `applyDisplayMode()` toggles the `.active` class on `#mt-classic`/`#mt-column`.
 
 - **Horizontal mode** (default): the main quiz card with the horizontal `num1 op num2 = [#answer-input]` line (`#h-problem`), plus all five visualization cards (`sbs-card`, `bridge-card`, `pv-card`, `grid-card`, `nl-card`).
 - **Column mode** (written method, Slovak "písomný postup / stĺpcová metóda"): the five viz cards are hidden and `#h-problem` is swapped for the stacked column layout rendered into `#col-method-area` (inside the **same** quiz card — there is no separate card). The student types the answer directly into digit input boxes. Column mode is constrained to **two-digit values (≤ 99)** — `generate()`'s while-loop rejects any problem where `num1`, `num2`, or `correctAnswer` exceeds 99, so the layout only ever needs tens + ones. `onColModeChanged()` regenerates if the current problem is out of range when switching into column mode.
@@ -126,6 +151,16 @@ A one-line caption (`.cm-note`, below the grid) ties the marks to words — e.g.
 **Post-check classic-viz reveal:** in column mode, after a correct/wrong check `checkAnswer()` calls **`showClassicVizReveal()`**, which renders **only the place-value card** (`renderPlaceValue(true)` + un-hides `pv-card`) solved for the same problem — place value is the single visualization that maps onto the written method (and its own text already narrates the carry/borrow: *"prenesieme 10!"* / *"požičali sme 10 z desiatok"*). It re-hides on the next `render()` (via `applyDisplayMode()` at its top).
 
 **Pomoc in column mode** fills **only the ones box** with the correct ones digit (still editable) and focuses the tens box so the student works out the tens themselves; sets `hintUsed`; the student confirms with Kontrola (scores "with help"). In horizontal mode Pomoc still reveals the side visualizations.
+
+**Scoring model** (shared by both modes — no branch on `columnMode`):
+
+| Outcome | Variables | Points |
+|---|---|---|
+| Correct, no help | `scoreOkFull++` | 2 |
+| Correct, used Pomoc | `scoreOkWithHelp++` | 1 |
+| Wrong | (nothing extra) | 0 |
+
+`points = 2 * scoreOkFull + scoreOkWithHelp`. `scoreTries` increments on every check. The summary shows stars based on `points / (2 * scoreTries)`.
 
 ## verb_helper.html specifics
 
