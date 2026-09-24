@@ -1,0 +1,391 @@
+KVÍZ i/y – Zoznam všetkých slov
+========================================
+
+Tvrdé spoluhlásky
+-----------------
+  dym
+  dyňa
+  dych
+  tyčka
+  tyran
+  týždeň
+  hýbať
+  chy/ýba
+
+Mäkké spoluhlásky
+-----------------
+  žiak
+  žirafa
+  čistý
+  číslo
+  šikovný
+  šípka
+  cibuľa
+
+Vybrané slová po B
+------------------
+  byť
+  bystrý
+  bylina
+  byvol
+  býk
+  bývať
+  bydlo
+  byt
+  kobyla
+  dobytok
+  nábytok
+  obyčajný
+  príbytok
+
+Vybrané slová po M
+------------------
+  myš
+  myslieť
+  myseľ
+  mydlo
+  mýto
+  mýliť sa
+  omyl
+  zmysel
+  hmyz
+  šmykľavka
+
+Vybrané slová po P
+------------------
+  pyšný
+  pýcha
+  pykať
+  pysk
+  kopyto
+
+Vybrané slová po R
+------------------
+  ryba
+  rybník
+  rýchly
+  ryža
+  rys
+  koryto
+  korytnačka
+
+Vybrané slová po S
+------------------
+  syn
+  syr
+  syseľ
+  sýkorka
+  sýty
+
+Vybrané slová po V
+------------------
+  vydra
+  vysoký
+  výška
+  zvyk
+
+Vybrané slová po Z
+------------------
+  jazyk
+
+Výnimky po L
+------------
+  lyže
+  lyžica
+  lýtko
+  lysý
+  mlyn
+  plyn
+  plyš
+  slýchať
+
+Nie vybrané slová (obojaké → i/í)
+---------------------------------
+  píla
+  sito
+  sila
+  zima
+  víla
+  víno
+  bič
+  misa
+  miska
+  pivo
+
+Vybrané slová po B (ďalšie)
+---------------------------
+  aby
+  býčí
+  byľ
+  živobytie
+  bytosť
+  bývalý
+  obývať
+  obyvateľ
+  prebývať
+  bydlisko
+  dobyť
+  vydobyť
+  výdobytok
+  dobývať
+  zbytočný
+  nadbytočný
+  prebytok
+  úbytok
+  odbyt
+  neodbytný
+  obyčaj
+
+Vybrané slová po M (ďalšie)
+---------------------------
+  mykať
+  myknúť
+  zamykať
+  odmykať
+  mylný
+  myšlienka
+  premýšľať
+  úmysel
+  výmysel
+  priemysel
+  mys
+  umyť
+  umývať
+  pomyje
+  mýtnik
+  čmýriť sa
+  hmýriť sa
+  smyk
+  priesmyk
+  šmýkať sa
+  šmyknúť sa
+  žmýkať
+
+Vybrané slová po P (ďalšie)
+---------------------------
+  pýšiť sa
+  pyšnieť
+  prepych
+  pýr
+  pýriť sa
+  pyskatý
+  pýtať sa
+  spytovať sa
+  opytovať sa
+  dopyt
+  pytliak
+  pyžamo
+
+Vybrané slová po R (ďalšie)
+---------------------------
+  rybina
+  ryčať
+  ryk
+  rýdzi
+  rýdzik
+  ryha
+  zrýchliť
+  rysovať
+  ryšavý
+  ryť
+  rozrývať
+  rýľ
+  úryvok
+  poryv
+  brýzgať
+  hrýzť
+  kryť
+  skryť
+  pokryť
+  pokrývka
+  prikryť
+  prikrývka
+  skrýša
+  úkryt
+  kryha
+  prýštiť
+  strýko
+  strýc
+  stryná
+  trýzniť
+  tryzna
+  trysk
+  rým
+  rýmovať sa
+  rýpať
+  bryndza
+
+Vybrané slová po S (ďalšie)
+---------------------------
+  sychravý
+  syčať
+  sykať
+  sykavý
+  sykot
+  sypať
+  sýpka
+  osýpky
+  sypký
+  nasýtiť
+  nenásytný
+  vysychať
+
+Vybrané slová po V (ďalšie)
+---------------------------
+  vy
+  vykať
+  vyhňa
+  výr
+  výskať
+  výskot
+  výšina
+  vyše
+  vyť
+  zavýjať
+  vyžla
+  zvýšiť sa
+  zvyšovať
+  zvyšok
+  zvykať
+  zvyknúť
+  zvyčajný
+  návyk
+
+Vybrané slová po Z (ďalšie)
+---------------------------
+  jazyčný
+  jazyčnica
+  nazývať
+  pozývať
+  vyzývať
+  prezývať
+  vzývať
+  ozývať sa
+  prizývať
+
+Výnimky po L (ďalšie)
+---------------------
+  lyko
+  lysina
+  blýskať sa
+  blýskavý
+  blyšťať sa
+  mlynica
+  plynný
+  plynáreň
+  plynúť
+  vplyv
+  vplyvný
+  vplývať
+  ovplyvniť
+  oplývať
+  splývať
+  plytký
+  plytčina
+  vzlykať
+  vzlyk
+  zlyhať
+
+Tvrdé spoluhlásky (ďalšie)
+--------------------------
+  gynekológ
+  hygiena
+  typ
+
+Vybrané slová po M (ďalšie 2)
+-----------------------------
+  my
+  mýtus
+
+Výnimky po L (ďalšie 2)
+-----------------------
+  lyrika
+
+Nie vybrané slová (obojaké → i/í) (ďalšie)
+------------------------------------------
+  bicykel
+  míňať
+  pichať
+  riziko
+  vidieť
+  víťaziť
+  víkend
+  visieť
+  visutý
+
+Kontrastné páry (obojaké)
+-------------------------
+  biť
+  dobiť
+  vír
+  vyla
+  pisk
+  mi
+  viť
+  tip
+
+Mäkké spoluhlásky (ďalšie 2)
+----------------------------
+  čítať
+  šiška
+  šiť
+  žila
+  žiť
+  čižma
+
+Nie vybrané slová (obojaké → i/í) (ďalšie 2)
+--------------------------------------------
+  sila
+  silný
+  sirup
+  zima
+  zisk
+  pivo
+  pilník
+  milý
+  miska
+  víno
+  víla
+  vidlička
+  riadok
+  biblia
+
+Mäkké spoluhlásky (ďalšie 3)
+----------------------------
+  čiapka
+  čiara
+  život
+  žiarovka
+  žiačka
+  cirkus
+  citrón
+
+Nie vybrané slová (obojaké → i/í) (ďalšie 3)
+--------------------------------------------
+  minúta
+  mince
+  mihať
+  pilot
+  písať
+  pivnica
+  sito
+  sivý
+  zips
+  bič
+  vila
+  víťaz
+
+Kontrastné páry (ďalšie)
+------------------------
+  byť
+  dobyť
+  výr
+  víla
+  vila
+  pysk
+  my
+  vyť
+  typ
+
+========================================
+Celkom: 299 slov

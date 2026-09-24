@@ -1205,7 +1205,7 @@
     { b:'š',   a:'ť',        ans:'i',           err_fam:'š je mäkká spoluhláska → píšeme i',              err_dlz:'šiť nemá dĺžeň → píšeme i (nie í)' },
     { b:'ž',   a:'la',       ans:'i',           err_fam:'ž je mäkká spoluhláska → píšeme i',              err_dlz:'žila nemá dĺžeň → píšeme i (nie í)' },
     { b:'ž',   a:'ť',        ans:'i',           err_fam:'ž je mäkká spoluhláska → píšeme i',              err_dlz:'žiť nemá dĺžeň → píšeme i (nie í)' },
-    { b:'čiž', a:'ma',       ans:'i', hl:'"ž"', err_fam:'ž je mäkká spoluhláska → píšeme i',              err_dlz:'čižma nemá dĺžeň → píšeme i (nie í)' },
+    { b:'č',   a:'žma',      ans:'i', hl:'"č"', err_fam:'č je mäkká spoluhláska → píšeme i',              err_dlz:'čižma nemá dĺžeň → píšeme i (nie í)' },
     // ── Nie vybrané slová (obojaké → i/í) (ďalšie 2) ─────────────────
     { b:'s',   a:'la',       ans:'i',           err_fam:'sila nie je vybrané slovo → po "s" píšeme i',    err_dlz:'sila nemá dĺžeň → píšeme i (nie í)' },
     { b:'s',   a:'lný',      ans:'i',           err_fam:'silný nie je vybrané slovo → po "s" píšeme i',   err_dlz:'silný nemá dĺžeň → píšeme i (nie í)' },
@@ -1242,6 +1242,16 @@
     { b:'b',   a:'č',        ans:'i',           err_fam:'bič nie je vybrané slovo → po "b" píšeme i',     err_dlz:'bič nemá dĺžeň → píšeme i (nie í)' },
     { b:'v',   a:'la',       ans:'i',           ctx:'veľká v_la', err_fam:'vila nie je vybrané slovo → po "v" píšeme i', err_dlz:'vila nemá dĺžeň → píšeme i (nie í)' },
     { b:'v',   a:'ťaz',      ans:'í',           err_fam:'víťaz nie je vybrané slovo → po "v" píšeme í',   err_dlz:'víťaz má dĺžeň → píšeme í (nie i)' },
+    // ── Kontrastné páry (ďalšie) ─────────────────────────────────
+    { b:'b',   a:'ť',        ans:'y',  ctx:'chcem b_ť dobrý',       hl:'"b"', err_fam:'byť je vybrané slovo po "b" → píšeme y',        err_dlz:'byť nemá dĺžeň → píšeme y (nie ý)' },
+    { b:'dob', a:'ť',        ans:'y',  ctx:'dob_ť hrad',             hl:'"b"', err_fam:'dobyť je vybrané slovo po "b" → píšeme y',       err_dlz:'dobyť nemá dĺžeň → píšeme y (nie ý)' },
+    { b:'v',   a:'r',        ans:'ý',  ctx:'veľký v_r',                        err_fam:'výr (sova) → správny tvar je s ý',               err_dlz:'výr má dĺžeň → píšeme ý (nie y)' },
+    { b:'v',   a:'la',       ans:'í',  ctx:'čarovná v_la',                     err_fam:'víla nie je vybrané slovo → po "v" píšeme í',    err_dlz:'víla má dĺžeň → píšeme í (nie i)' },
+    { b:'v',   a:'la',       ans:'i',  ctx:'stará v_la na kopci',              err_fam:'vila nie je vybrané slovo → po "v" píšeme i',    err_dlz:'vila nemá dĺžeň → píšeme i (nie í)' },
+    { b:'p',   a:'sk',       ans:'y',  ctx:'kravský p_sk',                     err_fam:'pysk je vybrané slovo po "p" → píšeme y',        err_dlz:'pysk nemá dĺžeň → píšeme y (nie ý)' },
+    { b:'m',   a:'',         ans:'y',  ctx:'m_ sme kamaráti',                  err_fam:'my je vybrané slovo po "m" → píšeme y',          err_dlz:'my nemá dĺžeň → píšeme y (nie ý)' },
+    { b:'v',   a:'ť',        ans:'y',  ctx:'vlk začal v_ť',                    err_fam:'vyť je vybrané slovo po "v" → píšeme y',         err_dlz:'vyť nemá dĺžeň → píšeme y (nie ý)' },
+    { b:'t',   a:'p',        ans:'y',  ctx:'t_p osobnosti',                    err_fam:'t je tvrdá spoluhláska → píšeme y',              err_dlz:'typ nemá dĺžeň → píšeme y (nie ý)' },
   ];
 
   // Difficulty levels: 1=easy, 2=medium, 3=hard
