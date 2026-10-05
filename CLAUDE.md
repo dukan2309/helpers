@@ -138,7 +138,7 @@ Two **display modes**, chosen by a **toggle switch** (`.method-toggle` at the to
 All visualization rendering fans out through **`renderAll(reveal)`**, which branches on `columnMode` — `render()` calls `renderAll(false)`; `checkAnswer()` calls `renderAll(true)`. Do **not** call individual `renderX()` functions from those sites.
 
 **`renderColumnMethod(reveal)`** — stacked place-value layout on a 3-column grid (`op | T | O`, classes `.cm-op/.cm-t/.cm-o`; the redundant hundreds column was removed). num1 row, operator+num2 row, `.cm-line` rule, then the result row:
-- **before reveal:** two editable answer boxes (`inputBox()` → `.cm-input`, tens + ones) — always exactly 2 regardless of operation, since column mode never exceeds 99. The ones box gets focus; typing a digit auto-advances **right→left** (ones→tens, the column-addition order), and Backspace on an empty box moves back left→right (`colSibling(inp, ±1)`).
+- **before reveal:** two editable answer boxes (`inputBox()` → `.cm-input`, tens + ones) — always exactly 2 regardless of operation, since column mode never exceeds 99. The tens box gets focus; typing a digit auto-advances **left→right** (tens→ones, natural writing order), and Backspace on an empty box moves back right→left (`colSibling(inp, ±1)`).
 - **after reveal:** the correct answer digits, colored, with `.cm-ans` (pop animation).
 
 **Carry / borrow school notation (reveal only).** On reveal `renderColumnMethod` annotates the **num1 row** with the marks a child writes on paper, via a small `mark(cls, txt)` → `.cm-regroup` span (orange `#f07d3a`) positioned absolutely inside the tens/ones cells (which are `position: relative`):

@@ -1170,7 +1170,7 @@ function renderMedalBadge(key) {
 
     if (!reveal) {
       const boxes = area.querySelectorAll('.cm-input');
-      if (boxes.length) boxes[boxes.length - 1].focus();   // start at the ones box
+      if (boxes.length) boxes[0].focus();   // start at the tens box (left→right typing order)
     }
   }
 
@@ -1184,12 +1184,12 @@ function renderMedalBadge(key) {
     inp.className = 'cm-input ' + placeCls;
     inp.addEventListener('input', () => {
       inp.value = inp.value.replace(/[^0-9]/g, '').slice(0, 1);
-      if (inp.value) { const prev = colSibling(inp, -1); if (prev) prev.focus(); }
+      if (inp.value) { const next = colSibling(inp, 1); if (next) next.focus(); }
     });
     inp.addEventListener('keydown', e => {
       if (e.key === 'Backspace' && inp.value === '') {
-        const next = colSibling(inp, 1);
-        if (next) { next.focus(); e.preventDefault(); }
+        const prev = colSibling(inp, -1);
+        if (prev) { prev.focus(); e.preventDefault(); }
       }
     });
     return inp;
