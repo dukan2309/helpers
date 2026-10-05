@@ -443,7 +443,7 @@ h1 .h1-icon { -webkit-text-fill-color: initial; background: none; -webkit-backgr
         <div class="medal-new" id="sum-medal-new"></div>
       </div>
     </div>
-    <div id="sum-medal-hint" class="medal-hint" style="display:none">Na získanie medaily odpovedz aspoň na 10 otázok.</div>
+    <div id="sum-medal-hint" class="medal-hint" style="display:none">Na získanie medaily vypočítaj aspoň 10 príkladov.</div>
     <div class="btn-group">
       <button id="btn-restart" onclick="restartSession()">Hrať znova ▶</button>
       <button id="btn-retry" onclick="retryMistakes()" style="display:none">Precvičiť chyby 🔁</button>
@@ -613,18 +613,16 @@ function renderMedalBadge(key) {
     if (inRetry && retryQueue.length === 0) setTimeout(finishSession, 1500);
   }
 
-  // assemble the number the student entered across the column boxes (blank = 0)
   function readColumnValue() {
     const boxes = [...document.querySelectorAll('#col-method-area .cm-input')];
     if (boxes.length === 0 || boxes.every(b => b.value === '')) return NaN;
-    let h = 0, t = 0, o = 0;
+    let t = 0, o = 0;
     boxes.forEach(b => {
       const v = b.value === '' ? 0 : parseInt(b.value);
-      if (b.classList.contains('cm-h')) h = v;
-      else if (b.classList.contains('cm-t')) t = v;
+      if (b.classList.contains('cm-t')) t = v;
       else o = v;
     });
-    return h * 100 + t * 10 + o;
+    return t * 10 + o;
   }
 
   function updateHud() {
@@ -641,7 +639,7 @@ function renderMedalBadge(key) {
     hintUsed = true;
     const fb = document.getElementById('feedback');
     if (columnMode) {
-      // help = fill only the ones digit; the student still works out the tens
+      // hint: fill the ones digit; student still works out the tens
       const o = correctAnswer % 10;
       let tensBox = null;
       document.querySelectorAll('#col-method-area .cm-input').forEach(b => {
@@ -1170,11 +1168,11 @@ function renderMedalBadge(key) {
 
     if (!reveal) {
       const boxes = area.querySelectorAll('.cm-input');
-      if (boxes.length) boxes[0].focus();   // start at the tens box (left→right typing order)
+      if (boxes.length) boxes[boxes.length - 1].focus();   // start at ones box
     }
   }
 
-  // one answer digit box; typing advances right→left (ones→tens→hundreds) — the column order
+  // single answer digit box; focus starts at ones, advances right→left to tens
   function inputBox(placeCls) {
     const inp = document.createElement('input');
     inp.type = 'text';
@@ -1184,12 +1182,12 @@ function renderMedalBadge(key) {
     inp.className = 'cm-input ' + placeCls;
     inp.addEventListener('input', () => {
       inp.value = inp.value.replace(/[^0-9]/g, '').slice(0, 1);
-      if (inp.value) { const next = colSibling(inp, 1); if (next) next.focus(); }
+      if (inp.value) { const prev = colSibling(inp, -1); if (prev) prev.focus(); }
     });
     inp.addEventListener('keydown', e => {
       if (e.key === 'Backspace' && inp.value === '') {
-        const prev = colSibling(inp, -1);
-        if (prev) { prev.focus(); e.preventDefault(); }
+        const next = colSibling(inp, 1);
+        if (next) { next.focus(); e.preventDefault(); }
       }
     });
     return inp;
