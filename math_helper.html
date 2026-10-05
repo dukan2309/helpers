@@ -661,9 +661,21 @@ h1 .h1-icon { -webkit-text-fill-color: initial; background: none; -webkit-backgr
   .page-header h1 { margin: 0; font-size: 20px; }
   body { padding-top: 0; }
 }
+/* Medal system */
+.medal-wrap { text-align: center; margin: 16px 0 8px; }
+.medal-img  { width: 100px; height: 100px; object-fit: cover; border-radius: 50%; box-shadow: 0 4px 16px rgba(0,0,0,.18); }
+.medal-name { font-size: 1.05rem; font-weight: 700; margin-top: 8px; }
+.medal-name.gold   { color: #c9a227; }
+.medal-name.silver { color: #7d8a94; }
+.medal-name.bronze { color: #9c6b3c; }
+.medal-new  { font-size: 0.82rem; color: #7c6cf2; margin-top: 3px; font-weight: 600; }
+#medal-badge { position: fixed; top: 14px; right: 16px; display: none; }
+#medal-badge img { width: 40px; height: 40px; object-fit: cover; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,.2); }
+@media (max-width: 600px) { #medal-badge img { width: 32px; height: 32px; } }
 </style>
 </head>
 <body>
+<div id="medal-badge"><img src="" alt=""></div>
 <div class="page-header">
 <a class="home-btn" href="index.html">⌂ Domov</a>
 <h1><span class="h1-icon">🌟</span> <span class="h1-grad">Pomocník s matematikou — do 20!</span> <span class="h1-icon">🌟</span></h1>
@@ -754,11 +766,34 @@ h1 .h1-icon { -webkit-text-fill-color: initial; background: none; -webkit-backgr
     <div class="sum-row"><span class="sum-lbl">Úspešnosť</span><span class="sum-count" id="sum-pct">—</span><span class="sum-pts"></span></div>
     <div class="sum-grade" id="sum-grade"></div>
     <div class="sum-msg"  id="sum-msg"></div>
+    <div id="sum-medal" style="display:none">
+      <div class="medal-wrap">
+        <img class="medal-img" id="sum-medal-img" src="" alt="">
+        <div class="medal-name" id="sum-medal-name"></div>
+        <div class="medal-new" id="sum-medal-new"></div>
+      </div>
+    </div>
     <button id="btn-restart" onclick="restartSession()">Hrať znova ▶</button>
   </div>
 </div>
 
 <script>
+const MEDAL_LEVELS = ['bronze','silver','gold'];
+const MEDAL_LABELS = { gold:'Zlatá medaila 🥇', silver:'Strieborná medaila 🥈', bronze:'Bronzová medaila 🥉' };
+function getMedal(pct) { return pct>=85?'gold':pct>=70?'silver':pct>=55?'bronze':null; }
+function saveMedalIfBetter(key,level) {
+  if (!level) return false;
+  const prev = localStorage.getItem('medal_'+key);
+  if (!prev || MEDAL_LEVELS.indexOf(level)>MEDAL_LEVELS.indexOf(prev)) { localStorage.setItem('medal_'+key,level); return true; }
+  return false;
+}
+function renderMedalBadge(key) {
+  const el = document.getElementById('medal-badge');
+  if (!el) return;
+  const level = localStorage.getItem('medal_'+key);
+  if (level) { el.querySelector('img').src='albert_'+level+'.jpg'; el.querySelector('img').title=MEDAL_LABELS[level]; el.style.display=''; }
+  else el.style.display='none';
+}
   let mode = 'add';
   let num1, num2, op, correctAnswer;
   let scoreOkFull = 0, scoreOkWithHelp = 0, scoreTries = 0;
@@ -1607,6 +1642,18 @@ h1 .h1-icon { -webkit-text-fill-color: initial; background: none; -webkit-backgr
     document.getElementById('sum-pct').textContent   = scoreTries > 0 ? pct + '%' : '—';
     document.getElementById('sum-grade').textContent = grade;
     document.getElementById('sum-msg').textContent   = msg;
+    // Medal
+    const medal = scoreTries > 0 ? getMedal(pct) : null;
+    const medalEl = document.getElementById('sum-medal');
+    if (medal) {
+      const isNew = saveMedalIfBetter('math20', medal);
+      document.getElementById('sum-medal-img').src = 'albert_' + medal + '.jpg';
+      const nameEl = document.getElementById('sum-medal-name');
+      nameEl.textContent = MEDAL_LABELS[medal]; nameEl.className = 'medal-name ' + medal;
+      const newEl = document.getElementById('sum-medal-new');
+      newEl.textContent = isNew ? 'Nový rekord! 🎉' : ''; newEl.style.display = isNew ? '' : 'none';
+      medalEl.style.display = ''; renderMedalBadge('math20');
+    } else { medalEl.style.display = 'none'; }
     document.getElementById('summary-overlay').classList.add('visible');
   }
 
@@ -1620,6 +1667,7 @@ h1 .h1-icon { -webkit-text-fill-color: initial; background: none; -webkit-backgr
   // Start
   nextProblem();
   buildBonds();
+  renderMedalBadge('math20');
 </script>
 </body>
 </html>

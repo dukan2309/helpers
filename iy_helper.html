@@ -483,9 +483,21 @@
     transition: transform .12s, box-shadow .12s;
   }
   .quiz-restart:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(124,108,242,0.3); }
+/* Medal system */
+.medal-wrap { text-align: center; margin: 16px 0 8px; }
+.medal-img  { width: 96px; height: 96px; object-fit: cover; border-radius: 50%; box-shadow: 0 4px 16px rgba(0,0,0,.18); }
+.medal-name { font-size: 1rem; font-weight: 700; margin-top: 8px; }
+.medal-name.gold   { color: #c9a227; }
+.medal-name.silver { color: #7d8a94; }
+.medal-name.bronze { color: #9c6b3c; }
+.medal-new  { font-size: 0.82rem; color: #7c6cf2; margin-top: 3px; font-weight: 600; }
+#medal-badge { position: fixed; top: 14px; right: 16px; display: none; }
+#medal-badge img { width: 40px; height: 40px; object-fit: cover; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,.2); }
+@media (max-width: 600px) { #medal-badge img { width: 32px; height: 32px; } }
 </style>
 </head>
 <body>
+<div id="medal-badge"><img src="" alt=""></div>
 <div class="wrap">
 
   <header class="hero">
@@ -922,6 +934,22 @@
   </div>
 </div>
 <script>
+const MEDAL_LEVELS = ['bronze','silver','gold'];
+const MEDAL_LABELS = { gold:'Zlatá medaila 🥇', silver:'Strieborná medaila 🥈', bronze:'Bronzová medaila 🥉' };
+function getMedal(pct) { return pct>=85?'gold':pct>=70?'silver':pct>=55?'bronze':null; }
+function saveMedalIfBetter(key,level) {
+  if (!level) return false;
+  const prev = localStorage.getItem('medal_'+key);
+  if (!prev || MEDAL_LEVELS.indexOf(level)>MEDAL_LEVELS.indexOf(prev)) { localStorage.setItem('medal_'+key,level); return true; }
+  return false;
+}
+function renderMedalBadge(key) {
+  const el = document.getElementById('medal-badge');
+  if (!el) return;
+  const level = localStorage.getItem('medal_'+key);
+  if (level) { el.querySelector('img').src='albert_'+level+'.jpg'; el.querySelector('img').title=MEDAL_LABELS[level]; el.style.display=''; }
+  else el.style.display='none';
+}
   // ── Quiz ──────────────────────────────────────────────────────
   const QW = [
     // ── Tvrdé spoluhlásky ─────────────────────────────────────────
@@ -1391,11 +1419,23 @@
   function showDone() {
     const pct = Math.round(qScore / qDeck.length * 100);
     const em = pct >= 80 ? '🎉' : pct >= 60 ? '😊' : '💪';
+    const medal = getMedal(pct);
+    let medalHtml = '';
+    if (medal) {
+      const isNew = saveMedalIfBetter('iy', medal);
+      renderMedalBadge('iy');
+      medalHtml = `<div class="medal-wrap">
+        <img class="medal-img" src="albert_${medal}.jpg" alt="">
+        <div class="medal-name ${medal}">${MEDAL_LABELS[medal]}</div>
+        ${isNew ? '<div class="medal-new">Nový rekord! 🎉</div>' : ''}
+      </div>`;
+    }
     document.getElementById('quiz-card').innerHTML = `
       <div class="quiz-done">
         <div class="done-emoji">${em}</div>
         <div class="done-score">${qScore} / ${qDeck.length} správne</div>
         <div class="done-sub">na prvý pokus</div>
+        ${medalHtml}
         <button class="quiz-restart" onclick="chooseDiff()">Znova 🔄</button>
       </div>`;
   }
@@ -1441,6 +1481,7 @@
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
   chooseDiff();
+  renderMedalBadge('iy');
 </script>
 </body>
 </html>

@@ -234,6 +234,10 @@
     opacity: 1;
     transform: translateX(-50%) translateY(0);
   }
+  /* Medal badges on tiles */
+  .tile { position: relative; }
+  .tile-medal { position: absolute; top: 10px; right: 10px; width: 36px; height: 36px; display: none; }
+  .tile-medal img { width: 36px; height: 36px; object-fit: cover; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,.22); border: 2px solid white; }
 </style>
 </head>
 <body>
@@ -251,7 +255,8 @@
 
     <div class="grid">
 
-      <a class="tile t-20" href="math_helper.html">
+      <a class="tile t-20" href="math_helper.html" data-medal-key="math20">
+        <div class="tile-medal"><img src="" alt=""></div>
         <span class="emoji">🧮</span>
         <h2>Sčítanie a odčítanie</h2>
         <div class="sub">Bodky, číselná os, desaťpole, korálky a číselné dvojice.</div>
@@ -259,7 +264,8 @@
         <div class="range">do 20</div>
       </a>
 
-      <a class="tile t-100" href="math_helper_100.html">
+      <a class="tile t-100" href="math_helper_100.html" data-medal-key="math100">
+        <div class="tile-medal"><img src="" alt=""></div>
         <span class="emoji">💯</span>
         <h2>Sčítanie a odčítanie</h2>
         <div class="sub">Premostenie cez 10, desiatky a jednotky, tabuľka čísel, číselná os.</div>
@@ -267,7 +273,8 @@
         <div class="range">do 100</div>
       </a>
 
-      <a class="tile t-verb" href="verb_helper.html">
+      <a class="tile t-verb" href="verb_helper.html" data-medal-key="verb">
+        <div class="tile-medal"><img src="" alt=""></div>
         <span class="emoji">
           <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 60 60" style="display:block;border-radius:10px;overflow:hidden;">
             <defs><clipPath id="fc"><rect width="60" height="60" rx="10"/></clipPath></defs>
@@ -295,7 +302,8 @@
         <div class="range">slovesá</div>
       </a>
 
-      <a class="tile t-iy" href="iy_helper.html">
+      <a class="tile t-iy" href="iy_helper.html" data-medal-key="iy">
+        <div class="tile-medal"><img src="" alt=""></div>
         <span class="emoji">✏️</span>
         <h2>I vs Y</h2>
         <div class="sub">Tvrdé, mäkké a obojaké spoluhlásky. Vybrané slová a výnimky po L.</div>
@@ -303,7 +311,8 @@
         <div class="range">i / y</div>
       </a>
 
-      <a class="tile t-nas" href="nasobilka_helper.html">
+      <a class="tile t-nas" href="nasobilka_helper.html" data-medal-key="nasobilka">
+        <div class="tile-medal"><img src="" alt=""></div>
         <span class="emoji">🔢</span>
         <h2>Násobilka</h2>
         <div class="sub">Malá násobilka 1–10 s násobilkovou mriežkou, maticou bodiek a tabuľkou.</div>
@@ -311,7 +320,8 @@
         <div class="range">1× – 10×</div>
       </a>
 
-      <a class="tile t-del" href="delenie_helper.html">
+      <a class="tile t-del" href="delenie_helper.html" data-medal-key="delenie">
+        <div class="tile-medal"><img src="" alt=""></div>
         <span class="emoji">➗</span>
         <h2>Delenie</h2>
         <div class="sub">Malé delenie 1–10 (opak násobilky) s číselnou osou, skupinami a tabuľkou.</div>
@@ -332,6 +342,18 @@
   </div>
   <script>
     document.addEventListener('keydown', e => { if (e.key === 'Escape') document.getElementById('lb').classList.remove('open'); });
+    // Medal badges on tiles
+    const MEDAL_LABELS_IDX = { gold:'Zlatá medaila 🥇', silver:'Strieborná medaila 🥈', bronze:'Bronzová medaila 🥉' };
+    document.querySelectorAll('.tile[data-medal-key]').forEach(tile => {
+      const level = localStorage.getItem('medal_' + tile.dataset.medalKey);
+      if (level) {
+        const wrap = tile.querySelector('.tile-medal');
+        const img = wrap.querySelector('img');
+        img.src = 'albert_' + level + '.jpg';
+        img.title = MEDAL_LABELS_IDX[level];
+        wrap.style.display = '';
+      }
+    });
   </script>
 </body>
 </html>

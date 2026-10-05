@@ -750,9 +750,21 @@
     border-left: 2px solid var(--primary);
     opacity: 1;
   }
+/* Medal system */
+.medal-wrap { text-align: center; margin: 16px 0 8px; }
+.medal-img  { width: 100px; height: 100px; object-fit: cover; border-radius: 50%; box-shadow: 0 4px 16px rgba(0,0,0,.18); }
+.medal-name { font-size: 1.05rem; font-weight: 700; margin-top: 8px; }
+.medal-name.gold   { color: #c9a227; }
+.medal-name.silver { color: #7d8a94; }
+.medal-name.bronze { color: #9c6b3c; }
+.medal-new  { font-size: 0.82rem; color: #7c6cf2; margin-top: 3px; font-weight: 600; }
+#medal-badge { position: fixed; top: 14px; right: 16px; display: none; }
+#medal-badge img { width: 40px; height: 40px; object-fit: cover; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,.2); }
+@media (max-width: 600px) { #medal-badge img { width: 32px; height: 32px; } }
 </style>
 </head>
 <body>
+<div id="medal-badge"><img src="" alt=""></div>
 <div class="wrap">
 
   <header class="title">
@@ -900,6 +912,13 @@
     <h2 id="gradeTitle">Skvelá práca!</h2>
     <div class="grade-msg" id="gradeMsg"></div>
     <div class="stats">
+      <div id="sum-medal" style="display:none; grid-column: 1/-1;">
+        <div class="medal-wrap">
+          <img class="medal-img" id="sum-medal-img" src="" alt="">
+          <div class="medal-name" id="sum-medal-name"></div>
+          <div class="medal-new" id="sum-medal-new"></div>
+        </div>
+      </div>
       <div class="stat"><div class="num" id="stTotal">0</div><div class="lbl">Otázok</div></div>
       <div class="stat good"><div class="num" id="stOk">0</div><div class="lbl">Správne</div></div>
       <div class="stat bad"><div class="num" id="stBad">0</div><div class="lbl">Chybné</div></div>
@@ -913,6 +932,22 @@
 </div>
 
 <script>
+const MEDAL_LEVELS = ['bronze','silver','gold'];
+const MEDAL_LABELS = { gold:'Zlatá medaila 🥇', silver:'Strieborná medaila 🥈', bronze:'Bronzová medaila 🥉' };
+function getMedal(pct) { return pct>=85?'gold':pct>=70?'silver':pct>=55?'bronze':null; }
+function saveMedalIfBetter(key,level) {
+  if (!level) return false;
+  const prev = localStorage.getItem('medal_'+key);
+  if (!prev || MEDAL_LEVELS.indexOf(level)>MEDAL_LEVELS.indexOf(prev)) { localStorage.setItem('medal_'+key,level); return true; }
+  return false;
+}
+function renderMedalBadge(key) {
+  const el = document.getElementById('medal-badge');
+  if (!el) return;
+  const level = localStorage.getItem('medal_'+key);
+  if (level) { el.querySelector('img').src='albert_'+level+'.jpg'; el.querySelector('img').title=MEDAL_LABELS[level]; el.style.display=''; }
+  else el.style.display='none';
+}
 /* ---------------------------------------------------------------- *
  * Local Slovak ↔ English verb dictionary (~150 common verbs)        *
  * Each entry: en (base), past, sk (one or more — first is primary)  *
@@ -2067,6 +2102,19 @@ function finishQuiz() {
   $('gradeTitle').textContent = g.title;
   $('gradeMsg').textContent   = g.msg;
 
+  // Medal
+  const medal = total > 0 ? getMedal(pct) : null;
+  const medalEl = $('sum-medal');
+  if (medal) {
+    const isNew = saveMedalIfBetter('verb', medal);
+    $('sum-medal-img').src = 'albert_' + medal + '.jpg';
+    const nameEl = $('sum-medal-name');
+    nameEl.textContent = MEDAL_LABELS[medal]; nameEl.className = 'medal-name ' + medal;
+    const newEl = $('sum-medal-new');
+    newEl.textContent = isNew ? 'Nový rekord! 🎉' : ''; newEl.style.display = isNew ? '' : 'none';
+    medalEl.style.display = ''; renderMedalBadge('verb');
+  } else { medalEl.style.display = 'none'; }
+
   $('overlay').classList.add('show');
 }
 
@@ -2280,6 +2328,7 @@ function renderAux() {
 window.addEventListener('DOMContentLoaded', () => {
   enInput.value = 'play';
   translateEnglishToSlovak('play');
+  renderMedalBadge('verb');
 });
 </script>
 </body>
