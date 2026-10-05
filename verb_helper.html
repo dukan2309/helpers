@@ -729,6 +729,27 @@
     font-size: 16px; padding: 6px 8px;
   }
 }
+  /* Auxiliary verbs section */
+  .av-label { font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); margin-bottom:8px; }
+  .tense.av-verb { font-size:17px; padding:11px 26px; text-transform:lowercase; }
+  .av-desc {
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--ink);
+    background: rgba(124,108,242,.07);
+    border-left: 3px solid var(--primary);
+    border-radius: 0 8px 8px 0;
+    padding: 10px 14px;
+  }
+  .row.av-row { grid-template-columns:100px 1fr 1.2fr; }
+  .row.av-row .form-sk {
+    color: var(--primary);
+    font-style: normal;
+    font-weight: 700;
+    font-size: 16px;
+    border-left: 2px solid var(--primary);
+    opacity: 1;
+  }
 </style>
 </head>
 <body>
@@ -739,6 +760,31 @@
     <h1><span class="h1-icon">📖</span> <span class="h1-grad">Slovesník</span></h1>
     <p>Anglické slovesá — preklad, časovanie, precvičovanie</p>
   </header>
+
+  <!-- AUXILIARY VERBS -->
+  <section class="card">
+    <h2 style="margin:0 0 16px;font-size:20px;">🔧 Pomocné slovesá <small style="font-size:13px;font-weight:500;color:var(--muted);font-style:italic;">primary auxiliaries</small></h2>
+
+    <div class="av-label">Sloveso</div>
+    <div class="tense-bar" id="auxVerbBar" style="margin-bottom:16px;">
+      <button class="tense av-verb" onclick="auxSelectVerb('be',this)">be</button>
+      <button class="tense av-verb" onclick="auxSelectVerb('have',this)">have</button>
+      <button class="tense av-verb" onclick="auxSelectVerb('do',this)">do</button>
+    </div>
+
+    <div id="auxVerbDesc" style="display:none;margin-bottom:16px;"></div>
+
+    <div class="av-label">Čas</div>
+    <div class="tense-bar" id="auxTenseBar">
+      <button class="tense" onclick="auxSelectTense('pres',this)">Prítomný jednoduchý</button>
+      <button class="tense" onclick="auxSelectTense('past',this)">Minulý čas</button>
+      <button class="tense" onclick="auxSelectTense('fut',this)">Budúci čas</button>
+    </div>
+
+    <div id="auxResult" style="margin-top:16px;">
+      <div class="empty-state"><div class="big">🔧</div><div>Vyber sloveso a čas.</div></div>
+    </div>
+  </section>
 
   <!-- TRANSLATOR -->
   <section class="card">
@@ -1731,9 +1777,9 @@ $('swap').addEventListener('click', () => {
 /* ---------------------------------------------------------------- *
  * Tense bar                                                        *
  * ---------------------------------------------------------------- */
-document.querySelectorAll('.tense').forEach(b => {
+document.querySelectorAll('#tenseBar .tense').forEach(b => {
   b.addEventListener('click', () => {
-    document.querySelectorAll('.tense').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('#tenseBar .tense').forEach(x => x.classList.remove('active'));
     b.classList.add('active');
     currentTense = b.dataset.t;
     renderConjugation();
@@ -2086,6 +2132,151 @@ document.addEventListener('keydown', e => {
 });
 
 /* Demo seed: load "play" so the page isn't empty on first open */
+
+/* ── Auxiliary verbs ────────────────────────────────────────── */
+const AUX_DATA = {
+  be: {
+    desc: '<b>be</b> (byť) je najdôležitejšie anglické sloveso. Opisuje totožnosť, vlastnosť, povolanie alebo polohu (<em>I am a student. She is tired.</em>). Používa sa aj na tvorenie priebehových tvarov (<em>is running</em>) a&nbsp;trpného rodu (<em>was broken</em>).',
+    pres: {
+      hint: 'Present simple — stav, vlastnosť, totožnosť.',
+      rows: [
+        ['I',         '<span class="ending">am</span>',   'ja som'],
+        ['you',       '<span class="ending">are</span>',  'ty si'],
+        ['he/she/it', '<span class="ending">is</span>',   'on/ona/ono je'],
+        ['we',        '<span class="ending">are</span>',  'my sme'],
+        ['you',       '<span class="ending">are</span>',  'vy ste'],
+        ['they',      '<span class="ending">are</span>',  'oni sú'],
+      ]
+    },
+    past: {
+      hint: 'Past simple — stav v minulosti.',
+      rows: [
+        ['I',         '<span class="ending">was</span>',  'ja som bol / bola'],
+        ['you',       '<span class="ending">were</span>', 'ty si bol / bola'],
+        ['he/she/it', '<span class="ending">was</span>',  'on bol / ona bola'],
+        ['we',        '<span class="ending">were</span>', 'my sme boli'],
+        ['you',       '<span class="ending">were</span>', 'vy ste boli'],
+        ['they',      '<span class="ending">were</span>', 'oni boli'],
+      ]
+    },
+    fut: {
+      hint: 'Future simple — budúci stav.',
+      rows: [
+        ['I',         '<span class="aux">will </span><span class="stem">be</span>', 'ja budem'],
+        ['you',       '<span class="aux">will </span><span class="stem">be</span>', 'ty budeš'],
+        ['he/she/it', '<span class="aux">will </span><span class="stem">be</span>', 'on/ona/ono bude'],
+        ['we',        '<span class="aux">will </span><span class="stem">be</span>', 'my budeme'],
+        ['you',       '<span class="aux">will </span><span class="stem">be</span>', 'vy budete'],
+        ['they',      '<span class="aux">will </span><span class="stem">be</span>', 'oni budú'],
+      ]
+    }
+  },
+  have: {
+    desc: '<b>have</b> (mať) vyjadruje vlastníctvo, vzťah alebo stav (<em>I have a&nbsp;dog. She has a&nbsp;cold.</em>). Ako pomocné sloveso tvorí predprítomný čas (<em>I have finished</em>) a&nbsp;predminulý čas (<em>She had left</em>).',
+    pres: {
+      hint: 'Present simple — vlastníctvo, vzťah.',
+      rows: [
+        ['I',         '<span class="stem">have</span>',  'ja mám'],
+        ['you',       '<span class="stem">have</span>',  'ty máš'],
+        ['he/she/it', '<span class="ending">has</span>', 'on/ona/ono má'],
+        ['we',        '<span class="stem">have</span>',  'my máme'],
+        ['you',       '<span class="stem">have</span>',  'vy máte'],
+        ['they',      '<span class="stem">have</span>',  'oni majú'],
+      ]
+    },
+    past: {
+      hint: 'Past simple — vlastníctvo v minulosti.',
+      rows: [
+        ['I',         '<span class="ending">had</span>', 'ja som mal / mala'],
+        ['you',       '<span class="ending">had</span>', 'ty si mal / mala'],
+        ['he/she/it', '<span class="ending">had</span>', 'on mal / ona mala'],
+        ['we',        '<span class="ending">had</span>', 'my sme mali'],
+        ['you',       '<span class="ending">had</span>', 'vy ste mali'],
+        ['they',      '<span class="ending">had</span>', 'oni mali'],
+      ]
+    },
+    fut: {
+      hint: 'Future simple — budúce vlastníctvo.',
+      rows: [
+        ['I',         '<span class="aux">will </span><span class="stem">have</span>', 'ja budem mať'],
+        ['you',       '<span class="aux">will </span><span class="stem">have</span>', 'ty budeš mať'],
+        ['he/she/it', '<span class="aux">will </span><span class="stem">have</span>', 'on/ona/ono bude mať'],
+        ['we',        '<span class="aux">will </span><span class="stem">have</span>', 'my budeme mať'],
+        ['you',       '<span class="aux">will </span><span class="stem">have</span>', 'vy budete mať'],
+        ['they',      '<span class="aux">will </span><span class="stem">have</span>', 'oni budú mať'],
+      ]
+    }
+  },
+  do: {
+    desc: '<b>do</b> (robiť) tvorí otázky a&nbsp;zápory v&nbsp;prítomnom a&nbsp;minulom čase (<em>Do you like it? He doesn\'t know.</em>). Ako plnovýznamové sloveso znamená vykonávať nejakú činnosť (<em>I do my homework.</em>).',
+    pres: {
+      hint: 'Present simple — tvorí otázky a zápory.',
+      rows: [
+        ['I',         '<span class="stem">do</span>',                               'ja robím'],
+        ['you',       '<span class="stem">do</span>',                               'ty robíš'],
+        ['he/she/it', '<span class="stem">do</span><span class="ending">es</span>', 'on/ona/ono robí'],
+        ['we',        '<span class="stem">do</span>',                               'my robíme'],
+        ['you',       '<span class="stem">do</span>',                               'vy robíte'],
+        ['they',      '<span class="stem">do</span>',                               'oni robia'],
+      ]
+    },
+    past: {
+      hint: 'Past simple — tvorí otázky a zápory v minulosti.',
+      rows: [
+        ['I',         '<span class="ending">did</span>', 'ja som robil / robila'],
+        ['you',       '<span class="ending">did</span>', 'ty si robil / robila'],
+        ['he/she/it', '<span class="ending">did</span>', 'on robil / ona robila'],
+        ['we',        '<span class="ending">did</span>', 'my sme robili'],
+        ['you',       '<span class="ending">did</span>', 'vy ste robili'],
+        ['they',      '<span class="ending">did</span>', 'oni robili'],
+      ]
+    },
+    fut: {
+      hint: 'Future simple — budúce činnosti.',
+      rows: [
+        ['I',         '<span class="aux">will </span><span class="stem">do</span>', 'ja budem robiť'],
+        ['you',       '<span class="aux">will </span><span class="stem">do</span>', 'ty budeš robiť'],
+        ['he/she/it', '<span class="aux">will </span><span class="stem">do</span>', 'on/ona/ono bude robiť'],
+        ['we',        '<span class="aux">will </span><span class="stem">do</span>', 'my budeme robiť'],
+        ['you',       '<span class="aux">will </span><span class="stem">do</span>', 'vy budete robiť'],
+        ['they',      '<span class="aux">will </span><span class="stem">do</span>', 'oni budú robiť'],
+      ]
+    }
+  }
+};
+
+let auxVerb = null, auxTense = null;
+
+function auxSelectVerb(v, btn) {
+  auxVerb = v;
+  document.querySelectorAll('#auxVerbBar .tense').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const descEl = document.getElementById('auxVerbDesc');
+  descEl.innerHTML = `<div class="av-desc">${AUX_DATA[v].desc}</div>`;
+  descEl.style.display = '';
+  renderAux();
+}
+function auxSelectTense(t, btn) {
+  auxTense = t;
+  document.querySelectorAll('#auxTenseBar .tense').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAux();
+}
+function renderAux() {
+  const el = document.getElementById('auxResult');
+  if (!auxVerb || !auxTense) return;
+  const { hint, rows } = AUX_DATA[auxVerb][auxTense];
+  const makeRows = rs => rs.map(([pron, form, sk]) =>
+    `<div class="row with-sk av-row"><span class="pron">${pron}</span><span class="form">${form}</span><span class="form-sk">${sk}</span></div>`
+  ).join('');
+  el.innerHTML = `
+    <div class="tense-hint" style="margin-bottom:12px;">${hint}</div>
+    <div class="conjugation">
+      <div class="col sing"><h3>👤 Singular</h3>${makeRows(rows.slice(0,3))}</div>
+      <div class="col plur"><h3>👥 Plural</h3>${makeRows(rows.slice(3))}</div>
+    </div>`;
+}
+
 window.addEventListener('DOMContentLoaded', () => {
   enInput.value = 'play';
   translateEnglishToSlovak('play');
