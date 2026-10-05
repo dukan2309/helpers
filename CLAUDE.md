@@ -126,6 +126,19 @@ All helpers share the same quiz structure:
 - **Summary overlay** (`finishQuiz()` / `finishSession()`) shown when word-count limit is reached or user presses Koniec.
 - **Keyboard shortcuts** consistent across all helpers: `Enter` = check / next, `End` = finish, `Esc` = cancel quiz. Letter shortcuts (N/H/F) are not used — the user types answers, so letter keys must remain free.
 
+## Medal system
+
+All 6 helpers award a persistent **Albert medal** (bronze/silver/gold) based on the end-of-session success rate. Shared utility (`MEDAL_LEVELS`, `MEDAL_LABELS`, `getMedal`, `saveMedalIfBetter`, `renderMedalBadge`) is duplicated verbatim at the top of each helper's `<script>` — keep them identical when editing.
+
+- **Thresholds:** `getMedal(pct, tries)` → gold ≥ 85 %, silver ≥ 70 %, bronze ≥ 55 %, else `null`. **Returns `null` when `tries < 10`** — a medal requires at least 10 answered questions/examples in the session. Call sites pass the session try count (`scoreTries` in the 4 math helpers, `qDeck.length` in iy, `total` in verb).
+- **Persistence:** best medal stored in `localStorage` under `medal_<key>` where key ∈ `math100 / math20 / nasobilka / delenie / iy / verb`. `saveMedalIfBetter()` only upgrades (never downgrades). "Nový rekord! 🎉" shows when the stored level improves.
+- **Medal images** are **landscape ~16:9 JPEGs** `albert_bronze.jpg` / `albert_silver.jpg` / `albert_gold.jpg`. **Never crop them to a circle or tiny square** — a wide image squeezed into a small circle is unrecognizable (this was the repeated "I can't see them" bug). Always render as a full landscape thumbnail (`height: auto`, fixed `width`, `border-radius`):
+  - **Summary modal** (`#sum-medal`, iy builds it inline in `showDone()`): `.medal-img` at `max-width: 360px`.
+  - **Persistent corner badge** (`#medal-badge`, fixed top-right): 88px thumbnail (60px mobile) + a colored `.mb-label` level caption. Rendered on page load via `renderMedalBadge(key)` at init, and refreshed after each session.
+  - **index.html tiles**: `.tile-medal` at the bottom-right of each tile, 90px landscape thumbnail; populated from `localStorage` on load.
+- **Short-session hint:** when a session ends with 1–9 answered (no medal yet), the summary shows the muted hint element (`#sum-medal-hint`, inline in iy). Math helpers read *"Na získanie medaily vypočítaj aspoň 10 príkladov."*; iy/verb read *"Na získanie medaily odpovedz aspoň na 10 otázok."* The hint shows purely on session count — it does **not** check for previously earned medals.
+
+
 ## math_helper_100.html specifics
 
 Two **display modes**, chosen by a **toggle switch** (`.method-toggle` at the top of the quiz card) with two clickable labels: **riadkové počítanie** (left) ↔ **počítanie pod seba** (right). The switch is a checkbox `#col-mode` (`onColModeChanged()`); clicking either label calls `setColMode(bool)` which flips the checkbox. `applyDisplayMode()` toggles the `.active` class on `#mt-classic`/`#mt-column`.
