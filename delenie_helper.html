@@ -316,13 +316,17 @@ button small { opacity: 0.7; font-size: 0.7em; margin-left: 4px; }
 .medal-name.bronze { color: #9c6b3c; }
 .medal-new  { font-size: 0.82rem; color: #7c6cf2; margin-top: 3px; font-weight: 600; }
 .medal-hint { text-align: center; color: var(--muted); font-size: 13px; margin: 10px 0 4px; }
-#medal-badge { position: fixed; top: 14px; right: 16px; display: none; }
-#medal-badge img { width: 40px; height: 40px; object-fit: cover; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,.2); }
-@media (max-width: 600px) { #medal-badge img { width: 32px; height: 32px; } }
+#medal-badge { position: fixed; top: 14px; right: 16px; display: none; z-index: 60; text-align: center; }
+#medal-badge img { width: 88px; height: auto; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,.28); border: 2px solid #fff; display: block; }
+#medal-badge .mb-label { margin-top: 3px; font-size: 11px; font-weight: 700; line-height: 1.1; }
+#medal-badge .mb-label.gold { color: #c9a227; }
+#medal-badge .mb-label.silver { color: #7d8a94; }
+#medal-badge .mb-label.bronze { color: #9c6b3c; }
+@media (max-width: 600px) { #medal-badge img { width: 60px; } #medal-badge .mb-label { font-size: 10px; } }
 </style>
 </head>
 <body>
-<div id="medal-badge"><img src="" alt=""></div>
+<div id="medal-badge"><img src="" alt=""><div class="mb-label"></div></div>
 <div class="page-header">
 <a class="home-btn" href="index.html">⌂ Domov</a>
 <h1><span class="h1-icon">➗</span> <span class="h1-grad">Malá násobilka - delenie</span></h1>
@@ -431,8 +435,13 @@ function renderMedalBadge(key) {
   const el = document.getElementById('medal-badge');
   if (!el) return;
   const level = localStorage.getItem('medal_'+key);
-  if (level) { el.querySelector('img').src='albert_'+level+'.jpg'; el.querySelector('img').title=MEDAL_LABELS[level]; el.style.display=''; }
-  else el.style.display='none';
+  if (level) {
+    el.querySelector('img').src='albert_'+level+'.jpg';
+    el.querySelector('img').title=MEDAL_LABELS[level];
+    const lbl=el.querySelector('.mb-label');
+    if (lbl) { lbl.textContent=MEDAL_LABELS[level]; lbl.className='mb-label '+level; }
+    el.style.display='';
+  } else el.style.display='none';
 }
   // ── State ────────────────────────────────────────────────────────────────
   let selectedDivisors = new Set([1]);   // which divisors are being practiced (multi-select)
