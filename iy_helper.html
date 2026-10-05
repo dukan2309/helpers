@@ -1430,7 +1430,7 @@ function renderMedalBadge(key) {
         <div class="medal-name ${medal}">${MEDAL_LABELS[medal]}</div>
         ${isNew ? '<div class="medal-new">Nový rekord! 🎉</div>' : ''}
       </div>`;
-    } else if (qDeck.length < 10) {
+    } else if (qDeck.length < 10 && !localStorage.getItem('medal_iy')) {
       medalHtml = `<div class="medal-hint">Na získanie medaily odpovedz aspoň na 10 otázok.</div>`;
     }
     document.getElementById('quiz-card').innerHTML = `

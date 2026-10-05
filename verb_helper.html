@@ -2118,7 +2118,7 @@ function finishQuiz() {
   } else {
     medalEl.style.display = 'none';
     const hintEl = $('sum-medal-hint');
-    hintEl.style.display = total > 0 && total < 10 ? '' : 'none';
+    hintEl.style.display = total > 0 && total < 10 && !localStorage.getItem('medal_verb') ? '' : 'none';
   }
 
   $('overlay').classList.add('show');

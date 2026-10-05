@@ -1010,7 +1010,7 @@ function renderMedalBadge(key) {
     } else {
       medalEl.style.display = 'none';
       const hintEl = document.getElementById('sum-medal-hint');
-      hintEl.style.display = scoreTries > 0 && scoreTries < 10 ? '' : 'none';
+      hintEl.style.display = scoreTries > 0 && scoreTries < 10 && !localStorage.getItem('medal_delenie') ? '' : 'none';
     }
     document.getElementById('btn-retry').style.display = wrongProblems.length > 0 ? '' : 'none';
     document.getElementById('summary-overlay').classList.add('visible');
