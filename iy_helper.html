@@ -491,6 +491,7 @@
 .medal-name.silver { color: #7d8a94; }
 .medal-name.bronze { color: #9c6b3c; }
 .medal-new  { font-size: 0.82rem; color: #7c6cf2; margin-top: 3px; font-weight: 600; }
+.medal-hint { text-align: center; color: var(--muted); font-size: 13px; margin: 10px 0 4px; }
 #medal-badge { position: fixed; top: 14px; right: 16px; display: none; }
 #medal-badge img { width: 40px; height: 40px; object-fit: cover; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,.2); }
 @media (max-width: 600px) { #medal-badge img { width: 32px; height: 32px; } }
@@ -1429,6 +1430,8 @@ function renderMedalBadge(key) {
         <div class="medal-name ${medal}">${MEDAL_LABELS[medal]}</div>
         ${isNew ? '<div class="medal-new">Nový rekord! 🎉</div>' : ''}
       </div>`;
+    } else if (qDeck.length < 10) {
+      medalHtml = `<div class="medal-hint">Na získanie medaily odpovedz aspoň na 10 otázok.</div>`;
     }
     document.getElementById('quiz-card').innerHTML = `
       <div class="quiz-done">

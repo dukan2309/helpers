@@ -758,6 +758,7 @@
 .medal-name.silver { color: #7d8a94; }
 .medal-name.bronze { color: #9c6b3c; }
 .medal-new  { font-size: 0.82rem; color: #7c6cf2; margin-top: 3px; font-weight: 600; }
+.medal-hint { text-align: center; color: var(--muted); font-size: 13px; margin: 10px 0 4px; }
 #medal-badge { position: fixed; top: 14px; right: 16px; display: none; }
 #medal-badge img { width: 40px; height: 40px; object-fit: cover; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,.2); }
 @media (max-width: 600px) { #medal-badge img { width: 32px; height: 32px; } }
@@ -919,6 +920,7 @@
           <div class="medal-new" id="sum-medal-new"></div>
         </div>
       </div>
+      <div id="sum-medal-hint" class="medal-hint" style="display:none; grid-column: 1/-1;">Na získanie medaily odpovedz aspoň na 10 otázok.</div>
       <div class="stat"><div class="num" id="stTotal">0</div><div class="lbl">Otázok</div></div>
       <div class="stat good"><div class="num" id="stOk">0</div><div class="lbl">Správne</div></div>
       <div class="stat bad"><div class="num" id="stBad">0</div><div class="lbl">Chybné</div></div>
@@ -2113,7 +2115,11 @@ function finishQuiz() {
     const newEl = $('sum-medal-new');
     newEl.textContent = isNew ? 'Nový rekord! 🎉' : ''; newEl.style.display = isNew ? '' : 'none';
     medalEl.style.display = ''; renderMedalBadge('verb');
-  } else { medalEl.style.display = 'none'; }
+  } else {
+    medalEl.style.display = 'none';
+    const hintEl = $('sum-medal-hint');
+    hintEl.style.display = total > 0 && total < 10 ? '' : 'none';
+  }
 
   $('overlay').classList.add('show');
 }
