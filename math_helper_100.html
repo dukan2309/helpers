@@ -452,7 +452,7 @@ h1 .h1-icon { -webkit-text-fill-color: initial; background: none; -webkit-backgr
 <script>
 const MEDAL_LEVELS = ['bronze','silver','gold'];
 const MEDAL_LABELS = { gold:'Zlatá medaila 🥇', silver:'Strieborná medaila 🥈', bronze:'Bronzová medaila 🥉' };
-function getMedal(pct) { return pct>=85?'gold':pct>=70?'silver':pct>=55?'bronze':null; }
+function getMedal(pct, tries) { if (tries < 10) return null; return pct>=85?'gold':pct>=70?'silver':pct>=55?'bronze':null; }
 function saveMedalIfBetter(key,level) {
   if (!level) return false;
   const prev = localStorage.getItem('medal_'+key);
@@ -1234,7 +1234,7 @@ function renderMedalBadge(key) {
     document.getElementById('sum-grade').textContent = grade;
     document.getElementById('sum-msg').textContent   = msg;
     // Medal
-    const medal = scoreTries > 0 ? getMedal(pct) : null;
+    const medal = getMedal(pct, scoreTries);
     const medalEl = document.getElementById('sum-medal');
     if (medal) {
       const isNew = saveMedalIfBetter('math100', medal);

@@ -934,7 +934,7 @@
 <script>
 const MEDAL_LEVELS = ['bronze','silver','gold'];
 const MEDAL_LABELS = { gold:'Zlatá medaila 🥇', silver:'Strieborná medaila 🥈', bronze:'Bronzová medaila 🥉' };
-function getMedal(pct) { return pct>=85?'gold':pct>=70?'silver':pct>=55?'bronze':null; }
+function getMedal(pct, tries) { if (tries < 10) return null; return pct>=85?'gold':pct>=70?'silver':pct>=55?'bronze':null; }
 function saveMedalIfBetter(key,level) {
   if (!level) return false;
   const prev = localStorage.getItem('medal_'+key);
@@ -2103,7 +2103,7 @@ function finishQuiz() {
   $('gradeMsg').textContent   = g.msg;
 
   // Medal
-  const medal = total > 0 ? getMedal(pct) : null;
+  const medal = getMedal(pct, total);
   const medalEl = $('sum-medal');
   if (medal) {
     const isNew = saveMedalIfBetter('verb', medal);

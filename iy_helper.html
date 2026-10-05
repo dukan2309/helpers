@@ -936,7 +936,7 @@
 <script>
 const MEDAL_LEVELS = ['bronze','silver','gold'];
 const MEDAL_LABELS = { gold:'Zlatá medaila 🥇', silver:'Strieborná medaila 🥈', bronze:'Bronzová medaila 🥉' };
-function getMedal(pct) { return pct>=85?'gold':pct>=70?'silver':pct>=55?'bronze':null; }
+function getMedal(pct, tries) { if (tries < 10) return null; return pct>=85?'gold':pct>=70?'silver':pct>=55?'bronze':null; }
 function saveMedalIfBetter(key,level) {
   if (!level) return false;
   const prev = localStorage.getItem('medal_'+key);
@@ -1419,7 +1419,7 @@ function renderMedalBadge(key) {
   function showDone() {
     const pct = Math.round(qScore / qDeck.length * 100);
     const em = pct >= 80 ? '🎉' : pct >= 60 ? '😊' : '💪';
-    const medal = getMedal(pct);
+    const medal = getMedal(pct, qDeck.length);
     let medalHtml = '';
     if (medal) {
       const isNew = saveMedalIfBetter('iy', medal);
