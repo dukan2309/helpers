@@ -474,7 +474,7 @@ function renderMedalBadge(key) {
     el.querySelector('img').title=MEDAL_LABELS[level];
     const lbl=el.querySelector('.mb-label');
     if (lbl) { lbl.textContent=MEDAL_LABELS[level]; lbl.className='mb-label '+level; }
-    el.style.display='';
+    el.style.display='block';
   } else el.style.display='none';
 }
   let mode = 'add';
