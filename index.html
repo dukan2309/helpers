@@ -236,10 +236,20 @@
     opacity: 1;
     transform: translateX(-50%) translateY(0);
   }
-  /* Medal badges on tiles */
+  /* Earned-medal counts row at the bottom of a tile */
   .tile { position: relative; }
-  .tile-medal { position: absolute; bottom: 10px; right: 10px; width: 90px; display: none; }
-  .tile-medal img { width: 90px; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.25); border: 2px solid white; }
+  .tile-counts {
+    display: none;                 /* JS switches to flex when a medal exists */
+    justify-content: center;
+    gap: 12px;
+    margin-top: 12px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .tile-counts .tc-item.bronze { color: #9c6b3c; }
+  .tile-counts .tc-item.silver { color: #7d8a94; }
+  .tile-counts .tc-item.gold   { color: #c9a227; }
+  .tile-counts .tc-item.zero   { color: var(--muted); opacity: .5; }
 </style>
 </head>
 <body>
@@ -263,7 +273,7 @@
         <div class="sub">Bodky, číselná os, desaťpole, korálky a číselné dvojice.</div>
         <span class="badge">Matematika</span>
         <div class="range">do 20</div>
-        <div class="tile-medal"><img src="" alt=""></div>
+        <div class="tile-counts"></div>
       </a>
 
       <a class="tile t-100" href="math_helper_100.html" data-medal-key="math100">
@@ -272,7 +282,7 @@
         <div class="sub">Premostenie cez 10, desiatky a jednotky, tabuľka čísel, číselná os.</div>
         <span class="badge">Matematika</span>
         <div class="range">do 100</div>
-        <div class="tile-medal"><img src="" alt=""></div>
+        <div class="tile-counts"></div>
       </a>
 
       <a class="tile t-verb" href="verb_helper.html" data-medal-key="verb">
@@ -301,7 +311,7 @@
         <div class="sub">Anglické slovesá — preklad, časovanie a precvičovanie.</div>
         <span class="badge">Angličtina</span>
         <div class="range">slovesá</div>
-        <div class="tile-medal"><img src="" alt=""></div>
+        <div class="tile-counts"></div>
       </a>
 
       <a class="tile t-iy" href="iy_helper.html" data-medal-key="iy">
@@ -310,7 +320,7 @@
         <div class="sub">Tvrdé, mäkké a obojaké spoluhlásky. Vybrané slová a výnimky po L.</div>
         <span class="badge">Slovenčina</span>
         <div class="range">i / y</div>
-        <div class="tile-medal"><img src="" alt=""></div>
+        <div class="tile-counts"></div>
       </a>
 
       <a class="tile t-nas" href="nasobilka_helper.html" data-medal-key="nasobilka">
@@ -319,7 +329,7 @@
         <div class="sub">Malá násobilka 1–10 s násobilkovou mriežkou, maticou bodiek a tabuľkou.</div>
         <span class="badge">Matematika</span>
         <div class="range">1× – 10×</div>
-        <div class="tile-medal"><img src="" alt=""></div>
+        <div class="tile-counts"></div>
       </a>
 
       <a class="tile t-del" href="delenie_helper.html" data-medal-key="delenie">
@@ -328,7 +338,7 @@
         <div class="sub">Malé delenie 1–10 (opak násobilky) s číselnou osou, skupinami a tabuľkou.</div>
         <span class="badge">Matematika</span>
         <div class="range">÷1 – ÷10</div>
-        <div class="tile-medal"><img src="" alt=""></div>
+        <div class="tile-counts"></div>
       </a>
 
     </div>
@@ -350,16 +360,20 @@
   </div>
   <script>
     document.addEventListener('keydown', e => { if (e.key === 'Escape') document.getElementById('lb').classList.remove('open'); });
-    // Medal badges on tiles
-    const MEDAL_LABELS_IDX = { gold:'Zlatá medaila 🥇', silver:'Strieborná medaila 🥈', bronze:'Bronzová medaila 🥉' };
+    // Medal counts on tiles
+    const TC_EMOJI = { bronze:'🥉', silver:'🥈', gold:'🥇' };
     document.querySelectorAll('.tile[data-medal-key]').forEach(tile => {
-      const level = localStorage.getItem('medal_' + tile.dataset.medalKey);
-      if (level) {
-        const wrap = tile.querySelector('.tile-medal');
-        const img = wrap.querySelector('img');
-        img.src = 'albert_' + level + '.jpg';
-        img.title = MEDAL_LABELS_IDX[level];
-        wrap.style.display = 'block';
+      if (tile.dataset.medalKey === 'iy') return;   // iy has no visible medal system
+      let c;
+      try { c = JSON.parse(localStorage.getItem('medalcount_' + tile.dataset.medalKey) || '{}'); }
+      catch (e) { c = {}; }
+      const total = (c.bronze || 0) + (c.silver || 0) + (c.gold || 0);
+      const el = tile.querySelector('.tile-counts');
+      if (total > 0) {
+        el.innerHTML = ['bronze','silver','gold']
+          .map(lv => `<span class="tc-item ${(c[lv] || 0) ? lv : 'zero'}">${TC_EMOJI[lv]} ${c[lv] || 0}×</span>`)
+          .join('');
+        el.style.display = 'flex';
       }
     });
   </script>

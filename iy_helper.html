@@ -491,17 +491,38 @@
 .medal-name.silver { color: #7d8a94; }
 .medal-name.bronze { color: #9c6b3c; }
 .medal-new  { font-size: 0.82rem; color: #7c6cf2; margin-top: 3px; font-weight: 600; }
-#medal-badge { position: fixed; top: 14px; right: 16px; display: none; z-index: 60; text-align: center; }
-#medal-badge img { width: 88px; height: auto; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,.28); border: 2px solid #fff; display: block; }
-#medal-badge .mb-label { margin-top: 3px; font-size: 11px; font-weight: 700; line-height: 1.1; }
-#medal-badge .mb-label.gold { color: #c9a227; }
-#medal-badge .mb-label.silver { color: #7d8a94; }
-#medal-badge .mb-label.bronze { color: #9c6b3c; }
-@media (max-width: 600px) { #medal-badge img { width: 60px; } #medal-badge .mb-label { font-size: 10px; } }
+/* Medals FAB + popup */
+#medals-fab { position: fixed; top: 14px; right: 16px; width: 44px; height: 44px; border: none; border-radius: 50%; background: linear-gradient(135deg, #7c6cf2, #ff7aa8); color: #fff; font-size: 22px; line-height: 1; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,.25); z-index: 60; display: flex; align-items: center; justify-content: center; padding: 0; }
+#medals-fab:hover { transform: translateY(-1px); }
+.medals-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 200; align-items: center; justify-content: center; padding: 16px; }
+.medals-overlay.open { display: flex; }
+.medals-box { background: #fff; border-radius: 20px; padding: 22px 20px 20px; max-width: 460px; width: 100%; position: relative; box-shadow: 0 12px 40px rgba(0,0,0,.3); text-align: center; }
+.medals-close { position: absolute; top: 10px; right: 12px; border: none; background: none; font-size: 20px; color: #9a9cb3; cursor: pointer; line-height: 1; }
+.medals-title { margin: 0 0 16px; font-size: 20px; font-weight: 700; color: #2b2b3f; }
+.medals-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.medal-card { border: 1px solid #e7e9f4; border-radius: 14px; padding: 10px 8px; }
+.medal-card img { width: 100%; height: auto; border-radius: 8px; display: block; }
+.medal-card .mc-name { font-size: 12px; font-weight: 700; margin-top: 6px; line-height: 1.2; min-height: 2.4em; }
+.medal-card .mc-name.gold { color: #c9a227; }
+.medal-card .mc-name.silver { color: #7d8a94; }
+.medal-card .mc-name.bronze { color: #9c6b3c; }
+.medal-card .mc-count { font-size: 18px; font-weight: 800; color: #2b2b3f; margin-top: 2px; }
+.medal-card .mc-req { font-size: 11px; color: #6c6e89; margin-top: 3px; font-weight: 600; }
+.medal-card.locked { opacity: .45; filter: grayscale(1); }
+.medals-reset { margin-top: 18px; border: none; background: linear-gradient(135deg, #7c6cf2, #ff7aa8); color: #fff; font-family: inherit; font-weight: 700; font-size: 14px; padding: 9px 18px; border-radius: 10px; cursor: pointer; }
+@media (max-width: 600px) { #medals-fab { width: 40px; height: 40px; font-size: 20px; } .medal-card .mc-name { font-size: 11px; } }
 </style>
 </head>
 <body>
-<div id="medal-badge"><img src="" alt=""><div class="mb-label"></div></div>
+<button id="medals-fab" onclick="openMedals()" aria-label="Moje medaily" title="Moje medaily" style="display:none">🏅</button>
+<div id="medals-modal" class="medals-overlay" onclick="if(event.target===this)closeMedals()">
+  <div class="medals-box">
+    <button class="medals-close" onclick="closeMedals()" aria-label="Zavrieť">✕</button>
+    <h2 class="medals-title">Moje medaily</h2>
+    <div class="medals-row" id="medals-row"></div>
+    <button class="medals-reset" onclick="resetMedalsConfirm()">Vynulovať počítadlo</button>
+  </div>
+</div>
 <div class="wrap">
 
   <header class="hero">
@@ -947,17 +968,40 @@ function saveMedalIfBetter(key,level) {
   if (!prev || MEDAL_LEVELS.indexOf(level)>MEDAL_LEVELS.indexOf(prev)) { localStorage.setItem('medal_'+key,level); return true; }
   return false;
 }
-function renderMedalBadge(key) {
-  const el = document.getElementById('medal-badge');
-  if (!el) return;
-  const level = localStorage.getItem('medal_'+key);
-  if (level) {
-    el.querySelector('img').src='albert_'+level+'.jpg';
-    el.querySelector('img').title=MEDAL_LABELS[level];
-    const lbl=el.querySelector('.mb-label');
-    if (lbl) { lbl.textContent=MEDAL_LABELS[level]; lbl.className='mb-label '+level; }
-    el.style.display='block';
-  } else el.style.display='none';
+const MEDAL_KEY = 'iy';
+function getMedalCounts(key) {
+  try { return Object.assign({bronze:0,silver:0,gold:0}, JSON.parse(localStorage.getItem('medalcount_'+key)||'{}')); }
+  catch (e) { return {bronze:0,silver:0,gold:0}; }
+}
+function addMedalCount(key, level) {
+  if (!level) return;
+  const c = getMedalCounts(key); c[level]++;
+  localStorage.setItem('medalcount_'+key, JSON.stringify(c));
+}
+function resetMedalCounts(key) {
+  localStorage.removeItem('medalcount_'+key);
+  localStorage.removeItem('medal_'+key);
+}
+function renderMedalsRow() {
+  const c = getMedalCounts(MEDAL_KEY);
+  const req = { bronze:'55 – 69 %', silver:'70 – 84 %', gold:'85 – 100 %' };
+  document.getElementById('medals-row').innerHTML = MEDAL_LEVELS.map(lv => {
+    const label = MEDAL_LABELS[lv], sp = label.lastIndexOf(' ');
+    return `
+    <div class="medal-card ${c[lv] ? lv : 'locked'}">
+      <img src="albert_${lv}.jpg" alt="${label}">
+      <div class="mc-name ${lv}">${label.slice(0, sp)}<br>${label.slice(sp + 1)}</div>
+      <div class="mc-count">${c[lv]}×</div>
+      <div class="mc-req">${req[lv]}</div>
+    </div>`;
+  }).join('');
+}
+function openMedals(){ renderMedalsRow(); document.getElementById('medals-modal').classList.add('open'); }
+function closeMedals(){ document.getElementById('medals-modal').classList.remove('open'); }
+function resetMedalsConfirm(){
+  if (confirm('Naozaj vynulovať počítadlo medailí pre túto hru? Táto akcia sa nedá vrátiť.')) {
+    resetMedalCounts(MEDAL_KEY); renderMedalsRow();
+  }
 }
   // ── Quiz ──────────────────────────────────────────────────────
   const QW = [
@@ -1429,22 +1473,12 @@ function renderMedalBadge(key) {
     const pct = Math.round(qScore / qDeck.length * 100);
     const em = pct >= 80 ? '🎉' : pct >= 60 ? '😊' : '💪';
     const medal = getMedal(pct, qDeck.length);
-    let medalHtml = '';
-    if (medal) {
-      const isNew = saveMedalIfBetter('iy', medal);
-      renderMedalBadge('iy');
-      medalHtml = `<div class="medal-wrap">
-        <img class="medal-img" src="albert_${medal}.jpg" alt="">
-        <div class="medal-name ${medal}">${MEDAL_LABELS[medal]}</div>
-        ${isNew ? '<div class="medal-new">Nový rekord! 🎉</div>' : ''}
-      </div>`;
-    }
+    if (medal) { saveMedalIfBetter('iy', medal); addMedalCount('iy', medal); }  // earned/counted but not shown — iy has no visible medal system
     document.getElementById('quiz-card').innerHTML = `
       <div class="quiz-done">
         <div class="done-emoji">${em}</div>
         <div class="done-score">${qScore} / ${qDeck.length} správne</div>
         <div class="done-sub">na prvý pokus</div>
-        ${medalHtml}
         <button class="quiz-restart" onclick="chooseDiff()">Znova 🔄</button>
       </div>`;
   }
@@ -1490,7 +1524,6 @@ function renderMedalBadge(key) {
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
   chooseDiff();
-  renderMedalBadge('iy');
 </script>
 </body>
 </html>
