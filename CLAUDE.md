@@ -294,7 +294,10 @@ Shows four linked facts: `divisor × quotient = dividend`, `quotient × divisor 
 
 ## iy_helper.html specifics
 
-- Word list comes from `zoznam_slov.txt` (fetched at runtime) plus a hardcoded fallback array.
+- All words are **inline** in the file — there is no runtime fetch and no external word file. Two **separate** stores exist and are not auto-synced:
+  1. **Quiz data** — the `QW` array (the fill-in-the-blank engine reads only this).
+  2. **Study cards** — the hand-written `.word-list` HTML chips under "⭐ Vybrané slová" (B/M/P/R/S/V/Z) and "⚠️ Výnimky po L" (`#vynimky-words`); each `.wc` chip marks the i/y syllable with `<span class="hl">`. These are display-only.
+- **Invariant: every study-card word must also be a `QW` entry** (study cards ⊆ quiz). The two are synced by *content*, not by code, so when adding a word to a study card, add the matching `QW` entry too (and vice-versa if it should be studyable). To re-check: strip tags from every `.wc`, reconstruct `b+ans+a` for every `QW` entry, and diff — the study set must be a subset. The reverse is **not** required: `QW` holds many words with no study card (obojaké i/í, tvrdé-výnimka loanwords, c→y, homonymá).
 - Quiz feedback messages must **not** contain `i/í` or `y/ý` letter pairs. The "nie X" suffix is appended dynamically from the clicked letter, not hardcoded.
 - Consonant categories: `TVRDE` (orange `#f07d3a`), `MAKKE` (blue `#4a90d9`), `OBOIAKE` (lavender `#7c6cf2`).
 
