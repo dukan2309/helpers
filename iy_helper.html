@@ -514,7 +514,7 @@
 </style>
 </head>
 <body>
-<button id="medals-fab" onclick="openMedals()" aria-label="Moje medaily" title="Moje medaily" style="display:none">🏅</button>
+<button id="medals-fab" onclick="openMedals()" aria-label="Moje medaily" title="Moje medaily">🏅</button>
 <div id="medals-modal" class="medals-overlay" onclick="if(event.target===this)closeMedals()">
   <div class="medals-box">
     <button class="medals-close" onclick="closeMedals()" aria-label="Zavrieť">✕</button>
@@ -1212,7 +1212,7 @@ function resetMedalsConfirm(){
     { b:'v',   a:'šina',     ans:'ý',       err_fam:'výšina je vybrané slovo po "v" → píšeme ý',      err_dlz:'výšina má dĺžeň → píšeme ý (nie y)' },
     { b:'v',   a:'še',       ans:'y',       err_fam:'vyše je vybrané slovo po "v" → píšeme y',        err_dlz:'vyše nemá dĺžeň → píšeme y (nie ý)' },
     { b:'v',   a:'ť',        ans:'y',       ctx:'pes v_je', err_fam:'vyť je vybrané slovo po "v" → píšeme y',         err_dlz:'vyť nemá dĺžeň → píšeme y (nie ý)' },
-    { b:'zav', a:'jať',      ans:'ý', hl:'"v"', err_fam:'zavýjať je vybrané slovo po "v" → píšeme ý',     err_dlz:'zavýjať má dĺžeň → píšeme ý (nie y)' },
+    { b:'zav', a:'jať',      ans:'ý', hl:'"v"', ctx:'vlk zav_ja', err_fam:'zavýjať je vybrané slovo po "v" → píšeme ý',     err_dlz:'zavýjať má dĺžeň → píšeme ý (nie y)' },
     { b:'v',   a:'žla',      ans:'y',       err_fam:'vyžla je vybrané slovo po "v" → píšeme y',       err_dlz:'vyžla nemá dĺžeň → píšeme y (nie ý)' },
     { b:'zv',  a:'šiť sa',   ans:'ý', hl:'"v"', err_fam:'zvýšiť sa je vybrané slovo po "v" → píšeme ý',   err_dlz:'zvýšiť sa má dĺžeň → píšeme ý (nie y)' },
     { b:'zv',  a:'šovať',    ans:'y', hl:'"v"', err_fam:'zvyšovať je vybrané slovo po "v" → píšeme y',    err_dlz:'zvyšovať nemá dĺžeň → píšeme y (nie ý)' },
@@ -1652,6 +1652,8 @@ function resetMedalsConfirm(){
     { b:'Tor', a:'sa', ans:'y', hl:'"r"', err_fam:'Torysa je vybrané slovo po "r" → píšeme y', err_dlz:'Torysa nemá dĺžeň → píšeme y (nie ý)' },
     { b:'s', a:'rovník', ans:'y', hl:'"s"', err_fam:'syrovník je vybrané slovo po "s" → píšeme y', err_dlz:'syrovník nemá dĺžeň → píšeme y (nie ý)' },
     { b:'V', a:'šehrad', ans:'y', hl:'"v"', err_fam:'Vyšehrad je vybrané slovo po "v" → píšeme y', err_dlz:'Vyšehrad nemá dĺžeň → píšeme y (nie ý)' },
+    // ═══ Kontrastný pár k zavýjať (index 190) ═══
+    { b:'zav', a:'jať', ans:'í', hl:'"v"', ctx:'zav_jať do deky', err_fam:'zavíjať nie je vybrané slovo → po "v" píšeme í', err_dlz:'zavíjať má dĺžeň → píšeme í (nie i)' },
   ];
 
   // Difficulty levels: 1=easy, 2=medium, 3=hard
@@ -1659,7 +1661,7 @@ function resetMedalsConfirm(){
   const _D3 = new Set([81,86,89,90,91,93,94,95,96,97,99,100,106,108,109,112,113,114,115,117,120,122,123,124,125,126,129,130,131,135,136,137,141,142,143,144,145,146,147,157,158,162,163,164,169,172,173,175,177,183,187,191,192,199,200,203,205,207,212,215,218,219,220,221,222,224,225,226,228,233,469,470,471,472,473,474,475,476,477,478,479,480,481,482,483,484,485,486,487,488,489,490,491,492,493,494,495,496,497,498,499,500,501,502,503,504,505,506,507,508,509,510,511,512,513,514,515,516,517,518,519,520,521,522,523,524,525,526,527,528,529,530,531,532,533,534,535,536,537,538,539,540,541,542,543,544,545,546,547,548,549,550,551,552,553,554,555,556,557,558,559,560,561,562,563,564,565,566,567,568,569,570,571,578,579,581,584,586,587,592,597]);
   QW.forEach((w,i) => { w.d = _D3.has(i) ? 3 : _D1.has(i) ? 1 : 2; });
 
-  let qDeck = [], qIdx = 0, qFirst = true, qScore = 0;
+  let qDeck = [], qIdx = 0, qFirst = true, qScore = 0, qAnswered = 0, qCountLimit = 20;
 
   function shuffle(a) {
     for (let i = a.length - 1; i > 0; i--) {
@@ -1672,10 +1674,21 @@ function resetMedalsConfirm(){
   function chooseDiff() {
     const cnt = [0,0,0,0];
     QW.forEach(w => cnt[w.d]++);
+    const countBtns = [5,10,20,0].map(n => {
+      const active = qCountLimit === n, lbl = n === 0 ? '∞' : n;
+      return `<button onclick="setCount(${n})" style="min-width:52px;padding:8px 14px;border-radius:12px;font-family:inherit;font-weight:700;font-size:15px;cursor:pointer;transition:all .12s;border:2px solid ${active?'#7c6cf2':'var(--line)'};background:${active?'linear-gradient(135deg,#7c6cf2,#ff7aa8)':'#fff'};color:${active?'#fff':'var(--muted)'};">${lbl}</button>`;
+    }).join('');
+    const belowTen = qCountLimit > 0 && qCountLimit < 10;
+    const medalNote = belowTen
+      ? `<div style="margin-bottom:22px;text-align:center;font-size:13px;font-weight:700;color:#f07d3a;">⚠️ Za menej ako 10 slov nezískaš medailu.</div>`
+      : `<div style="margin-bottom:22px;text-align:center;font-size:13px;color:var(--muted);">🏅 Medailu môžeš získať za 10 a viac slov.</div>`;
     document.getElementById('quiz-card').innerHTML = `
       <div class="quiz-header">
         <span class="quiz-title">✏️ Cvičenie</span>
       </div>
+      <div class="quiz-prompt" style="margin-bottom:10px;">Koľko slov chceš precvičiť?</div>
+      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:10px;flex-wrap:wrap;">${countBtns}</div>
+      ${medalNote}
       <div class="quiz-prompt" style="margin-bottom:20px;">Vyber si obtiažnosť:</div>
       <div style="display:flex;flex-direction:row;gap:10px;justify-content:center;flex-wrap:nowrap;">
         <button onclick="startQuiz(1)" style="flex:1;min-width:0;background:linear-gradient(160deg,#f0fdf4,#dcfce7);border:2px solid #86efac;border-radius:18px;padding:16px 8px 14px;cursor:pointer;font-family:inherit;text-align:center;transition:transform .12s,box-shadow .12s;box-shadow:0 3px 10px rgba(74,222,128,.2);" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 20px rgba(74,222,128,.35)'" onmouseout="this.style.transform='';this.style.boxShadow='0 3px 10px rgba(74,222,128,.2)'">
@@ -1701,16 +1714,19 @@ function resetMedalsConfirm(){
       </div>`;
   }
 
+  function setCount(n) { qCountLimit = n; chooseDiff(); }
+
   function startQuiz(d) {
     const pool = d === 0 ? [...QW] : QW.filter(w => w.d === d);
-    qDeck = shuffle(pool).slice(0, 20);
-    qIdx = 0; qScore = 0;
+    const limit = qCountLimit === 0 ? pool.length : Math.min(qCountLimit, pool.length);
+    qDeck = shuffle(pool).slice(0, limit);
+    qIdx = 0; qScore = 0; qAnswered = 0;
     document.getElementById('quiz-card').innerHTML = `
       <div class="quiz-header">
         <span class="quiz-title">✏️ Cvičenie</span>
         <span style="display:flex;align-items:center;gap:10px;">
           <span class="quiz-prog" id="quiz-prog"></span>
-          <button onclick="chooseDiff()" style="background:none;border:2px solid var(--line);border-radius:8px;padding:3px 10px;font-family:inherit;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .12s;white-space:nowrap;" onmouseover="this.style.borderColor='#f87171';this.style.color='#f87171'" onmouseout="this.style.borderColor='var(--line)';this.style.color='var(--muted)'">⬅ Koniec</button>
+          <button onclick="endQuiz()" style="background:none;border:2px solid var(--line);border-radius:8px;padding:3px 10px;font-family:inherit;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .12s;white-space:nowrap;" onmouseover="this.style.borderColor='#f87171';this.style.color='#f87171'" onmouseout="this.style.borderColor='var(--line)';this.style.color='var(--muted)'">⬅ Koniec</button>
         </span>
       </div>
       <div class="quiz-prompt">Doplň správne písmeno:</div>
@@ -1728,7 +1744,8 @@ function resetMedalsConfirm(){
 
   function showQ() {
     const q = qDeck[qIdx];
-    document.getElementById('quiz-prog').textContent = (qIdx + 1) + ' / ' + qDeck.length;
+    const total = qCountLimit === 0 ? '∞' : qDeck.length;
+    document.getElementById('quiz-prog').textContent = (qIdx + 1) + ' / ' + total;
     document.getElementById('quiz-word').innerHTML =
       q.b + '<span class="quiz-gap" id="quiz-gap"> </span>' + q.a;
     const ctxEl = document.getElementById('quiz-ctx');
@@ -1750,6 +1767,7 @@ function resetMedalsConfirm(){
     if (!gap) return;
 
     const hl = q.hl !== undefined ? q.hl : q.b;
+    qAnswered++;
     if (letter === q.ans || (Array.isArray(q.ans) && q.ans.includes(letter))) {
       gap.textContent = letter;
       gap.classList.add('correct');
@@ -1788,17 +1806,34 @@ function resetMedalsConfirm(){
     qIdx >= qDeck.length ? showDone() : showQ();
   }
 
+  function endQuiz() {
+    if (qAnswered === 0) { chooseDiff(); return; }
+    showDone();
+  }
+
   function showDone() {
-    const pct = Math.round(qScore / qDeck.length * 100);
+    const answered = qAnswered;
+    const pct = answered ? Math.round(qScore / answered * 100) : 0;
     const em = pct >= 80 ? '🎉' : pct >= 60 ? '😊' : '💪';
-    const medal = getMedal(pct, qDeck.length);
-    if (medal) { saveMedalIfBetter('iy', medal); addMedalCount('iy', medal); }  // earned/counted but not shown — iy has no visible medal system
+    const medal = getMedal(pct, answered);
+    let medalHtml = '';
+    if (medal) {
+      const isNew = saveMedalIfBetter('iy', medal);
+      addMedalCount('iy', medal);
+      medalHtml = `
+        <img class="medal-img" src="albert_${medal}.jpg" alt="${MEDAL_LABELS[medal]}" style="margin-top:16px;">
+        <div class="medal-name ${medal}">${MEDAL_LABELS[medal]}</div>
+        ${isNew ? '<div class="medal-new">Nový rekord! 🎉</div>' : ''}`;
+    } else if (answered > 0 && answered < 10) {
+      medalHtml = `<div class="done-sub" style="margin-top:14px;">Na získanie medaily vyrieš aspoň 10 slov.</div>`;
+    }
     document.getElementById('quiz-card').innerHTML = `
       <div class="quiz-done">
         <div class="done-emoji">${em}</div>
-        <div class="done-score">${qScore} / ${qDeck.length} správne</div>
+        <div class="done-score">${qScore} / ${answered} správne</div>
         <div class="done-sub">na prvý pokus</div>
-        <button class="quiz-restart" onclick="chooseDiff()">Znova 🔄</button>
+        ${medalHtml}
+        <button class="quiz-restart" onclick="chooseDiff()" style="margin-top:18px;">Znova 🔄</button>
       </div>`;
   }
 

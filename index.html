@@ -363,7 +363,6 @@
     // Medal counts on tiles
     const TC_EMOJI = { bronze:'🥉', silver:'🥈', gold:'🥇' };
     document.querySelectorAll('.tile[data-medal-key]').forEach(tile => {
-      if (tile.dataset.medalKey === 'iy') return;   // iy has no visible medal system
       let c;
       try { c = JSON.parse(localStorage.getItem('medalcount_' + tile.dataset.medalKey) || '{}'); }
       catch (e) { c = {}; }
