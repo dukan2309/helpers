@@ -961,7 +961,7 @@
 <script>
 const MEDAL_LEVELS = ['bronze','silver','gold'];
 const MEDAL_LABELS = { gold:'Zlatá medaila 🥇', silver:'Strieborná medaila 🥈', bronze:'Bronzová medaila 🥉' };
-function getMedal(pct, tries) { if (tries < 10) return null; return pct>=85?'gold':pct>=70?'silver':pct>=55?'bronze':null; }
+function getMedal(pct, tries) { if (tries < 10) return null; return pct>=90?'gold':pct>=70?'silver':pct>=50?'bronze':null; }
 function saveMedalIfBetter(key,level) {
   if (!level) return false;
   const prev = localStorage.getItem('medal_'+key);
@@ -984,7 +984,7 @@ function resetMedalCounts(key) {
 }
 function renderMedalsRow() {
   const c = getMedalCounts(MEDAL_KEY);
-  const req = { bronze:'55 – 69 %', silver:'70 – 84 %', gold:'85 – 100 %' };
+  const req = { bronze:'50 – 69 %', silver:'70 – 89 %', gold:'90 – 100 %' };
   document.getElementById('medals-row').innerHTML = MEDAL_LEVELS.map(lv => {
     const label = MEDAL_LABELS[lv], sp = label.lastIndexOf(' ');
     return `
@@ -1669,10 +1669,7 @@ function resetMedalsConfirm(){
       const active = qCountLimit === n, lbl = n === 0 ? '∞' : n;
       return `<button onclick="setCount(${n})" style="min-width:52px;padding:8px 14px;border-radius:12px;font-family:inherit;font-weight:700;font-size:15px;cursor:pointer;transition:all .12s;border:2px solid ${active?'#7c6cf2':'var(--line)'};background:${active?'linear-gradient(135deg,#7c6cf2,#ff7aa8)':'#fff'};color:${active?'#fff':'var(--muted)'};">${lbl}</button>`;
     }).join('');
-    const belowTen = qCountLimit > 0 && qCountLimit < 10;
-    const medalNote = belowTen
-      ? `<div style="margin-bottom:22px;text-align:center;font-size:13px;font-weight:700;color:#f07d3a;">⚠️ Za menej ako 10 slov nezískaš medailu.</div>`
-      : `<div style="margin-bottom:22px;text-align:center;font-size:13px;color:var(--muted);">🏅 Medailu môžeš získať za 10 a viac slov.</div>`;
+    const medalNote = `<div style="margin-bottom:22px;text-align:center;font-size:13px;color:var(--muted);">🏅 Medailu môžeš získať za 10 a viac slov.</div>`;
     document.getElementById('quiz-card').innerHTML = `
       <div class="quiz-header">
         <span class="quiz-title">✏️ Cvičenie</span>
@@ -1816,7 +1813,7 @@ function resetMedalsConfirm(){
         <div class="medal-name ${medal}">${MEDAL_LABELS[medal]}</div>
         ${isNew ? '<div class="medal-new">Nový rekord! 🎉</div>' : ''}`;
     } else if (answered > 0 && answered < 10) {
-      medalHtml = `<div class="done-sub" style="margin-top:14px;">Na získanie medaily vyrieš aspoň 10 slov.</div>`;
+      medalHtml = `<div class="done-sub" style="margin-top:14px;">🏅 Medailu môžeš získať za 10 a viac slov.</div>`;
     }
     document.getElementById('quiz-card').innerHTML = `
       <div class="quiz-done">
