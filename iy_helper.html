@@ -84,6 +84,8 @@
     header.hero h1 { margin: 0; font-size: 22px; }
     header.hero p { display: none; }
     body { padding-top: 16px; }
+    .quiz-word-display { font-size: 28px; letter-spacing: 2px; }
+    .diff-picker { grid-template-columns: repeat(2, 1fr); }
   }
 
   header.hero { text-align: center; margin-bottom: 36px; }
@@ -418,7 +420,9 @@
     font-size: 38px; font-weight: 700;
     text-align: center; margin-bottom: 10px;
     color: var(--ink); letter-spacing: 3px;
+    overflow-wrap: anywhere;
   }
+  .diff-picker { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
   .quiz-ctx {
     text-align: center;
     font-size: 13px;
@@ -1678,7 +1682,7 @@ function resetMedalsConfirm(){
       <div style="display:flex;gap:8px;justify-content:center;margin-bottom:10px;flex-wrap:wrap;">${countBtns}</div>
       ${medalNote}
       <div class="quiz-prompt" style="margin-bottom:20px;">Vyber si obtiažnosť:</div>
-      <div style="display:flex;flex-direction:row;gap:10px;justify-content:center;flex-wrap:nowrap;">
+      <div class="diff-picker">
         <button onclick="startQuiz(1)" style="flex:1;min-width:0;background:linear-gradient(160deg,#f0fdf4,#dcfce7);border:2px solid #86efac;border-radius:18px;padding:16px 8px 14px;cursor:pointer;font-family:inherit;text-align:center;transition:transform .12s,box-shadow .12s;box-shadow:0 3px 10px rgba(74,222,128,.2);" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 20px rgba(74,222,128,.35)'" onmouseout="this.style.transform='';this.style.boxShadow='0 3px 10px rgba(74,222,128,.2)'">
           <div style="font-size:40px;line-height:1;margin-bottom:8px;">🐣</div>
           <div style="font-weight:700;font-size:15px;color:#166534;margin-bottom:3px;">Ľahké</div>

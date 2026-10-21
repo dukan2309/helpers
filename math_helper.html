@@ -657,9 +657,15 @@ h1 .h1-icon { -webkit-text-fill-color: initial; background: none; -webkit-backgr
 }
 @media (max-width: 600px) {
   .home-btn { position: static; padding: 6px 12px; font-size: 13px; flex-shrink: 0; }
-  .page-header { display: flex; align-items: center; gap: 12px; padding: 12px 16px 0; }
+  .page-header { display: flex; align-items: center; gap: 12px; padding: 12px 60px 0 16px; }
   .page-header h1 { margin: 0; font-size: 20px; }
   body { padding-top: 0; }
+  .card { padding: 20px 16px; }
+  .problem { flex-wrap: wrap; gap: 10px; font-size: 2.4rem; }
+  #answer-input { width: 84px; font-size: 2.1rem; }
+  .bonds-grid { grid-template-columns: 1fr; }
+  .bond-card { min-width: 0; width: 100%; }
+  .bead-num { display: none; }
 }
 /* Medal system */
 .medal-wrap { text-align: center; margin: 16px 0 8px; }
@@ -1414,6 +1420,7 @@ function resetMedalsConfirm(){
 
       // number under every bead
       const tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      tick.setAttribute('class', 'bead-num');
       tick.setAttribute('x', bx);
       tick.setAttribute('y', cy + beadR + 13);
       tick.setAttribute('text-anchor', 'middle');

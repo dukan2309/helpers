@@ -728,6 +728,10 @@
     flex: none; width: 158px;
     font-size: 16px; padding: 6px 8px;
   }
+
+  /* Stack the Slovak translation under the English form instead of a cramped 3rd column */
+  .row.with-sk { grid-template-columns: 90px 1fr; }
+  .row.with-sk .form-sk { grid-column: 2; border-left: none; padding-left: 0; margin-top: 2px; }
 }
   /* Auxiliary verbs section */
   .av-label { font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); margin-bottom:8px; }
